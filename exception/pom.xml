@@ -4,24 +4,20 @@
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.nesscomputing.components</groupId>
-    <artifactId>ness-jersey-parent</artifactId>
-    <version>1.9.2-SNAPSHOT</version>
+    <groupId>com.opentable.components</groupId>
+    <artifactId>otj-jersey-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ness-jersey-exception</artifactId>
-  <name>ness-jersey-exception</name>
+  <artifactId>otj-jersey-exception</artifactId>
+  <name>otj-jersey-exception</name>
   <packaging>jar</packaging>
   <description>Exception handling for Jersey through HttpClient</description>
 
-  <properties>
-    <ness.root.dir>${project.parent.basedir}</ness.root.dir>
-  </properties>
-
   <dependencies>
     <dependency>
-      <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-logging</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-logging</artifactId>
     </dependency>
  
     <dependency>
@@ -43,11 +39,11 @@
     </dependency>
 
     <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-core</artifactId>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.sun.jersey</groupId>
+      <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-client</artifactId>
       <scope>runtime</scope>
     </dependency>

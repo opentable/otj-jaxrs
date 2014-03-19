@@ -4,15 +4,15 @@
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.nesscomputing.components</groupId>
-    <artifactId>ness-jersey-parent</artifactId>
-    <version>1.9.2-SNAPSHOT</version>
+    <groupId>com.opentable.components</groupId>
+    <artifactId>otj-jersey-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ness-jersey-testing</artifactId>
-  <name>ness-jersey-testing</name>
+  <artifactId>otj-jersey-testing</artifactId>
+  <name>otj-jersey-testing</name>
   <packaging>jar</packaging>
-  <description>ness specific jersey glue code</description>
+  <description>OpenTable Jersey testing support</description>
 
   <build>
     <pluginManagement>
@@ -28,32 +28,28 @@
     </pluginManagement>
   </build>
 
-  <properties>
-    <ness.root.dir>${project.parent.basedir}</ness.root.dir>
-  </properties>
-
   <dependencies>
     <dependency>
-      <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-jersey</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-jersey</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-jersey-exception</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-jersey-exception</artifactId>
       <scope>test</scope>
     </dependency>
 
 
     <dependency>
-      <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-config</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-config</artifactId>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-lifecycle</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-lifecycle</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -70,26 +66,14 @@
     </dependency>
 
     <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-core</artifactId>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-common</artifactId>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.sun.jersey</groupId>
+      <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-server</artifactId>
-      <scope>test</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>com.sun.jersey.contribs</groupId>
-      <artifactId>jersey-guice</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.inject.extensions</groupId>
-      <artifactId>guice-servlet</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -129,9 +113,10 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
+    <dependency> <!-- XXX -->
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
+      <version>RELEASE</version>
     </dependency>
 
     <!-- Annotations used in the integration test builder -->

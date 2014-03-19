@@ -4,24 +4,20 @@
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.nesscomputing.components</groupId>
-    <artifactId>ness-jersey-parent</artifactId>
-    <version>1.9.2-SNAPSHOT</version>
+    <groupId>com.opentable.components</groupId>
+    <artifactId>otj-jersey-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ness-jersey</artifactId>
-  <name>ness-jersey</name>
+  <artifactId>otj-jersey</artifactId>
+  <name>otj-jersey</name>
   <packaging>jar</packaging>
-  <description>ness specific jersey glue code</description>
-
-  <properties>
-    <ness.root.dir>${project.parent.basedir}</ness.root.dir>
-  </properties>
+  <description>OpenTable specific jersey glue code</description>
 
   <dependencies>
     <dependency>
-      <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-logging</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-logging</artifactId>
     </dependency>
 
     <dependency>
@@ -30,28 +26,17 @@
     </dependency>
 
     <dependency>
-      <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-config</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-config</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-core</artifactId>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-common</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-servlet</artifactId>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sun.jersey.contribs</groupId>
-      <artifactId>jersey-guice</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
+      <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-server</artifactId>
     </dependency>
 
@@ -113,13 +98,8 @@
     </dependency>
 
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
 
     <dependency>

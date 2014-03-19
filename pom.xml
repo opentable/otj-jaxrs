@@ -4,21 +4,21 @@
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.nesscomputing</groupId>
-    <artifactId>ness-oss-parent</artifactId>
-    <version>29</version>
+    <groupId>com.opentable</groupId>
+    <artifactId>opentable-parent</artifactId>
+    <version>1-SNAPSHOT</version>
   </parent>
 
   <scm>
-    <connection>scm:git:git://github.com/NessComputing/components-ness-jersey.git</connection>
-    <developerConnection>scm:git:git@github.com:NessComputing/components-ness-jersey.git</developerConnection>
-    <url>http://github.com/NessComputing/components-ness-jersey</url>
+    <connection>scm:git:git://github.com/opentable/otj-jersey.git</connection>
+    <developerConnection>scm:git:git@github.com:opentable/otj-jersey.git</developerConnection>
+    <url>http://github.com/opentable/otj-jersey</url>
     <tag>HEAD</tag>
   </scm>
 
-  <groupId>com.nesscomputing.components</groupId>
-  <artifactId>ness-jersey-parent</artifactId>
-  <version>1.9.2-SNAPSHOT</version>
+  <groupId>com.opentable.components</groupId>
+  <artifactId>otj-jersey-parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -28,26 +28,20 @@
   </modules>
 
   <properties>
-    <dep.jersey.version>1.16</dep.jersey.version>
-    <dep.jackson.version>2.2.1</dep.jackson.version>
-    <dep.yammer.version>2.1.2</dep.yammer.version>
+    <dep.jersey.version>2.7</dep.jersey.version>
+    <dep.jackson.version>2.3.2</dep.jackson.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>com.nesscomputing.components</groupId>
-        <artifactId>ness-jersey</artifactId>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-jersey</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.nesscomputing.components</groupId>
-        <artifactId>ness-jersey-exception</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.nesscomputing.components</groupId>
-        <artifactId>ness-jersey-testing</artifactId>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-jersey-exception</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -58,21 +52,21 @@
       </dependency>
 
       <dependency>
-        <groupId>com.nesscomputing.components</groupId>
-        <artifactId>ness-lifecycle</artifactId>
-        <version>1.3.0</version>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-lifecycle</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
-        <groupId>com.nesscomputing.components</groupId>
-        <artifactId>ness-logging</artifactId>
-        <version>1.1.1</version>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-logging</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
-        <groupId>com.nesscomputing.components</groupId>
-        <artifactId>ness-config</artifactId>
-        <version>2.2.0</version>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-config</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
@@ -124,39 +118,21 @@
       </dependency>
 
       <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-core</artifactId>
+        <groupId>org.glassfish.jersey.core</groupId>
+        <artifactId>jersey-common</artifactId>
         <version>${dep.jersey.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>com.sun.jersey</groupId>
+        <groupId>org.glassfish.jersey.core</groupId>
         <artifactId>jersey-client</artifactId>
         <version>${dep.jersey.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-servlet</artifactId>
-        <version>${dep.jersey.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.sun.jersey.contribs</groupId>
-        <artifactId>jersey-guice</artifactId>
-        <version>${dep.jersey.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.sun.jersey</groupId>
+        <groupId>org.glassfish.jersey.core</groupId>
         <artifactId>jersey-server</artifactId>
         <version>${dep.jersey.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.yammer.metrics</groupId>
-        <artifactId>metrics-guice</artifactId>
-        <version>${dep.yammer.version}</version>
       </dependency>
 
       <dependency>
@@ -183,12 +159,6 @@
         <groupId>com.fasterxml.jackson.jaxrs</groupId>
         <artifactId>jackson-jaxrs-json-provider</artifactId>
         <version>${dep.jackson.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.nesscomputing</groupId>
-        <artifactId>ness-syslog4j</artifactId>
-        <version>0.9.47-NESS-7</version>
       </dependency>
 
       <dependency>
