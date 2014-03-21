@@ -19,7 +19,8 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 
-import com.nesscomputing.callback.Callback;
+import com.opentable.callback.Callback;
+
 import com.nesscomputing.jersey.json.JaxRsJsonStreamer.JsonEmitter;
 
 /**

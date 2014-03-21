@@ -5,8 +5,8 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.opentable</groupId>
-    <artifactId>opentable-parent</artifactId>
-    <version>1-SNAPSHOT</version>
+    <artifactId>otj-parent</artifactId>
+    <version>2-SNAPSHOT</version>
   </parent>
 
   <scm>
@@ -30,6 +30,7 @@
   <properties>
     <dep.jersey.version>2.7</dep.jersey.version>
     <dep.jackson.version>2.3.2</dep.jackson.version>
+    <dep.httpclient.version>1.0.0-SNAPSHOT</dep.httpclient.version>
   </properties>
 
   <dependencyManagement>
@@ -46,9 +47,9 @@
       </dependency>
 
       <dependency>
-        <groupId>com.nesscomputing.components</groupId>
-        <artifactId>ness-core</artifactId>
-        <version>1.6.1</version>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-core</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
@@ -70,51 +71,33 @@
       </dependency>
 
       <dependency>
-        <groupId>com.nesscomputing.components</groupId>
-        <artifactId>ness-jdbi</artifactId>
-        <version>1.4.0</version>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-jackson</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
-        <groupId>com.nesscomputing.components</groupId>
-        <artifactId>ness-jmx</artifactId>
-        <version>1.3.0</version>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-httpserver</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
-        <groupId>com.nesscomputing.components</groupId>
-        <artifactId>ness-jackson</artifactId>
-        <version>2.2.5</version>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-integration-testing</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
-        <groupId>com.nesscomputing.components</groupId>
-        <artifactId>ness-httpserver</artifactId>
-        <version>2.3.1</version>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-httpclient</artifactId>
+        <version>${dep.httpclient.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>com.nesscomputing.components</groupId>
-        <artifactId>ness-galaxy</artifactId>
-        <version>1.1.0</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.nesscomputing.components</groupId>
-        <artifactId>ness-integration-testing</artifactId>
-        <version>3.3.0</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.nesscomputing.components</groupId>
-        <artifactId>ness-httpclient</artifactId>
-        <version>2.0.3</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.nesscomputing.components</groupId>
-        <artifactId>ness-httpclient-testing</artifactId>
-        <version>2.0.3</version>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-httpclient-testing</artifactId>
+        <version>${dep.httpclient.version}</version>
       </dependency>
 
       <dependency>
@@ -122,16 +105,19 @@
         <artifactId>jersey-common</artifactId>
         <version>${dep.jersey.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.glassfish.jersey.core</groupId>
         <artifactId>jersey-client</artifactId>
         <version>${dep.jersey.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.glassfish.jersey.core</groupId>
         <artifactId>jersey-server</artifactId>
+        <version>${dep.jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.containers</groupId>
+        <artifactId>jersey-container-jetty-servlet</artifactId>
         <version>${dep.jersey.version}</version>
       </dependency>
 

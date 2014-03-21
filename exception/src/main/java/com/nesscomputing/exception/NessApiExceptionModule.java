@@ -30,7 +30,7 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 
-import com.nesscomputing.httpclient.guice.HttpClientModule;
+import com.opentable.httpclient.guice.HttpClientModule;
 
 /**
  * Add support for mapping NessApiException subclasses to and from HTTP responses.

@@ -26,13 +26,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.nesscomputing.httpclient.HttpClientObserver;
-import com.nesscomputing.httpclient.HttpClientResponse;
-import com.nesscomputing.logging.Log;
+import com.opentable.httpclient.HttpClientObserver;
+import com.opentable.httpclient.HttpClientResponse;
+import com.opentable.logging.Log;
 
 /**
  * Intercept exceptions that have been mapped to <code>x-ness/error</code> responses,

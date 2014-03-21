@@ -21,8 +21,8 @@
     </dependency>
  
     <dependency>
-      <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-httpclient</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-httpclient</artifactId>
     </dependency>
 
     <dependency>
@@ -79,8 +79,8 @@
     </dependency>
 
     <dependency>
-      <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-httpclient-testing</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-httpclient-testing</artifactId>
       <scope>test</scope>
     </dependency>
 

@@ -15,28 +15,39 @@
  */
 package com.nesscomputing.jersey;
 
+import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.easymock.EasyMock;
+import org.glassfish.jersey.server.ContainerRequest;
+import org.glassfish.jersey.server.ContainerResponse;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-
-import com.nesscomputing.jersey.JsonUtf8ResponseFilter;
-import com.sun.jersey.spi.container.ContainerResponse;
 
 public class TestJsonUtf8ResponseFilter
 {
+    ContainerRequest req;
+
+    @Before
+    public void createRequest()
+    {
+        req = EasyMock.createNiceMock(ContainerRequest.class);
+        EasyMock.replay(req);
+    }
+
     @Test
     public void testSimple()
     {
         final JsonUtf8ResponseFilter filter = new JsonUtf8ResponseFilter();
 
-        final ContainerResponse c = new ContainerResponse(null, null, null);
-        c.setResponse(Response.ok().type(MediaType.APPLICATION_JSON_TYPE).build());
+        final ContainerResponseContext c = new ContainerResponse(req,
+                Response.ok().type(MediaType.APPLICATION_JSON_TYPE).build());
 
-        final ContainerResponse r2 = filter.filter(null, c);
+        filter.filter(null, c);
 
-        Assert.assertEquals(JsonUtf8ResponseFilter.APPLICATION_JSON_UTF8_TYPE, r2.getMediaType());
+        Assert.assertEquals(JsonUtf8ResponseFilter.APPLICATION_JSON_UTF8_TYPE, c.getMediaType());
     }
 
     @Test
@@ -44,12 +55,12 @@ public class TestJsonUtf8ResponseFilter
     {
         final JsonUtf8ResponseFilter filter = new JsonUtf8ResponseFilter();
 
-        final ContainerResponse c = new ContainerResponse(null, null, null);
-        c.setResponse(Response.ok().type(MediaType.APPLICATION_XML_TYPE).build());
+        final ContainerResponseContext c = new ContainerResponse(req,
+                Response.ok().type(MediaType.APPLICATION_XML_TYPE).build());
 
-        final ContainerResponse r2 = filter.filter(null, c);
+        filter.filter(null, c);
 
-        Assert.assertEquals(MediaType.APPLICATION_XML_TYPE, r2.getMediaType());
+        Assert.assertEquals(MediaType.APPLICATION_XML_TYPE, c.getMediaType());
     }
 
     @Test
@@ -57,12 +68,12 @@ public class TestJsonUtf8ResponseFilter
     {
         final JsonUtf8ResponseFilter filter = new JsonUtf8ResponseFilter();
 
-        final ContainerResponse c = new ContainerResponse(null, null, null);
-        c.setResponse(Response.ok().type(JsonUtf8ResponseFilter.APPLICATION_JSON_UTF8_TYPE).build());
+        final ContainerResponseContext c = new ContainerResponse(req,
+                Response.ok().type(JsonUtf8ResponseFilter.APPLICATION_JSON_UTF8_TYPE).build());
 
-        final ContainerResponse r2 = filter.filter(null, c);
+        filter.filter(null, c);
 
-        Assert.assertEquals(JsonUtf8ResponseFilter.APPLICATION_JSON_UTF8_TYPE, r2.getMediaType());
+        Assert.assertEquals(JsonUtf8ResponseFilter.APPLICATION_JSON_UTF8_TYPE, c.getMediaType());
     }
 
     @Test
@@ -70,12 +81,11 @@ public class TestJsonUtf8ResponseFilter
     {
         final JsonUtf8ResponseFilter filter = new JsonUtf8ResponseFilter();
 
-        final ContainerResponse c = new ContainerResponse(null, null, null);
-        c.setResponse(Response.ok().build());
+        final ContainerResponseContext c = new ContainerResponse(req, Response.ok().build());
 
-        final ContainerResponse r2 = filter.filter(null, c);
+        filter.filter(null, c);
 
-        Assert.assertNull(r2.getMediaType());
+        Assert.assertNull(c.getMediaType());
     }
 
     @Test
@@ -83,12 +93,12 @@ public class TestJsonUtf8ResponseFilter
     {
         final JsonUtf8ResponseFilter filter = new JsonUtf8ResponseFilter();
 
-        final ContainerResponse c = new ContainerResponse(null, null, null);
-        c.setResponse(Response.ok().type(new MediaType("*", "json")).build());
+        final ContainerResponse c = new ContainerResponse(req,
+                Response.ok().type(new MediaType("*", "json")).build());
 
-        final ContainerResponse r2 = filter.filter(null, c);
+        filter.filter(null, c);
 
-        Assert.assertEquals(JsonUtf8ResponseFilter.APPLICATION_JSON_UTF8_TYPE, r2.getMediaType());
+        Assert.assertEquals(JsonUtf8ResponseFilter.APPLICATION_JSON_UTF8_TYPE, c.getMediaType());
     }
 
     @Test
@@ -96,12 +106,12 @@ public class TestJsonUtf8ResponseFilter
     {
         final JsonUtf8ResponseFilter filter = new JsonUtf8ResponseFilter();
 
-        final ContainerResponse c = new ContainerResponse(null, null, null);
-        c.setResponse(Response.ok().type(new MediaType("text", "json")).build());
+        final ContainerResponse c = new ContainerResponse(req,
+                Response.ok().type(new MediaType("text", "json")).build());
 
-        final ContainerResponse r2 = filter.filter(null, c);
+        filter.filter(null, c);
 
-        Assert.assertEquals(JsonUtf8ResponseFilter.APPLICATION_JSON_UTF8_TYPE, r2.getMediaType());
+        Assert.assertEquals(JsonUtf8ResponseFilter.APPLICATION_JSON_UTF8_TYPE, c.getMediaType());
     }
 
     @Test
@@ -109,11 +119,11 @@ public class TestJsonUtf8ResponseFilter
     {
         final JsonUtf8ResponseFilter filter = new JsonUtf8ResponseFilter();
 
-        final ContainerResponse c = new ContainerResponse(null, null, null);
-        c.setResponse(Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build());
+        final ContainerResponse c = new ContainerResponse(req,
+                Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build());
 
-        final ContainerResponse r2 = filter.filter(null, c);
+        filter.filter(null, c);
 
-        Assert.assertEquals(MediaType.TEXT_PLAIN_TYPE, r2.getMediaType());
+        Assert.assertEquals(MediaType.TEXT_PLAIN_TYPE, c.getMediaType());
     }
 }

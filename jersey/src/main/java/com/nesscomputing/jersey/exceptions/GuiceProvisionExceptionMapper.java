@@ -27,11 +27,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.log4j.MDC;
-
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
@@ -42,8 +37,14 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.ProvisionException;
 import com.google.inject.spi.Message;
-import com.nesscomputing.logging.Log;
-import com.sun.jersey.core.reflection.ReflectionHelper;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.glassfish.jersey.internal.util.ReflectionHelper;
+import org.glassfish.jersey.internal.util.collection.ClassTypePair;
+import org.slf4j.MDC;
+
+import com.opentable.logging.Log;
 
 @Provider
 public class GuiceProvisionExceptionMapper implements ExceptionMapper<ProvisionException>
@@ -112,7 +113,7 @@ public class GuiceProvisionExceptionMapper implements ExceptionMapper<ProvisionE
 
         final Map<String, String> response = ImmutableMap.of("code", Status.INTERNAL_SERVER_ERROR.toString(),
              // XXX: this feels a tad like it violates encapsulation, but any other solution drags in tc-tracking as a dependency.
-                                                             "trace", ObjectUtils.toString(MDC.get("track")),
+                                                             "track", Objects.firstNonNull(MDC.get("track"), ""),
                                                              "message", ((cause != null) ? Objects.firstNonNull(cause.getMessage(), "unknown") : "unknown"));
 
         return Response.status(Status.INTERNAL_SERVER_ERROR)
@@ -197,9 +198,9 @@ public class GuiceProvisionExceptionMapper implements ExceptionMapper<ProvisionE
             return (Class<?>)t;
         }
         else if (t instanceof TypeVariable) {
-            ReflectionHelper.ClassTypePair ct = ReflectionHelper.resolveTypeVariable(c, dc, (TypeVariable<?>)t);
+            ClassTypePair ct = ReflectionHelper.resolveTypeVariable(c, dc, (TypeVariable<?>)t);
             if (ct != null) {
-                return ct.c;
+                return ct.rawClass();
             }
             else {
                 return null;

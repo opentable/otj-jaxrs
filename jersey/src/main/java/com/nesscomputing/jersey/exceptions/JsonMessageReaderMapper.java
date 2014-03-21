@@ -26,16 +26,16 @@ import javax.ws.rs.ext.Provider;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.jaxrs.base.ProviderBase;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.log4j.MDC;
+import org.slf4j.MDC;
 
 @Provider
-public class JsonMessageReaderMapper extends NessJerseyExceptionMapper<JsonParseException> {
-
+public class JsonMessageReaderMapper extends OpenTableTableJerseyExceptionMapper<JsonParseException>
+{
     private static final Set<String> CLASS_NAMES = ImmutableSet.of(JacksonJsonProvider.class.getName(), ProviderBase.class.getName());
 
     @Inject
@@ -49,8 +49,8 @@ public class JsonMessageReaderMapper extends NessJerseyExceptionMapper<JsonParse
             if (CLASS_NAMES.contains(e.getClassName())) {
                 final Map<String, String> response = ImmutableMap.of(
                         "code", "400",
-                        "trace", ObjectUtils.toString(MDC.get("track")),
-                        "message", ObjectUtils.toString(exception.getMessage(), "(no message)"));
+                        "track", Objects.firstNonNull(MDC.get("track"), ""),
+                        "message", Objects.firstNonNull(exception.getMessage(), "(no message)"));
 
                 return Response.status(400)
                         .entity(response)

@@ -16,6 +16,11 @@
 package com.nesscomputing.jersey.types;
 
 import static org.junit.Assert.assertEquals;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -28,28 +33,26 @@ import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.servlet.GuiceFilter;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kitei.testing.lessio.AllowDNSResolution;
+import org.kitei.testing.lessio.AllowNetworkAccess;
 
-import com.nesscomputing.config.Config;
-import com.nesscomputing.httpclient.HttpClient;
-import com.nesscomputing.httpclient.response.StringContentConverter;
+import com.opentable.config.Config;
+import com.opentable.httpclient.HttpClient;
+import com.opentable.httpclient.response.StringContentConverter;
+import com.opentable.lifecycle.junit.LifecycleRule;
+import com.opentable.lifecycle.junit.LifecycleRunner;
+import com.opentable.lifecycle.junit.LifecycleStatement;
+import com.opentable.testing.IntegrationTestRule;
+import com.opentable.testing.IntegrationTestRuleBuilder;
+import com.opentable.testing.tweaked.TweakedModule;
+
 import com.nesscomputing.jersey.ServerBaseModule;
-import com.nesscomputing.jersey.types.DateParam;
-import com.nesscomputing.lifecycle.junit.LifecycleRule;
-import com.nesscomputing.lifecycle.junit.LifecycleRunner;
-import com.nesscomputing.lifecycle.junit.LifecycleStatement;
-import com.nesscomputing.testing.IntegrationTestRule;
-import com.nesscomputing.testing.IntegrationTestRuleBuilder;
-import com.nesscomputing.testing.lessio.AllowDNSResolution;
-import com.nesscomputing.testing.lessio.AllowNetworkAccess;
-import com.nesscomputing.testing.tweaked.TweakedModule;
 
 @AllowNetworkAccess(endpoints= {"127.0.0.1:*"})
 @AllowDNSResolution
@@ -70,7 +73,7 @@ public class DateParamTest
         .build(this);
 
     @Inject
-    private HttpClient httpClient = null;
+    private final HttpClient httpClient = null;
 
     private GuiceFilter guiceFilter = null;
 
@@ -91,30 +94,30 @@ public class DateParamTest
     @Test
     public void testDateLong() throws Exception
     {
-        DateTime when = new DateTime(1000);
-        assertEquals(when.getMillis(),
+        Instant when = Instant.ofEpochMilli(1000);
+        assertEquals(when.toEpochMilli(),
                 Long.parseLong(httpClient.get(
-                        uriBuilder.queryParam("date", when.getMillis()).build(),
+                        uriBuilder.queryParam("date", when.toEpochMilli()).build(),
                         StringContentConverter.DEFAULT_RESPONSE_HANDLER).perform()));
     }
 
     @Test
     public void testDateString() throws Exception
     {
-        DateTime when = new DateTime(1000);
-        assertEquals(when.getMillis(),
+        Instant when = Instant.ofEpochMilli(1000);
+        assertEquals(when.toEpochMilli(),
                 Long.parseLong(httpClient.get(
-                        uriBuilder.queryParam("date", when.toString()).build(),
+                        uriBuilder.queryParam("date", DateTimeFormatter.ISO_DATE_TIME.format(when)).build(),
                         StringContentConverter.DEFAULT_RESPONSE_HANDLER).perform()));
     }
 
     @Test
     public void testDateTZString() throws Exception
     {
-        DateTime when = new DateTime(1000);
-        assertEquals(when.getMillis(),
+        Instant when = Instant.ofEpochMilli(1000);
+        assertEquals(when.toEpochMilli(),
                 Long.parseLong(httpClient.get(
-                        uriBuilder.queryParam("date", when.withZone(DateTimeZone.forID("America/Los_Angeles")).toString()).build(),
+                        uriBuilder.queryParam("date", when.atZone(ZoneId.of("America/Los_Angeles")).toString()).build(),
                         StringContentConverter.DEFAULT_RESPONSE_HANDLER).perform()));
     }
 
@@ -129,10 +132,10 @@ public class DateParamTest
     @Test
     public void testNegativeDate() throws Exception
     {
-        DateTime when = new DateTime(-1000);
-        assertEquals(when.getMillis(),
+        Instant when = Instant.ofEpochMilli(-1000);
+        assertEquals(when.toEpochMilli(),
                 Long.parseLong(httpClient.get(
-                        uriBuilder.queryParam("date", when.getMillis()).build(),
+                        uriBuilder.queryParam("date", when.toEpochMilli()).build(),
                         StringContentConverter.DEFAULT_RESPONSE_HANDLER).perform()));
     }
 
@@ -161,7 +164,7 @@ public class DateParamTest
             if (DateParam.getDateTime(dateTime) == null) {
                 return "asdf";
             }
-            return Long.toString(DateParam.getDateTime(dateTime).getMillis());
+            return Long.toString(DateParam.getDateTime(dateTime).toInstant().toEpochMilli());
         }
     }
 }

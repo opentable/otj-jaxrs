@@ -35,10 +35,10 @@ import com.google.inject.name.Named;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.nesscomputing.httpclient.HttpClient;
-import com.nesscomputing.httpclient.internal.HttpClientMethod;
-import com.nesscomputing.httpclient.response.Valid2xxContentConverter;
-import com.nesscomputing.httpclient.testing.TestingHttpClientBuilder;
+import com.opentable.httpclient.HttpClient;
+import com.opentable.httpclient.internal.HttpClientMethod;
+import com.opentable.httpclient.response.Valid2xxContentConverter;
+import com.opentable.httpclient.testing.TestingHttpClientBuilder;
 
 public class TestNessApiExceptionMapping
 {

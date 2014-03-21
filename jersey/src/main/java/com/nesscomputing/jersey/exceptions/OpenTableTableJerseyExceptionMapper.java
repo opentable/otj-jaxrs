@@ -22,10 +22,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.log4j.MDC;
-
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
+
+import org.apache.commons.lang3.ObjectUtils;
+import org.slf4j.MDC;
 
 /**
  * A generic base class to map an exception to a Ness response. This must be implemented by a concrete
@@ -42,11 +43,11 @@ import com.google.common.collect.ImmutableMap;
    }
    </pre>
  */
-public abstract class NessJerseyExceptionMapper<U extends Throwable> implements ExceptionMapper<U>
+public abstract class OpenTableTableJerseyExceptionMapper<U extends Throwable> implements ExceptionMapper<U>
 {
     private final Status statusCode;
 
-    protected NessJerseyExceptionMapper(final Status statusCode)
+    protected OpenTableTableJerseyExceptionMapper(final Status statusCode)
     {
         this.statusCode = statusCode;
     }
@@ -55,8 +56,8 @@ public abstract class NessJerseyExceptionMapper<U extends Throwable> implements 
     public Response toResponse(final U exception)
     {
         final Map<String, String> response = ImmutableMap.of("code", statusCode.toString(),
-                                                             "trace", ObjectUtils.toString(MDC.get("track")),
-                                                             "message", ObjectUtils.toString(exception.getMessage(), "(no message)"));
+                                                             "trace", Objects.firstNonNull(MDC.get("track"), ""),
+                                                             "message", ObjectUtils.firstNonNull(exception.getMessage(), "(no message)"));
 
         return Response.status(statusCode)
         .entity(response)

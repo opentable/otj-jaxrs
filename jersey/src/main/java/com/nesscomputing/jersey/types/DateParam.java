@@ -17,11 +17,11 @@ package com.nesscomputing.jersey.types;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.regex.Pattern;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 /**
  * Simple Jersey date parameter class.  Accepts either milliseconds since epoch UTC or ISO formatted dates.
@@ -29,15 +29,17 @@ import org.joda.time.DateTimeZone;
  */
 public class DateParam
 {
+    private static final ZoneId UTC_ID = ZoneId.of("UTC");
     private static final Pattern NUMBER_PATTERN = Pattern.compile("-?\\d+");
-    private final DateTime dateTime;
 
-    DateParam(DateTime dateTime)
+    private final ZonedDateTime dateTime;
+
+    DateParam(ZonedDateTime dateTime)
     {
-        this.dateTime = checkNotNull(dateTime, "null datetime").withZone(DateTimeZone.UTC);
+        this.dateTime = checkNotNull(dateTime, "null datetime").withZoneSameInstant(UTC_ID);
     }
 
-    public static DateParam valueOf(DateTime dateTime)
+    public static DateParam valueOf(ZonedDateTime dateTime)
     {
         return new DateParam(dateTime);
     }
@@ -49,9 +51,9 @@ public class DateParam
         }
 
         if (NUMBER_PATTERN.matcher(string).matches()) {
-            return new DateParam(new DateTime(Long.parseLong(string), DateTimeZone.UTC));
+            return new DateParam(ZonedDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(string)), UTC_ID));
         } else {
-            return new DateParam(new DateTime(string, DateTimeZone.UTC));
+            return new DateParam(ZonedDateTime.parse(string));
         }
     }
 
@@ -59,7 +61,7 @@ public class DateParam
      * @return a DateTime if the parameter was provided, or null otherwise.
      */
     // This method is static so that you can handle optional parameters as null instances.
-    public static DateTime getDateTime(DateParam param)
+    public static ZonedDateTime getDateTime(DateParam param)
     {
         return param == null ? null : param.dateTime;
     }

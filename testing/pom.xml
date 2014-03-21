@@ -54,14 +54,14 @@
     </dependency>
 
     <dependency>
-      <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-jackson</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-jackson</artifactId>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-httpserver</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-httpserver</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -96,33 +96,27 @@
     </dependency>
 
     <dependency>
-      <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-integration-testing</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-integration-testing</artifactId>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-httpclient</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-httpclient</artifactId>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.nesscomputing.components</groupId>
-      <artifactId>ness-httpclient-testing</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-httpclient-testing</artifactId>
       <scope>test</scope>
-    </dependency>
-
-    <dependency> <!-- XXX -->
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-      <version>RELEASE</version>
     </dependency>
 
     <!-- Annotations used in the integration test builder -->
     <dependency>
-      <groupId>com.nesscomputing.testing</groupId>
-      <artifactId>kawala-lessio</artifactId>
+      <groupId>org.kitei.testing</groupId>
+      <artifactId>kitei-lessio</artifactId>
       <scope>test</scope>
     </dependency>
 

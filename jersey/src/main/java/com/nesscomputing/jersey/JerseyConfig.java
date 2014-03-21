@@ -44,17 +44,6 @@ public abstract class JerseyConfig
         return true;
     }
 
-    /**
-     * Enables gzip. This is usually false, so that the container
-     * can handle that.
-     */
-    @Config("ness.jersey.gzip.enabled")
-    @Default("false")
-    public boolean isGzipEnabled()
-    {
-        return false;
-    }
-
     @Config("ness.jersey.logging.enabled")
     @Default("false")
     public boolean isLoggingEnabled()

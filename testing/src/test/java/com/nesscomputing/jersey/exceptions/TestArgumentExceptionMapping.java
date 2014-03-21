@@ -17,6 +17,7 @@ package com.nesscomputing.jersey.exceptions;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.net.URI;
 
 import javax.ws.rs.Consumes;
@@ -37,22 +38,23 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kitei.testing.lessio.AllowDNSResolution;
+import org.kitei.testing.lessio.AllowNetworkAccess;
 
-import com.nesscomputing.config.Config;
-import com.nesscomputing.httpclient.HttpClient;
-import com.nesscomputing.httpclient.HttpClientResponse;
-import com.nesscomputing.httpclient.response.StringContentConverter;
-import com.nesscomputing.httpclient.testing.CapturingHttpResponseHandler;
-import com.nesscomputing.httpserver.HttpServer;
+import com.opentable.config.Config;
+import com.opentable.httpclient.HttpClient;
+import com.opentable.httpclient.HttpClientResponse;
+import com.opentable.httpclient.response.StringContentConverter;
+import com.opentable.httpclient.testing.CapturingHttpResponseHandler;
+import com.opentable.httpserver.HttpServer;
+import com.opentable.lifecycle.junit.LifecycleRule;
+import com.opentable.lifecycle.junit.LifecycleRunner;
+import com.opentable.lifecycle.junit.LifecycleStatement;
+import com.opentable.testing.IntegrationTestRule;
+import com.opentable.testing.IntegrationTestRuleBuilder;
+import com.opentable.testing.tweaked.TweakedModule;
+
 import com.nesscomputing.jersey.ServerBaseModule;
-import com.nesscomputing.lifecycle.junit.LifecycleRule;
-import com.nesscomputing.lifecycle.junit.LifecycleRunner;
-import com.nesscomputing.lifecycle.junit.LifecycleStatement;
-import com.nesscomputing.testing.IntegrationTestRule;
-import com.nesscomputing.testing.IntegrationTestRuleBuilder;
-import com.nesscomputing.testing.lessio.AllowDNSResolution;
-import com.nesscomputing.testing.lessio.AllowNetworkAccess;
-import com.nesscomputing.testing.tweaked.TweakedModule;
 
 @AllowNetworkAccess(endpoints= {"127.0.0.1:*"})
 @AllowDNSResolution
@@ -81,7 +83,7 @@ public class TestArgumentExceptionMapping
     private GuiceFilter guiceFilter = null;
 
     @Before
-    public void setUp()
+    public void setUp() throws IOException
     {
         guiceFilter = test.exposeBinding("http", Key.get(GuiceFilter.class));
         final HttpServer server = test.exposeBinding("http", Key.get(HttpServer.class));

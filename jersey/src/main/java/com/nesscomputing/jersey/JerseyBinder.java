@@ -15,16 +15,16 @@
  */
 package com.nesscomputing.jersey;
 
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseFilter;
+
 import com.google.inject.Binder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ResourceFilterFactory;
 
-public final class NessJerseyBinder
+public final class JerseyBinder
 {
-    private NessJerseyBinder()
+    private JerseyBinder()
     {
     }
 
@@ -36,10 +36,5 @@ public final class NessJerseyBinder
     public static LinkedBindingBuilder<ContainerResponseFilter> bindResponseFilter(final Binder binder)
     {
         return Multibinder.newSetBinder(binder, ContainerResponseFilter.class).addBinding();
-    }
-
-    public static LinkedBindingBuilder<ResourceFilterFactory> bindResourceFilterFactory(final Binder binder)
-    {
-        return Multibinder.newSetBinder(binder, ResourceFilterFactory.class).addBinding();
     }
 }

@@ -29,10 +29,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 
-import com.nesscomputing.callback.Callback;
-import com.nesscomputing.logging.Log;
-
 import org.apache.commons.lang3.time.StopWatch;
+
+import com.opentable.callback.Callback;
+import com.opentable.logging.Log;
 
 /**
  * A configurable JAX-RS Json output streamer.  Allows customization of the header, footer, and how

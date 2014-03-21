@@ -35,17 +35,19 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.nesscomputing.config.Config;
-import com.nesscomputing.httpclient.HttpClient;
-import com.nesscomputing.httpclient.guice.HttpClientModule;
-import com.nesscomputing.httpclient.response.HttpResponseException;
-import com.nesscomputing.httpclient.response.Valid2xxContentConverter;
-import com.nesscomputing.jersey.NessJerseyServletModule;
-import com.nesscomputing.lifecycle.junit.LifecycleRunner;
-import com.nesscomputing.lifecycle.junit.LifecycleStatement;
-import com.nesscomputing.testing.IntegrationTestRule;
-import com.nesscomputing.testing.IntegrationTestRuleBuilder;
-import com.nesscomputing.testing.tweaked.TweakedModule;
+import com.opentable.config.Config;
+import com.opentable.httpclient.HttpClient;
+import com.opentable.httpclient.guice.HttpClientModule;
+import com.opentable.httpclient.response.HttpResponseException;
+import com.opentable.httpclient.response.Valid2xxContentConverter;
+import com.opentable.jackson.OpenTableJacksonModule;
+import com.opentable.lifecycle.junit.LifecycleRunner;
+import com.opentable.lifecycle.junit.LifecycleStatement;
+import com.opentable.testing.IntegrationTestRule;
+import com.opentable.testing.IntegrationTestRuleBuilder;
+import com.opentable.testing.tweaked.TweakedModule;
+
+import com.nesscomputing.jersey.OpenTableJerseyServletModule;
 
 @RunWith(LifecycleRunner.class)
 public class TestExceptionMappingBinding
@@ -61,7 +63,8 @@ public class TestExceptionMappingBinding
             @Override
             protected void configure()
             {
-                install (new NessJerseyServletModule(EMPTY_CONFIG));
+                install (new OpenTableJerseyServletModule(EMPTY_CONFIG));
+                install (new OpenTableJacksonModule());
                 install (new NessApiExceptionModule("boom"));
                 NessApiExceptionBinder.of(binder(), "boom").registerExceptionClass(BoomException.class);
                 bind (BoomResource.class);

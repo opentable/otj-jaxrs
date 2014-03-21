@@ -15,33 +15,31 @@
  */
 package com.nesscomputing.jersey;
 
-
 import java.util.Collections;
+import java.util.List;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
 
 /**
  * Enforces charset=utf8 on our json responses. Strictly spoken this is not necessary because application/json is inherently UTF-8 according to the
  * RFC, but it seems that there are client libraries out there that do not know that. So let's be sure.
- *
  */
 public class JsonUtf8ResponseFilter implements ContainerResponseFilter
 {
     public static final MediaType APPLICATION_JSON_UTF8_TYPE = new MediaType("application", "json", Collections.singletonMap("charset", "utf-8"));
     public static final MediaType TEXT_JSON = new MediaType("text", "json");
 
+    private static final List<Object> CONTENT_TYPE_HEADERS = Collections.<Object>singletonList(APPLICATION_JSON_UTF8_TYPE.toString());
+
     @Override
-    public ContainerResponse filter(ContainerRequest request, ContainerResponse response)
+    public void filter(ContainerRequestContext request, ContainerResponseContext response)
     {
         if (MediaType.APPLICATION_JSON_TYPE.isCompatible(response.getMediaType()) || TEXT_JSON.isCompatible(response.getMediaType())) {
-            response.setResponse(Response.fromResponse(response.getResponse()).type(APPLICATION_JSON_UTF8_TYPE).build());
+            response.getHeaders().put(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_HEADERS);
         }
-
-        return response;
     }
 }
