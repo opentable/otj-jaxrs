@@ -48,7 +48,7 @@ import com.opentable.httpclient.response.StringContentConverter;
 import com.opentable.httpclient.testing.CapturingHttpResponseHandler;
 import com.opentable.httpserver.HttpServer;
 import com.opentable.jaxrs.ServerBaseModule;
-import com.opentable.jaxrs.exceptions.NessJaxRsExceptionMapperModule;
+import com.opentable.jaxrs.exceptions.OpenTableJaxRsExceptionMapperModule;
 import com.opentable.lifecycle.junit.LifecycleRule;
 import com.opentable.lifecycle.junit.LifecycleRunner;
 import com.opentable.lifecycle.junit.LifecycleStatement;
@@ -77,7 +77,7 @@ public class TestArgumentExceptionMapping
     @Rule
     public IntegrationTestRule test = IntegrationTestRuleBuilder.defaultBuilder()
         .addService("http", TweakedModule.forServiceModule(badResourceModule))
-        .addTestCaseModules(NessJaxRsExceptionMapperModule.class, lifecycleRule.getLifecycleModule(), badResourceModule)
+        .addTestCaseModules(OpenTableJaxRsExceptionMapperModule.class, lifecycleRule.getLifecycleModule(), badResourceModule)
         .build(this);
 
     private GuiceFilter guiceFilter = null;

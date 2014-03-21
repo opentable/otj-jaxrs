@@ -15,10 +15,9 @@
  */
 package com.opentable.jaxrs.exceptions;
 
-
 import com.google.inject.AbstractModule;
 
-public class NessJaxRsExceptionMapperModule extends AbstractModule
+public class OpenTableJaxRsExceptionMapperModule extends AbstractModule
 {
     @Override
     public void configure()

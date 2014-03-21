@@ -32,7 +32,7 @@ import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
 
 import com.opentable.config.Config;
 import com.opentable.httpserver.HttpServerHandlerBinder;
-import com.opentable.jaxrs.exceptions.NessJaxRsExceptionMapperModule;
+import com.opentable.jaxrs.exceptions.OpenTableJaxRsExceptionMapperModule;
 
 public class OpenTableJaxRsServletModule extends ServletModule
 {
@@ -59,7 +59,7 @@ public class OpenTableJaxRsServletModule extends ServletModule
     @Override
     protected void configureServlets()
     {
-        install (new NessJaxRsExceptionMapperModule());
+        install (new OpenTableJaxRsExceptionMapperModule());
 
         JaxRsBinder.bindResponseFilter(binder()).to(JsonUtf8ResponseFilter.class);
 
