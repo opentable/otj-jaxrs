@@ -5,14 +5,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.opentable.components</groupId>
-    <artifactId>otj-jersey-parent</artifactId>
+    <artifactId>otj-jaxrs-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>otj-jersey-testing</artifactId>
-  <name>otj-jersey-testing</name>
+  <artifactId>otj-jaxrs-testing</artifactId>
+  <name>otj-jaxrs-testing</name>
   <packaging>jar</packaging>
-  <description>OpenTable Jersey testing support</description>
+  <description>OpenTable jaxrs testing support</description>
 
   <build>
     <pluginManagement>
@@ -31,12 +31,12 @@
   <dependencies>
     <dependency>
       <groupId>com.opentable.components</groupId>
-      <artifactId>otj-jersey</artifactId>
+      <artifactId>otj-jaxrs</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.opentable.components</groupId>
-      <artifactId>otj-jersey-exception</artifactId>
+      <artifactId>otj-jaxrs-exception</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -79,6 +79,11 @@
     <dependency>
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.inject.extensions</groupId>
+      <artifactId>guice-servlet</artifactId>
       <scope>test</scope>
     </dependency>
 

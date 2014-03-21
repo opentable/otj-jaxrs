@@ -10,19 +10,19 @@
   </parent>
 
   <scm>
-    <connection>scm:git:git://github.com/opentable/otj-jersey.git</connection>
-    <developerConnection>scm:git:git@github.com:opentable/otj-jersey.git</developerConnection>
-    <url>http://github.com/opentable/otj-jersey</url>
+    <connection>scm:git:git://github.com/opentable/otj-jaxrs.git</connection>
+    <developerConnection>scm:git:git@github.com:opentable/otj-jaxrs.git</developerConnection>
+    <url>http://github.com/opentable/otj-jaxrs</url>
     <tag>HEAD</tag>
   </scm>
 
   <groupId>com.opentable.components</groupId>
-  <artifactId>otj-jersey-parent</artifactId>
+  <artifactId>otj-jaxrs-parent</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
-    <module>jersey</module>
+    <module>jaxrs</module>
     <module>exception</module>
     <module>testing</module>
   </modules>
@@ -37,12 +37,12 @@
     <dependencies>
       <dependency>
         <groupId>com.opentable.components</groupId>
-        <artifactId>otj-jersey</artifactId>
+        <artifactId>otj-jaxrs</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.opentable.components</groupId>
-        <artifactId>otj-jersey-exception</artifactId>
+        <artifactId>otj-jaxrs-exception</artifactId>
         <version>${project.version}</version>
       </dependency>
 

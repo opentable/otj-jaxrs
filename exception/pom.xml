@@ -5,19 +5,19 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.opentable.components</groupId>
-    <artifactId>otj-jersey-parent</artifactId>
+    <artifactId>otj-jaxrs-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>otj-jersey-exception</artifactId>
-  <name>otj-jersey-exception</name>
+  <artifactId>otj-jaxrs-exception</artifactId>
+  <name>otj-jaxrs-exception</name>
   <packaging>jar</packaging>
-  <description>Exception handling for Jersey through HttpClient</description>
+  <description>Exception handling for JAX-RS through HttpClient</description>
 
   <dependencies>
     <dependency>
       <groupId>com.opentable.components</groupId>
-      <artifactId>otj-jersey</artifactId>
+      <artifactId>otj-jaxrs</artifactId>
       <scope>runtime</scope>
     </dependency>
 
