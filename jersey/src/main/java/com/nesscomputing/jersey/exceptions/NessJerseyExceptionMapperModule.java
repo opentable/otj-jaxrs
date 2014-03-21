@@ -24,7 +24,6 @@ public class NessJerseyExceptionMapperModule extends AbstractModule
     public void configure()
     {
         bind(JsonMessageReaderMapper.class).asEagerSingleton();
-        bind(GuiceProvisionExceptionMapper.class).asEagerSingleton();
         bind(ExcessivelySizedHttpBodyExceptionMapper.class).asEagerSingleton();
     }
 }

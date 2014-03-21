@@ -15,26 +15,33 @@
  */
 package com.nesscomputing.jersey;
 
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.easymock.EasyMock;
-import org.glassfish.jersey.server.ContainerRequest;
-import org.glassfish.jersey.server.ContainerResponse;
+import org.jboss.resteasy.core.interception.ContainerResponseContextImpl;
+import org.jboss.resteasy.specimpl.BuiltResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestJsonUtf8ResponseFilter
 {
-    ContainerRequest req;
+    ContainerRequestContext req;
 
     @Before
     public void createRequest()
     {
-        req = EasyMock.createNiceMock(ContainerRequest.class);
+        req = EasyMock.createNiceMock(ContainerRequestContext.class);
         EasyMock.replay(req);
+    }
+
+    private ContainerResponseContext response(ResponseBuilder built)
+    {
+        return new ContainerResponseContextImpl(null, null, (BuiltResponse)built.build());
     }
 
     @Test
@@ -42,8 +49,7 @@ public class TestJsonUtf8ResponseFilter
     {
         final JsonUtf8ResponseFilter filter = new JsonUtf8ResponseFilter();
 
-        final ContainerResponseContext c = new ContainerResponse(req,
-                Response.ok().type(MediaType.APPLICATION_JSON_TYPE).build());
+        final ContainerResponseContext c = response(Response.ok().type(MediaType.APPLICATION_JSON_TYPE));
 
         filter.filter(null, c);
 
@@ -55,8 +61,7 @@ public class TestJsonUtf8ResponseFilter
     {
         final JsonUtf8ResponseFilter filter = new JsonUtf8ResponseFilter();
 
-        final ContainerResponseContext c = new ContainerResponse(req,
-                Response.ok().type(MediaType.APPLICATION_XML_TYPE).build());
+        final ContainerResponseContext c = response(Response.ok().type(MediaType.APPLICATION_XML_TYPE));
 
         filter.filter(null, c);
 
@@ -68,8 +73,7 @@ public class TestJsonUtf8ResponseFilter
     {
         final JsonUtf8ResponseFilter filter = new JsonUtf8ResponseFilter();
 
-        final ContainerResponseContext c = new ContainerResponse(req,
-                Response.ok().type(JsonUtf8ResponseFilter.APPLICATION_JSON_UTF8_TYPE).build());
+        final ContainerResponseContext c = response(Response.ok().type(JsonUtf8ResponseFilter.APPLICATION_JSON_UTF8_TYPE));
 
         filter.filter(null, c);
 
@@ -81,7 +85,7 @@ public class TestJsonUtf8ResponseFilter
     {
         final JsonUtf8ResponseFilter filter = new JsonUtf8ResponseFilter();
 
-        final ContainerResponseContext c = new ContainerResponse(req, Response.ok().build());
+        final ContainerResponseContext c = response(Response.ok());
 
         filter.filter(null, c);
 
@@ -93,8 +97,7 @@ public class TestJsonUtf8ResponseFilter
     {
         final JsonUtf8ResponseFilter filter = new JsonUtf8ResponseFilter();
 
-        final ContainerResponse c = new ContainerResponse(req,
-                Response.ok().type(new MediaType("*", "json")).build());
+        final ContainerResponseContext c = response(Response.ok().type(new MediaType("*", "json")));
 
         filter.filter(null, c);
 
@@ -106,8 +109,7 @@ public class TestJsonUtf8ResponseFilter
     {
         final JsonUtf8ResponseFilter filter = new JsonUtf8ResponseFilter();
 
-        final ContainerResponse c = new ContainerResponse(req,
-                Response.ok().type(new MediaType("text", "json")).build());
+        final ContainerResponseContext c = response(Response.ok().type(new MediaType("text", "json")));
 
         filter.filter(null, c);
 
@@ -119,8 +121,7 @@ public class TestJsonUtf8ResponseFilter
     {
         final JsonUtf8ResponseFilter filter = new JsonUtf8ResponseFilter();
 
-        final ContainerResponse c = new ContainerResponse(req,
-                Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build());
+        final ContainerResponseContext c = response(Response.ok().type(MediaType.TEXT_PLAIN_TYPE));
 
         filter.filter(null, c);
 

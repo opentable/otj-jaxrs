@@ -28,7 +28,7 @@
   </modules>
 
   <properties>
-    <dep.jersey.version>2.7</dep.jersey.version>
+    <dep.resteasy.version>3.0.6.Final</dep.resteasy.version>
     <dep.jackson.version>2.3.2</dep.jackson.version>
     <dep.httpclient.version>1.0.0-SNAPSHOT</dep.httpclient.version>
   </properties>
@@ -101,24 +101,35 @@
       </dependency>
 
       <dependency>
-        <groupId>org.glassfish.jersey.core</groupId>
-        <artifactId>jersey-common</artifactId>
-        <version>${dep.jersey.version}</version>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>async-http-servlet-3.0</artifactId>
+        <version>${dep.resteasy.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.jersey.core</groupId>
-        <artifactId>jersey-client</artifactId>
-        <version>${dep.jersey.version}</version>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-guice</artifactId>
+        <version>${dep.resteasy.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.annotation</groupId>
+            <artifactId>jsr250-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.jersey.core</groupId>
-        <artifactId>jersey-server</artifactId>
-        <version>${dep.jersey.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-jetty-servlet</artifactId>
-        <version>${dep.jersey.version}</version>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-jaxrs</artifactId>
+        <version>${dep.resteasy.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>jaxrs-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.jboss.spec.javax.annotation</groupId>
+            <artifactId>jboss-annotations-api_1.1_spec</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
@@ -145,6 +156,11 @@
         <groupId>com.fasterxml.jackson.jaxrs</groupId>
         <artifactId>jackson-jaxrs-json-provider</artifactId>
         <version>${dep.jackson.version}</version>
+      </dependency>
+      <dependency> <!-- XXX: this is broken! -->
+        <groupId>com.fasterxml.jackson.module</groupId>
+        <artifactId>jackson-module-mrbean</artifactId>
+        <version>2.3.3-SNAPSHOT</version>
       </dependency>
 
       <dependency>

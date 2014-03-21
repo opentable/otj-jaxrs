@@ -54,7 +54,7 @@ import com.opentable.testing.tweaked.TweakedModule;
 
 import com.nesscomputing.jersey.ServerBaseModule;
 
-@AllowNetworkAccess(endpoints= {"127.0.0.1:*"})
+@AllowNetworkAccess(endpoints= {"0.0.0.0:*"})
 @AllowDNSResolution
 @RunWith(LifecycleRunner.class)
 public class DateParamTest
@@ -107,7 +107,7 @@ public class DateParamTest
         Instant when = Instant.ofEpochMilli(1000);
         assertEquals(when.toEpochMilli(),
                 Long.parseLong(httpClient.get(
-                        uriBuilder.queryParam("date", DateTimeFormatter.ISO_DATE_TIME.format(when)).build(),
+                        uriBuilder.queryParam("date", DateTimeFormatter.ISO_DATE_TIME.format(when.atZone(ZoneId.of("UTC")))).build(),
                         StringContentConverter.DEFAULT_RESPONSE_HANDLER).perform()));
     }
 

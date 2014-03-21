@@ -19,8 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.Application;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.base.Preconditions;
@@ -31,11 +29,11 @@ import com.google.inject.Scopes;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.ServletModule;
 
-import org.glassfish.jersey.filter.LoggingFilter;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.servlet.ServletContainer;
+import org.jboss.resteasy.plugins.guice.GuiceResteasyBootstrapServletContextListener;
+import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
 
 import com.opentable.config.Config;
+import com.opentable.httpserver.HttpServerHandlerBinder;
 
 import com.nesscomputing.jersey.exceptions.NessJerseyExceptionMapperModule;
 
@@ -72,16 +70,18 @@ public class OpenTableJerseyServletModule extends ServletModule
         JerseyBinder.bindResponseFilter(binder()).to(JsonUtf8ResponseFilter.class);
 
         if (jerseyConfig.isLoggingEnabled()) {
-            JerseyBinder.bindRequestFilter(binder()).to(LoggingFilter.class);
-            JerseyBinder.bindResponseFilter(binder()).to(LoggingFilter.class);
+            // XXX
+//            JerseyBinder.bindRequestFilter(binder()).to(LoggingFilter.class);
+//            JerseyBinder.bindResponseFilter(binder()).to(LoggingFilter.class);
         }
 
-        bind (Application.class).to(OpenTableJerseyApplication.class).in(Scopes.SINGLETON);
-        bind (ResourceConfig.class).toProvider(ResourceConfigProvider.class).in(Scopes.SINGLETON);
-        bind (ServletContainer.class).toProvider(ServletContainerProvider.class).in(Scopes.SINGLETON);
+        HttpServerHandlerBinder.bindServletContextListener(binder()).to(GuiceResteasyBootstrapServletContextListener.class);
+        bind (GuiceResteasyBootstrapServletContextListener.class);
+
         String first = paths.get(0);
         String[] rest = paths.subList(1, paths.size()).toArray(new String[paths.size()-1]);
-        serve(first, rest).with(ServletContainer.class, getJerseyFeatures(jerseyConfig));
+        bind (HttpServlet30Dispatcher.class).in(Scopes.SINGLETON);
+        serve(first, rest).with(HttpServlet30Dispatcher.class, getJerseyFeatures(jerseyConfig));
     }
 
     Map<String, String> getJerseyFeatures(final JerseyConfig jerseyConfig)

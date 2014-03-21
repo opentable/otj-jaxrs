@@ -34,6 +34,7 @@ import com.google.inject.name.Named;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kitei.testing.lessio.AllowNetworkAccess;
 
 import com.opentable.config.Config;
 import com.opentable.httpclient.HttpClient;
@@ -49,6 +50,7 @@ import com.opentable.testing.tweaked.TweakedModule;
 
 import com.nesscomputing.jersey.OpenTableJerseyServletModule;
 
+@AllowNetworkAccess(endpoints= {"0.0.0.0:8080"})
 @RunWith(LifecycleRunner.class)
 public class TestExceptionMappingBinding
 {
