@@ -34,7 +34,7 @@ import com.google.inject.Inject;
 import org.slf4j.MDC;
 
 @Provider
-public class JsonMessageReaderMapper extends OpenTableTableJerseyExceptionMapper<JsonParseException>
+public class JsonMessageReaderMapper extends OpenTableJaxRsExceptionMapper<JsonParseException>
 {
     private static final Set<String> CLASS_NAMES = ImmutableSet.of(JacksonJsonProvider.class.getName(), ProviderBase.class.getName());
 

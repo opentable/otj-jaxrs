@@ -24,7 +24,7 @@ import javax.ws.rs.ext.Provider;
  * Map the {@link ExcessivelySizedHttpBodyException} to a HTTP 400 Bad Request
  */
 @Provider
-public class ExcessivelySizedHttpBodyExceptionMapper extends OpenTableTableJerseyExceptionMapper<ExcessivelySizedHttpBodyException> {
+public class ExcessivelySizedHttpBodyExceptionMapper extends OpenTableJaxRsExceptionMapper<ExcessivelySizedHttpBodyException> {
 
     public ExcessivelySizedHttpBodyExceptionMapper() {
         super(Status.BAD_REQUEST);

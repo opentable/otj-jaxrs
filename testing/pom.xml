@@ -41,14 +41,14 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-config</artifactId>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.opentable.components</groupId>
-      <artifactId>otj-config</artifactId>
+      <artifactId>otj-core</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -61,6 +61,24 @@
     <dependency>
       <groupId>com.opentable.components</groupId>
       <artifactId>otj-jackson</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-integration-testing</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-httpclient</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-httpclient-testing</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -100,20 +118,8 @@
     </dependency>
 
     <dependency>
-      <groupId>com.opentable.components</groupId>
-      <artifactId>otj-integration-testing</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.opentable.components</groupId>
-      <artifactId>otj-httpclient</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.opentable.components</groupId>
-      <artifactId>otj-httpclient-testing</artifactId>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
       <scope>test</scope>
     </dependency>
 

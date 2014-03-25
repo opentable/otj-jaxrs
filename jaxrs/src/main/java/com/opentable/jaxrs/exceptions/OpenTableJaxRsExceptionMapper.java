@@ -34,7 +34,7 @@ import org.slf4j.MDC;
  * implements this. An example would be
  *
  * <pre>   @Provider
-   public static final class IllegalArgumentExceptionMapper extends NessJerseyExceptionMapper<IllegalArgumentException>
+   public static final class IllegalArgumentExceptionMapper extends NessJerseyExceptionMapper&lt;IllegalArgumentException&gt;
    {
        public IllegalArgumentExceptionMapper()
        {
@@ -43,11 +43,11 @@ import org.slf4j.MDC;
    }
    </pre>
  */
-public abstract class OpenTableTableJerseyExceptionMapper<U extends Throwable> implements ExceptionMapper<U>
+public abstract class OpenTableJaxRsExceptionMapper<U extends Throwable> implements ExceptionMapper<U>
 {
     private final Status statusCode;
 
-    protected OpenTableTableJerseyExceptionMapper(final Status statusCode)
+    protected OpenTableJaxRsExceptionMapper(final Status statusCode)
     {
         this.statusCode = statusCode;
     }

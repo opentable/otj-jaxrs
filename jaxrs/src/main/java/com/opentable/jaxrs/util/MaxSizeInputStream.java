@@ -24,7 +24,7 @@ import com.google.common.base.Preconditions;
 import com.opentable.jaxrs.exceptions.ExcessivelySizedHttpBodyException;
 
 /**
- * Same as {@link LimitInputStream} except it tosses an exception rather than
+ * Same as LimitInputStream except it tosses an exception rather than
  * just pretending there is no more data
  */
 public class MaxSizeInputStream extends FilterInputStream {
