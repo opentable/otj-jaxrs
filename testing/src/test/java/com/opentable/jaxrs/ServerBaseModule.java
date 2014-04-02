@@ -20,7 +20,7 @@ import com.google.inject.AbstractModule;
 import com.opentable.config.Config;
 import com.opentable.jaxrs.OpenTableJaxRsServletModule;
 import com.opentable.jaxrs.exceptions.OpenTableJaxRsExceptionMapperModule;
-import com.opentable.jaxrs.json.NessJacksonJsonProvider;
+import com.opentable.jaxrs.json.OTJacksonJsonProvider;
 
 public class ServerBaseModule extends AbstractModule
 {
@@ -37,6 +37,6 @@ public class ServerBaseModule extends AbstractModule
         install(new OpenTableJaxRsServletModule(config, "/*"));
         install (new OpenTableJaxRsExceptionMapperModule());
 
-        bind (NessJacksonJsonProvider.class);
+        bind (OTJacksonJsonProvider.class);
     }
 }

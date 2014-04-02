@@ -37,19 +37,19 @@ import com.google.inject.Singleton;
 
 /**
  * Jersey Provider class that allows Jackson to serialize any media type starting
- * with <code>x-ness</code>.  By default, only types that end with <code>+json</code> will
+ * with <code>x-ot</code>.  By default, only types that end with <code>+json</code> will
  * be matched.
  */
 @Provider
-@Produces("x-ness/*")
-@Consumes("x-ness/*")
+@Produces("x-ot/*")
+@Consumes("x-ot/*")
 @Singleton
-public class NessJacksonJsonProvider implements MessageBodyReader<Object>, MessageBodyWriter<Object>, Versioned
+public class OTJacksonJsonProvider implements MessageBodyReader<Object>, MessageBodyWriter<Object>, Versioned
 {
     private final JacksonJsonProvider delegate;
 
     @Inject
-    NessJacksonJsonProvider(JacksonJsonProvider delegate)
+    OTJacksonJsonProvider(JacksonJsonProvider delegate)
     {
         this.delegate = delegate;
     }
@@ -95,6 +95,6 @@ public class NessJacksonJsonProvider implements MessageBodyReader<Object>, Messa
     @Override
     public String toString()
     {
-        return "NessJacksonJsonProvider: " + delegate.toString();
+        return "OTJacksonJsonProvider: " + delegate.toString();
     }
 }

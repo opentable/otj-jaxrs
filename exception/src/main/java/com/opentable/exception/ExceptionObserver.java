@@ -18,6 +18,7 @@ package com.opentable.exception;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
@@ -28,7 +29,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.opentable.httpclient.HttpClientObserver;
@@ -36,7 +36,7 @@ import com.opentable.httpclient.HttpClientResponse;
 import com.opentable.logging.Log;
 
 /**
- * Intercept exceptions that have been mapped to <code>x-ness/error</code> responses,
+ * Intercept exceptions that have been mapped to <code>x-ot/error</code> responses,
  * and rethrow them clientside.
  * Rudely consumes the http response body and never lets the actual response handler do anything.
  */
@@ -94,7 +94,7 @@ class ExceptionObserver extends HttpClientObserver
 
     private OTApiException toException(final Map<String, Object> fields)
     {
-        final String type = ObjectUtils.toString(fields.get(OTApiException.ERROR_TYPE));
+        final String type = Objects.toString(fields.get(OTApiException.ERROR_TYPE));
 
         final Set<ExceptionReviver> set = revivers.get(type);
         if (CollectionUtils.isEmpty(set))
