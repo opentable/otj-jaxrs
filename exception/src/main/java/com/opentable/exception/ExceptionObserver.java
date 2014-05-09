@@ -81,7 +81,7 @@ class ExceptionObserver extends HttpClientObserver
 
             for (int i = 1; i < causesList.size(); i++)
             {
-                final OTApiException suppressed = toException((Map<String, Object>) causesList.get(1));
+                final OTApiException suppressed = toException((Map<String, Object>) causesList.get(i));
                 LOG.debug(suppressed, "Multiple exceptions, continuation from prior backtrace...");
                 exn.addSuppressed(suppressed);
             }
