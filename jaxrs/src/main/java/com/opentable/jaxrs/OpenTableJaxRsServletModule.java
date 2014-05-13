@@ -36,7 +36,6 @@ import com.opentable.jaxrs.exceptions.OpenTableJaxRsExceptionMapperModule;
 
 public class OpenTableJaxRsServletModule extends ServletModule
 {
-    private final Config config;
     private final List<String> paths;
 
     public OpenTableJaxRsServletModule(final Config config)
@@ -52,7 +51,6 @@ public class OpenTableJaxRsServletModule extends ServletModule
         Preconditions.checkNotNull(config, "null config");
         Preconditions.checkNotNull(paths, "null paths");
         Preconditions.checkArgument(paths.size() >= 1, "must serve at least one path");
-        this.config = config;
         this.paths = ImmutableList.copyOf(paths);
     }
 
