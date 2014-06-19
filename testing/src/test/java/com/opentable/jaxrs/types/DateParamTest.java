@@ -25,6 +25,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Client;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
@@ -43,10 +44,7 @@ import org.kitei.testing.lessio.AllowDNSResolution;
 import org.kitei.testing.lessio.AllowNetworkAccess;
 
 import com.opentable.config.Config;
-import com.opentable.httpclient.HttpClient;
-import com.opentable.httpclient.response.StringContentConverter;
 import com.opentable.jaxrs.ServerBaseModule;
-import com.opentable.jaxrs.types.DateParam;
 import com.opentable.lifecycle.junit.LifecycleRule;
 import com.opentable.lifecycle.junit.LifecycleRunner;
 import com.opentable.lifecycle.junit.LifecycleStatement;
@@ -73,7 +71,7 @@ public class DateParamTest
         .build(this);
 
     @Inject
-    private final HttpClient httpClient = null;
+    private Client httpClient;
 
     private GuiceFilter guiceFilter = null;
 
@@ -96,9 +94,9 @@ public class DateParamTest
     {
         Instant when = Instant.ofEpochMilli(1000);
         assertEquals(when.toEpochMilli(),
-                Long.parseLong(httpClient.get(
-                        uriBuilder.queryParam("date", when.toEpochMilli()).build(),
-                        StringContentConverter.DEFAULT_RESPONSE_HANDLER).perform()));
+                Long.parseLong(httpClient.target(
+                        uriBuilder.queryParam("date", when.toEpochMilli()).build())
+                        .request().get(String.class)));
     }
 
     @Test
@@ -106,9 +104,9 @@ public class DateParamTest
     {
         Instant when = Instant.ofEpochMilli(1000);
         assertEquals(when.toEpochMilli(),
-                Long.parseLong(httpClient.get(
-                        uriBuilder.queryParam("date", DateTimeFormatter.ISO_DATE_TIME.format(when.atZone(ZoneId.of("UTC")))).build(),
-                        StringContentConverter.DEFAULT_RESPONSE_HANDLER).perform()));
+                Long.parseLong(httpClient.target(
+                        uriBuilder.queryParam("date", DateTimeFormatter.ISO_DATE_TIME.format(when.atZone(ZoneId.of("UTC")))).build())
+                        .request().get(String.class)));
     }
 
     @Test
@@ -116,17 +114,16 @@ public class DateParamTest
     {
         Instant when = Instant.ofEpochMilli(1000);
         assertEquals(when.toEpochMilli(),
-                Long.parseLong(httpClient.get(
-                        uriBuilder.queryParam("date", when.atZone(ZoneId.of("America/Los_Angeles")).toString()).build(),
-                        StringContentConverter.DEFAULT_RESPONSE_HANDLER).perform()));
+                Long.parseLong(httpClient.target(
+                        uriBuilder.queryParam("date", when.atZone(ZoneId.of("America/Los_Angeles")).toString()).build())
+                        .request().get(String.class)));
     }
 
     @Test
     public void testNull() throws Exception
     {
-        assertEquals("asdf", httpClient.get(
-                        uriBuilder.build(),
-                        StringContentConverter.DEFAULT_RESPONSE_HANDLER).perform());
+        assertEquals("asdf", httpClient.target(
+                        uriBuilder.build()).request().get(String.class));
     }
 
     @Test
@@ -134,9 +131,9 @@ public class DateParamTest
     {
         Instant when = Instant.ofEpochMilli(-1000);
         assertEquals(when.toEpochMilli(),
-                Long.parseLong(httpClient.get(
-                        uriBuilder.queryParam("date", when.toEpochMilli()).build(),
-                        StringContentConverter.DEFAULT_RESPONSE_HANDLER).perform()));
+                Long.parseLong(httpClient.target(
+                        uriBuilder.queryParam("date", when.toEpochMilli()).build())
+                        .request().get(String.class)));
     }
 
     public static class DateToLongWadlModule extends AbstractModule {
