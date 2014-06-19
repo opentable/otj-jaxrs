@@ -72,18 +72,6 @@
 
     <dependency>
       <groupId>com.opentable.components</groupId>
-      <artifactId>otj-httpclient</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.opentable.components</groupId>
-      <artifactId>otj-httpclient-testing</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.opentable.components</groupId>
       <artifactId>otj-httpserver</artifactId>
       <scope>test</scope>
     </dependency>

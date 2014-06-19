@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.opentable</groupId>
     <artifactId>otj-parent</artifactId>
-    <version>2</version>
+    <version>11-SNAPSHOT</version>
   </parent>
 
   <scm>
@@ -86,18 +86,6 @@
         <groupId>com.opentable.components</groupId>
         <artifactId>otj-integration-testing</artifactId>
         <version>1.0.0</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.opentable.components</groupId>
-        <artifactId>otj-httpclient</artifactId>
-        <version>${dep.httpclient.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.opentable.components</groupId>
-        <artifactId>otj-httpclient-testing</artifactId>
-        <version>${dep.httpclient.version}</version>
       </dependency>
 
       <dependency>
