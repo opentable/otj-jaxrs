@@ -115,7 +115,7 @@
       <dependency> <!-- XXX: this is broken! -->
         <groupId>com.fasterxml.jackson.module</groupId>
         <artifactId>jackson-module-mrbean</artifactId>
-        <version>2.3.2-OT-1</version>
+        <version>2.3.2-OT-2</version>
       </dependency>
 
       <dependency>
