@@ -5,6 +5,8 @@ import static java.lang.String.format;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -17,12 +19,9 @@ import com.google.common.base.Charsets;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import com.google.inject.Guice;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.Singleton;
 import com.google.inject.Stage;
 import com.google.inject.servlet.ServletModule;
-
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.After;
@@ -47,7 +46,7 @@ public class TestLZ4Encoding
     private static final String BIG_CONTENT_RESOURCE = "/test-resources/big-content.txt";
 
     @Inject
-    private final Lifecycle lifecycle = null;
+    private Lifecycle lifecycle = null;
 
     @Inject
     private PortNumberProvider pnp;
