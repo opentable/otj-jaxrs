@@ -15,130 +15,38 @@
  */
 package com.opentable.exception;
 
-import java.lang.annotation.Annotation;
-import java.util.Map;
-import java.util.Set;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Preconditions;
 import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.Provider;
 import com.google.inject.Scopes;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
-
-import com.opentable.httpclient.guice.HttpClientModule;
 
 /**
  * Add support for mapping NessApiException subclasses to and from HTTP responses.
  */
 public final class OTApiExceptionModule extends AbstractModule
 {
-    private final Annotation httpClientAnnotation;
-
-    public OTApiExceptionModule(final String httpClientName)
+    public OTApiExceptionModule()
     {
-        this(Names.named(httpClientName));
-    }
-
-    public OTApiExceptionModule(final Annotation httpClientAnnotation)
-    {
-        this.httpClientAnnotation = Preconditions.checkNotNull(httpClientAnnotation, "null binding annotation");
     }
 
     @Override
     protected void configure()
     {
-        install(new SharedOTApiExceptionModule());
-
-        HttpClientModule.bindNewObserver(binder(), httpClientAnnotation).to(Key.get(ExceptionObserver.class, httpClientAnnotation));
-        bind(ExceptionObserver.class).annotatedWith(httpClientAnnotation).toProvider(new ExceptionObserverProvider()).in(Scopes.SINGLETON);
+        bind(ResponseMapper.class);
+        bind(ExceptionFilter.class).in(Scopes.SINGLETON);
 
         // Constructing the binder creates the MapBinder, so we don't have undeclared dependencies
         // even if there end up being no bindings, just an empty map.
-        OTApiExceptionBinder.of(binder(), httpClientAnnotation);
+        OTApiExceptionBinder.of(binder());
     }
 
     @Override
     public int hashCode()
     {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (httpClientAnnotation == null ? 0 : httpClientAnnotation.hashCode());
-        return result;
+        return OTApiExceptionModule.class.hashCode();
     }
 
     @Override
     public boolean equals(final Object obj)
     {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final OTApiExceptionModule other = (OTApiExceptionModule) obj;
-        if (httpClientAnnotation == null) {
-            if (other.httpClientAnnotation != null) {
-                return false;
-            }
-        }
-        else if (!httpClientAnnotation.equals(other.httpClientAnnotation)) {
-            return false;
-        }
-        return true;
-    }
-
-    class ExceptionObserverProvider implements Provider<ExceptionObserver>
-    {
-        private Injector injector;
-
-        @Inject
-        void setInjector(final Injector injector)
-        {
-            this.injector = injector;
-        }
-
-        @Override
-        public ExceptionObserver get()
-        {
-            final TypeLiteral<Map<String, Set<ExceptionReviver>>> type = new TypeLiteral<Map<String, Set<ExceptionReviver>>>() {};
-            final Key<Map<String, Set<ExceptionReviver>>> mapBindingKey = Key.get(type, httpClientAnnotation);
-
-            final ObjectMapper mapper = injector.getInstance(ObjectMapper.class);
-            final Map<String, Set<ExceptionReviver>> revivers = injector.getInstance(mapBindingKey);
-
-            return new ExceptionObserver(mapper, revivers);
-        }
-    }
-
-    /**
-     * Bindings that are shared by every OTApiExceptionModule.
-     */
-    static final class SharedOTApiExceptionModule extends AbstractModule
-    {
-        @Override
-        protected void configure()
-        {
-            bind(ResponseMapper.class);
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return SharedOTApiExceptionModule.class.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object obj)
-        {
-            return obj instanceof SharedOTApiExceptionModule;
-        }
+        return obj instanceof OTApiExceptionModule;
     }
 }

@@ -15,34 +15,24 @@
  */
 package com.opentable.exception;
 
-import java.lang.annotation.Annotation;
-
-import com.google.common.base.Preconditions;
 import com.google.inject.Binder;
 import com.google.inject.multibindings.MapBinder;
-import com.google.inject.name.Names;
 
 /**
- * Register NessApiException subclasses so they may be correctly mapped to and from HTTP responses.
+ * Register OtApiException subclasses so they may be correctly mapped to and from HTTP responses.
  */
 public final class OTApiExceptionBinder
 {
     private final MapBinder<String, ExceptionReviver> mapBinder;
 
-    private OTApiExceptionBinder(Binder binder, Annotation httpClientAnnotation)
+    private OTApiExceptionBinder(Binder binder)
     {
-        Preconditions.checkNotNull(httpClientAnnotation != null, "No annotation specified");
-        mapBinder = MapBinder.newMapBinder(binder, String.class, ExceptionReviver.class, httpClientAnnotation).permitDuplicates();
+        mapBinder = MapBinder.newMapBinder(binder, String.class, ExceptionReviver.class).permitDuplicates();
     }
 
-    public static OTApiExceptionBinder of(Binder binder, String httpClientName)
+    public static OTApiExceptionBinder of(Binder binder)
     {
-        return of(binder, Names.named(httpClientName));
-    }
-
-    public static OTApiExceptionBinder of(Binder binder, Annotation httpClientAnnotation)
-    {
-        return new OTApiExceptionBinder(binder, httpClientAnnotation);
+        return new OTApiExceptionBinder(binder);
     }
 
     public void registerExceptionClass(Class<? extends OTApiException> klass)
