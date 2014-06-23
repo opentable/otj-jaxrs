@@ -1,11 +1,19 @@
 package com.opentable.jaxrs;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.Feature;
 import javax.ws.rs.ext.RuntimeDelegate;
+
+import com.google.common.collect.ImmutableSet;
 
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
@@ -13,11 +21,18 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 class JaxRsClientProvider implements Provider<Client>
 {
     private final String name;
-    private ResteasyProviderFactory delegate;
+    private final Set<JaxRsFeatureGroup> featureGroups;
 
-    JaxRsClientProvider(String name)
+    private ResteasyProviderFactory delegate;
+    private Map<JaxRsFeatureGroup, Feature> features;
+
+    JaxRsClientProvider(String name, Collection<JaxRsFeatureGroup> featureGroups)
     {
         this.name = name;
+        this.featureGroups = ImmutableSet.<JaxRsFeatureGroup>builder()
+                .addAll(featureGroups)
+                .add(PrivateFeatureGroup.WILDCARD)
+                .build();
     }
 
     @Inject
@@ -26,17 +41,25 @@ class JaxRsClientProvider implements Provider<Client>
         this.delegate = (ResteasyProviderFactory) delegate;
     }
 
+    @Inject
+    public void setFeatures(Map<JaxRsFeatureGroup, Feature> features)
+    {
+        this.features = features;
+    }
+
     @Override
     public Client get()
     {
-        ClientBuilder builder = ClientBuilder.newBuilder();
-        for (Class<?> c : delegate.getProviderClasses()) {
-            builder.register(c);
+        final ClientBuilder builder = ClientBuilder.newBuilder()
+            .withConfig(delegate);
+
+        for (Entry<JaxRsFeatureGroup, Feature> e : features.entrySet()) {
+            if (featureGroups.contains(e.getKey())) {
+                builder.register(e.getValue());
+            }
         }
-        for (Object o : delegate.getProviderInstances()) {
-            builder.register(o);
-        }
-        builder.property(JaxRsClientModule.CLIENT_PROPERTY, name);
-        return builder.build();
+
+        return builder.property(JaxRsClientModule.CLIENT_PROPERTY, name)
+            .build();
     }
 }

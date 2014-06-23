@@ -40,12 +40,6 @@
 
     <dependency>
       <groupId>com.opentable.components</groupId>
-      <artifactId>otj-server-templates</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.opentable.components</groupId>
       <artifactId>otj-config</artifactId>
       <scope>test</scope>
     </dependency>
