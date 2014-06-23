@@ -140,5 +140,11 @@
       <artifactId>resteasy-client</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.weakref</groupId>
+      <artifactId>jmxutils</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>
