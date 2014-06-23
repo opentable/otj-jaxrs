@@ -1,5 +1,6 @@
 package com.opentable.jaxrs;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import javax.ws.rs.client.Client;
@@ -15,10 +16,13 @@ public class JaxRsClientModule extends AbstractModule
     private final String name;
     private final Collection<JaxRsFeatureGroup> features;
 
-    public JaxRsClientModule(String name, JaxRsFeatureGroup... features)
+    public JaxRsClientModule(String name, JaxRsFeatureGroup feature, JaxRsFeatureGroup... moreFeatures)
     {
         this.name = name;
-        this.features = ImmutableSet.copyOf(features);
+        this.features = ImmutableSet.<JaxRsFeatureGroup>builder()
+                .add(feature)
+                .addAll(Arrays.asList(moreFeatures))
+                .build();
     }
 
     @Override
