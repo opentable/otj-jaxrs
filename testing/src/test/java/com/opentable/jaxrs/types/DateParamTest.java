@@ -43,6 +43,7 @@ import org.kitei.testing.lessio.AllowNetworkAccess;
 import com.opentable.config.Config;
 import com.opentable.jaxrs.JaxRsClientModule;
 import com.opentable.jaxrs.ServerBaseModule;
+import com.opentable.jaxrs.StandardFeatureGroup;
 import com.opentable.jaxrs.json.OTJacksonJsonProvider;
 import com.opentable.lifecycle.junit.LifecycleRule;
 import com.opentable.lifecycle.junit.LifecycleRunner;
@@ -70,7 +71,7 @@ public class DateParamTest
             @Override
             protected void configure()
             {
-                install (new JaxRsClientModule("test"));
+                install (new JaxRsClientModule("test", StandardFeatureGroup.PLATFORM_INTERNAL));
                 bind (OTJacksonJsonProvider.class);
             }
         })

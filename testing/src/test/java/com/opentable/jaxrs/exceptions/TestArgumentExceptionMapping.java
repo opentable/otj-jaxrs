@@ -49,6 +49,7 @@ import com.opentable.config.Config;
 import com.opentable.httpserver.HttpServer;
 import com.opentable.jaxrs.JaxRsClientModule;
 import com.opentable.jaxrs.ServerBaseModule;
+import com.opentable.jaxrs.StandardFeatureGroup;
 import com.opentable.lifecycle.junit.LifecycleRule;
 import com.opentable.lifecycle.junit.LifecycleRunner;
 import com.opentable.lifecycle.junit.LifecycleStatement;
@@ -80,7 +81,7 @@ public class TestArgumentExceptionMapping
         .addTestCaseModules(
                 OpenTableJaxRsExceptionMapperModule.class,
                 lifecycleRule.getLifecycleModule(),
-                new JaxRsClientModule("test"),
+                new JaxRsClientModule("test", StandardFeatureGroup.PLATFORM_INTERNAL),
                 badResourceModule)
         .build(this);
 

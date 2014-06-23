@@ -41,6 +41,7 @@ import org.kitei.testing.lessio.AllowNetworkAccess;
 import com.opentable.config.Config;
 import com.opentable.jaxrs.JaxRsClientModule;
 import com.opentable.jaxrs.ServerBaseModule;
+import com.opentable.jaxrs.StandardFeatureGroup;
 import com.opentable.jaxrs.json.OTJacksonJsonProvider;
 import com.opentable.lifecycle.junit.LifecycleRunner;
 import com.opentable.lifecycle.junit.LifecycleStatement;
@@ -74,7 +75,7 @@ public class TestExceptionMappingBinding
                 install (lifecycle.getLifecycleModule());
                 bind (OTJacksonJsonProvider.class);
 
-                install (new JaxRsClientModule("mapping"));
+                install (new JaxRsClientModule("mapping", StandardFeatureGroup.PLATFORM_INTERNAL));
 
                 install (new OTApiExceptionModule());
                 OTApiExceptionBinder.of(binder()).registerExceptionClass(BoomException.class);
