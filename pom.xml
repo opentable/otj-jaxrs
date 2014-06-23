@@ -78,7 +78,7 @@
       <dependency>
         <groupId>com.opentable.components</groupId>
         <artifactId>otj-serverinfo</artifactId>
-        <version>1.2.0</version>
+        <version>1.2.1-SNAPSHOT</version>
       </dependency>
 
       <dependency>
