@@ -19,9 +19,12 @@ import static com.opentable.exception.OTApiException.DETAIL;
 import static com.opentable.exception.OTApiException.ERROR_SUBTYPE;
 import static com.opentable.exception.OTApiException.ERROR_TYPE;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Map;
 
-import javax.ws.rs.core.Response;
+import javax.inject.Inject;
+import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.core.Response.Status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,39 +32,25 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
-import javax.inject.Inject;
-import com.google.inject.name.Named;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.opentable.exception.ExceptionObserver;
-import com.opentable.exception.ExceptionSubtype;
-import com.opentable.exception.ExceptionType;
-import com.opentable.exception.OTApiException;
-import com.opentable.exception.OTApiExceptionBinder;
-import com.opentable.exception.OTApiExceptionModule;
-import com.opentable.exception.UnknownOTApiException;
-import com.opentable.httpclient.HttpClient;
-import com.opentable.httpclient.internal.HttpClientMethod;
-import com.opentable.httpclient.response.Valid2xxContentConverter;
-import com.opentable.httpclient.testing.TestingHttpClientBuilder;
-
-public class TestNessApiExceptionMapping
+public class TestOTApiExceptionMapping
 {
 
     @Inject
-    @Named("test")
-    ExceptionObserver observer;
+    ExceptionFilter filter;
 
     @Before
     public void setUp()
     {
-        Guice.createInjector(new OTApiExceptionModule("test"), new AbstractModule() {
+        Guice.createInjector(new OTApiExceptionModule(), new AbstractModule() {
             @Override
             protected void configure()
             {
-                OTApiExceptionBinder.of(binder(), "test").registerExceptionClass(TestingException.class);
+                OTApiExceptionBinder.of(binder()).registerExceptionClass(TestingException.class);
             }
         }).injectMembers(this);
     }
@@ -93,15 +82,15 @@ public class TestNessApiExceptionMapping
                 DETAIL, "bogus!"
             )));
 
-        final TestingHttpClientBuilder builder = new TestingHttpClientBuilder().withObjectMapper(new ObjectMapper());
-        builder.on(HttpClientMethod.GET).of("/foo")
-            .respondWith(Response.serverError().type(OTApiException.MEDIA_TYPE).entity(error));
+        final InputStream data = new ByteArrayInputStream(new ObjectMapper().writeValueAsBytes(error));
 
-        builder.withObserver(observer);
+        final ClientResponseContext response = EasyMock.createMock(ClientResponseContext.class);
 
-        try (final HttpClient httpClient = builder.build()) {
-            httpClient.get("/foo", Valid2xxContentConverter.DEFAULT_FAILING_RESPONSE_HANDLER).perform();
-        }
+        EasyMock.expect(response.getMediaType()).andReturn(OTApiException.MEDIA_TYPE);
+        EasyMock.expect(response.getEntityStream()).andReturn(data);
+        EasyMock.replay(response);
+
+        filter.filter(null, response);
     }
 
     @Test(expected=TestingException.class)
@@ -113,14 +102,14 @@ public class TestNessApiExceptionMapping
                 DETAIL, "bogus!"
             )));
 
-        final TestingHttpClientBuilder builder = new TestingHttpClientBuilder().withObjectMapper(new ObjectMapper());
-        builder.on(HttpClientMethod.GET).of("/foo")
-            .respondWith(Response.serverError().type(OTApiException.MEDIA_TYPE).entity(error));
+        final InputStream data = new ByteArrayInputStream(new ObjectMapper().writeValueAsBytes(error));
 
-        builder.withObserver(observer);
+        final ClientResponseContext response = EasyMock.createMock(ClientResponseContext.class);
 
-        try (final HttpClient httpClient = builder.build()) {
-            httpClient.get("/foo", Valid2xxContentConverter.DEFAULT_FAILING_RESPONSE_HANDLER).perform();
-        }
+        EasyMock.expect(response.getMediaType()).andReturn(OTApiException.MEDIA_TYPE);
+        EasyMock.expect(response.getEntityStream()).andReturn(data);
+        EasyMock.replay(response);
+
+        filter.filter(null, response);
     }
 }
