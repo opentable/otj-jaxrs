@@ -14,6 +14,9 @@ import javax.ws.rs.core.Feature;
 
 import com.google.common.collect.ImmutableSet;
 
+import com.opentable.lifecycle.Lifecycle;
+import com.opentable.lifecycle.LifecycleStage;
+
 @Singleton
 class JaxRsClientProvider implements Provider<Client>
 {
@@ -21,6 +24,7 @@ class JaxRsClientProvider implements Provider<Client>
     private final Set<JaxRsFeatureGroup> featureGroups;
 
     private Map<JaxRsFeatureGroup, Set<Feature>> features;
+    private Lifecycle lifecycle;
 
     JaxRsClientProvider(String name, Collection<JaxRsFeatureGroup> featureGroups)
     {
@@ -37,6 +41,12 @@ class JaxRsClientProvider implements Provider<Client>
         this.features = features;
     }
 
+    @Inject
+    public void setLifecycle(Lifecycle lifecycle)
+    {
+        this.lifecycle = lifecycle;
+    }
+
     @Override
     public Client get()
     {
@@ -51,7 +61,9 @@ class JaxRsClientProvider implements Provider<Client>
             }
         }
 
-        return builder.property(JaxRsClientModule.CLIENT_PROPERTY, name)
-            .build();
+        builder.property(JaxRsClientModule.CLIENT_PROPERTY, name);
+        final Client client = builder.build();
+        lifecycle.addListener(LifecycleStage.STOP_STAGE, client::close);
+        return client;
     }
 }
