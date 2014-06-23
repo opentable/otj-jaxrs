@@ -11,11 +11,8 @@ import javax.inject.Singleton;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Feature;
-import javax.ws.rs.ext.RuntimeDelegate;
 
 import com.google.common.collect.ImmutableSet;
-
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 @Singleton
 class JaxRsClientProvider implements Provider<Client>
@@ -23,8 +20,7 @@ class JaxRsClientProvider implements Provider<Client>
     private final String name;
     private final Set<JaxRsFeatureGroup> featureGroups;
 
-    private ResteasyProviderFactory delegate;
-    private Map<JaxRsFeatureGroup, Feature> features;
+    private Map<JaxRsFeatureGroup, Set<Feature>> features;
 
     JaxRsClientProvider(String name, Collection<JaxRsFeatureGroup> featureGroups)
     {
@@ -36,13 +32,7 @@ class JaxRsClientProvider implements Provider<Client>
     }
 
     @Inject
-    public void setRuntimeDelegate(RuntimeDelegate delegate)
-    {
-        this.delegate = (ResteasyProviderFactory) delegate;
-    }
-
-    @Inject
-    public void setFeatures(Map<JaxRsFeatureGroup, Feature> features)
+    public void setFeatures(Map<JaxRsFeatureGroup, Set<Feature>> features)
     {
         this.features = features;
     }
@@ -50,12 +40,14 @@ class JaxRsClientProvider implements Provider<Client>
     @Override
     public Client get()
     {
-        final ClientBuilder builder = ClientBuilder.newBuilder()
-            .withConfig(delegate);
+        final ClientBuilder builder = ClientBuilder.newBuilder();
 
-        for (Entry<JaxRsFeatureGroup, Feature> e : features.entrySet()) {
-            if (featureGroups.contains(e.getKey())) {
-                builder.register(e.getValue());
+        for (Entry<JaxRsFeatureGroup, Set<Feature>> e : features.entrySet()) {
+            JaxRsFeatureGroup group = e.getKey();
+            if (featureGroups.contains(group)) {
+                for (Feature f : e.getValue()) {
+                    builder.register(f);
+                }
             }
         }
 

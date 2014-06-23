@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
@@ -37,7 +38,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kitei.testing.lessio.AllowNetworkAccess;
 
+import com.opentable.config.Config;
 import com.opentable.jaxrs.JaxRsClientModule;
+import com.opentable.jaxrs.ServerBaseModule;
+import com.opentable.jaxrs.json.OTJacksonJsonProvider;
 import com.opentable.lifecycle.junit.LifecycleRunner;
 import com.opentable.lifecycle.junit.LifecycleStatement;
 import com.opentable.testing.IntegrationTestRule;
@@ -57,6 +61,7 @@ public class TestExceptionMappingBinding
             @Override
             protected void configure()
             {
+                install (new ServerBaseModule(Config.getEmptyConfig()));
                 install (new OTApiExceptionModule());
                 OTApiExceptionBinder.of(binder()).registerExceptionClass(BoomException.class);
                 bind (BoomResource.class);
@@ -67,8 +72,9 @@ public class TestExceptionMappingBinding
             protected void configure()
             {
                 install (lifecycle.getLifecycleModule());
+                bind (OTJacksonJsonProvider.class);
+
                 install (new JaxRsClientModule("mapping"));
-                install (new JaxRsClientModule("regular"));
 
                 install (new OTApiExceptionModule());
                 OTApiExceptionBinder.of(binder()).registerExceptionClass(BoomException.class);
@@ -76,12 +82,10 @@ public class TestExceptionMappingBinding
         });
 
     @Inject
-    @Named("test")
+    @Named("mapping")
     Client mappingClient;
 
-    @Inject
-    @Named("regular")
-    Client regularClient;
+    Client regularClient = ClientBuilder.newClient();
 
     @Test(expected=BoomException.class)
     public void testWithMapping() throws Exception
@@ -93,7 +97,7 @@ public class TestExceptionMappingBinding
     public void testNoMapping() throws Exception
     {
         Response response = regularClient.target(UriBuilder.fromUri(rule.locateService("boom")).path("/boom")).request().get();
-        assertEquals(BOOM_STATUS, response.getStatus());
+        assertEquals(BOOM_STATUS.getStatusCode(), response.getStatus());
     }
 
     /** A status unlikely to be accidentally returned (i.e. not 500) */

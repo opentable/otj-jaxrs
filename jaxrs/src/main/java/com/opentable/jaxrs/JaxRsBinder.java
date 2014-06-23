@@ -37,7 +37,7 @@ public final class JaxRsBinder
 
     public static LinkedBindingBuilder<Feature> bindFeatureForGroup(final Binder binder, final JaxRsFeatureGroup feature)
     {
-        return MapBinder.newMapBinder(binder, JaxRsFeatureGroup.class, Feature.class).addBinding(feature);
+        return MapBinder.newMapBinder(binder, JaxRsFeatureGroup.class, Feature.class).permitDuplicates().addBinding(feature);
     }
 
     public static LinkedBindingBuilder<ContainerRequestFilter> bindRequestFilter(final Binder binder)

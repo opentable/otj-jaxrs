@@ -13,7 +13,7 @@ final class JaxRsSharedModule extends AbstractModule
     @Override
     public void configure()
     {
-        JaxRsBinder.bindFeatureForAllClients(binder()).toInstance((g) -> true);
+        JaxRsBinder.bindFeatureForAllClients(binder()).to(ClientJsonFeature.class);
         install (new JaxrsModule());
     }
 

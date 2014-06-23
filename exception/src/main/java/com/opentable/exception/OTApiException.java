@@ -18,6 +18,7 @@ package com.opentable.exception;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.StatusType;
 
@@ -29,7 +30,7 @@ import com.google.common.collect.ImmutableMap;
  * API exception base class which has automatic transparency through
  * Jersey and HttpClient.  Attempts to remain mostly human-consumable.
  */
-public abstract class OTApiException extends RuntimeException
+public abstract class OTApiException extends ResponseProcessingException
 {
     private static final long serialVersionUID = 1L;
 
@@ -44,6 +45,7 @@ public abstract class OTApiException extends RuntimeException
 
     protected OTApiException(Map<String, ? extends Object> fields)
     {
+        super(null, Objects.toString(fields.get(DETAIL)));
         checkNotBlank(fields, ERROR_TYPE);
         checkNotBlank(fields, ERROR_SUBTYPE);
         this.fields = ImmutableMap.copyOf(fields);

@@ -18,13 +18,6 @@
     <dependency>
       <groupId>com.opentable.components</groupId>
       <artifactId>otj-jaxrs</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.opentable.components</groupId>
-      <artifactId>otj-core</artifactId>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>

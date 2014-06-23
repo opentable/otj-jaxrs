@@ -18,7 +18,9 @@ package com.opentable.jaxrs;
 import com.google.inject.AbstractModule;
 
 import com.opentable.config.Config;
+import com.opentable.httpserver.HttpServerModule;
 import com.opentable.jaxrs.exceptions.OpenTableJaxRsExceptionMapperModule;
+import com.opentable.jaxrs.json.OTJacksonJsonProvider;
 
 public class ServerBaseModule extends AbstractModule
 {
@@ -32,6 +34,10 @@ public class ServerBaseModule extends AbstractModule
     @Override
     protected void configure()
     {
-        install (new OpenTableJaxRsExceptionMapperModule());
+        install(new HttpServerModule(config));
+        install(new OpenTableJaxRsServletModule(config, "/*"));
+
+        install(new OpenTableJaxRsExceptionMapperModule());
+        bind(OTJacksonJsonProvider.class);
     }
 }

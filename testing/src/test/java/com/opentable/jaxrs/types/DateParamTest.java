@@ -43,6 +43,7 @@ import org.kitei.testing.lessio.AllowNetworkAccess;
 import com.opentable.config.Config;
 import com.opentable.jaxrs.JaxRsClientModule;
 import com.opentable.jaxrs.ServerBaseModule;
+import com.opentable.jaxrs.json.OTJacksonJsonProvider;
 import com.opentable.lifecycle.junit.LifecycleRule;
 import com.opentable.lifecycle.junit.LifecycleRunner;
 import com.opentable.lifecycle.junit.LifecycleStatement;
@@ -64,8 +65,15 @@ public class DateParamTest
 
     @Rule
     public IntegrationTestRule test = IntegrationTestRuleBuilder.defaultBuilder()
-        .addService(DATE_TEST_SERVICE_NAME, TweakedModule.forServiceModule(DateToLongWadlModule.class))
-        .addTestCaseModules(lifecycleRule.getLifecycleModule(), new JaxRsClientModule("test"))
+        .addService(DATE_TEST_SERVICE_NAME, TweakedModule.forServiceModule(DateToLongModule.class))
+        .addTestCaseModules(lifecycleRule.getLifecycleModule(), new AbstractModule() {
+            @Override
+            protected void configure()
+            {
+                install (new JaxRsClientModule("test"));
+                bind (OTJacksonJsonProvider.class);
+            }
+        })
         .build(this);
 
     @Inject
@@ -125,10 +133,10 @@ public class DateParamTest
                         .request().get(String.class)));
     }
 
-    public static class DateToLongWadlModule extends AbstractModule {
+    public static class DateToLongModule extends AbstractModule {
         private final Config config;
 
-        public DateToLongWadlModule(Config config)
+        public DateToLongModule(Config config)
         {
             this.config = config;
         }
