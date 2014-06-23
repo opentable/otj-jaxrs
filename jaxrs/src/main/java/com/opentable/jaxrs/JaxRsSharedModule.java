@@ -1,12 +1,16 @@
 package com.opentable.jaxrs;
 
+import javax.inject.Singleton;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import javax.inject.Singleton;
+import com.google.inject.Scopes;
 
 import org.jboss.resteasy.plugins.guice.ext.JaxrsModule;
+
+import com.opentable.jaxrs.json.OTJacksonJsonProvider;
 
 final class JaxRsSharedModule extends AbstractModule
 {
@@ -14,6 +18,7 @@ final class JaxRsSharedModule extends AbstractModule
     public void configure()
     {
         JaxRsBinder.bindFeatureForAllClients(binder()).to(ClientJsonFeature.class);
+        bind (OTJacksonJsonProvider.class).in(Scopes.SINGLETON);
         install (new JaxrsModule());
     }
 
