@@ -15,11 +15,10 @@
  */
 package com.opentable.exception;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import java.util.Map;
 import java.util.Objects;
 
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.StatusType;
 
@@ -31,7 +30,7 @@ import com.google.common.collect.ImmutableMap;
  * API exception base class which has automatic transparency through
  * Jersey and HttpClient.  Attempts to remain mostly human-consumable.
  */
-public abstract class OTApiException extends RuntimeException
+public abstract class OTApiException extends ResponseProcessingException
 {
     private static final long serialVersionUID = 1L;
 
@@ -46,6 +45,7 @@ public abstract class OTApiException extends RuntimeException
 
     protected OTApiException(Map<String, ? extends Object> fields)
     {
+        super(null, Objects.toString(fields.get(DETAIL)));
         checkNotBlank(fields, ERROR_TYPE);
         checkNotBlank(fields, ERROR_SUBTYPE);
         this.fields = ImmutableMap.copyOf(fields);
@@ -86,7 +86,8 @@ public abstract class OTApiException extends RuntimeException
 
     private static void checkNotBlank(Map<String, ? extends Object> fields, String fieldName)
     {
-        Preconditions.checkArgument(!isBlank(Objects.toString(fields.get(fieldName))), "Field %s may not be missing", fieldName);
+        final String field = Objects.toString(fields.get(fieldName), null);
+        Preconditions.checkArgument(field != null && !field.trim().equals(""), "Field %s may not be missing", fieldName);
     }
 
     @Override

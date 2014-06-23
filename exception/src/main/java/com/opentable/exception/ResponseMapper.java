@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import com.google.inject.Singleton;
+import javax.inject.Singleton;
 
 @Provider
 @Singleton

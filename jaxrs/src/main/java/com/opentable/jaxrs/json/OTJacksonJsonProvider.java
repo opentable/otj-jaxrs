@@ -32,8 +32,8 @@ import javax.ws.rs.ext.Provider;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.Versioned;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Jersey Provider class that allows Jackson to serialize any media type starting

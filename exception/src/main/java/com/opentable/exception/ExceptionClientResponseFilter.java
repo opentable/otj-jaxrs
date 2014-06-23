@@ -21,18 +21,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientResponseContext;
+import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Provider;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import com.opentable.httpclient.HttpClientObserver;
-import com.opentable.httpclient.HttpClientResponse;
 import com.opentable.logging.Log;
 
 /**
@@ -40,30 +40,32 @@ import com.opentable.logging.Log;
  * and rethrow them clientside.
  * Rudely consumes the http response body and never lets the actual response handler do anything.
  */
-class ExceptionObserver extends HttpClientObserver
+@Provider
+class ExceptionClientResponseFilter implements ClientResponseFilter
 {
     private static final Log LOG = Log.findLog();
     private final ObjectMapper mapper;
     private final Map<String, Set<ExceptionReviver>> revivers;
 
-    ExceptionObserver(ObjectMapper mapper, Map<String, Set<ExceptionReviver>> revivers) {
+    @Inject
+    ExceptionClientResponseFilter(ObjectMapper mapper, Map<String, Set<ExceptionReviver>> revivers) {
         this.mapper = mapper;
         this.revivers = revivers;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public HttpClientResponse onResponseReceived(HttpClientResponse response) throws IOException
+    public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException
     {
-        if (StringUtils.isBlank(response.getContentType()))
+        final MediaType type = responseContext.getMediaType();
+        if (type == null)
         {
-            return response;
+            return;
         }
 
-        final MediaType type = MediaType.valueOf(response.getContentType());
         if (type.isCompatible(OTApiException.MEDIA_TYPE))
         {
-            final Map<String, Object> wrapper = mapper.readValue(response.getResponseBodyAsStream(), new TypeReference<Map<String, Object>>() {});
+            final Map<String, Object> wrapper = mapper.readValue(responseContext.getEntityStream(), new TypeReference<Map<String, Object>>() {});
             final Object causes = wrapper.get("causes");
 
             Preconditions.checkState(causes instanceof List, "bad causes");
@@ -88,8 +90,6 @@ class ExceptionObserver extends HttpClientObserver
 
             throw exn;
         }
-
-        return response;
     }
 
     private OTApiException toException(final Map<String, Object> fields)
@@ -97,7 +97,7 @@ class ExceptionObserver extends HttpClientObserver
         final String type = Objects.toString(fields.get(OTApiException.ERROR_TYPE));
 
         final Set<ExceptionReviver> set = revivers.get(type);
-        if (CollectionUtils.isEmpty(set))
+        if (set.isEmpty())
         {
             LOG.error("Unknown exception type '%s'", type);
             return makeUnknownException(fields);

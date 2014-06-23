@@ -21,20 +21,18 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Client;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Key;
-import com.google.inject.servlet.GuiceFilter;
 
-import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,10 +41,9 @@ import org.kitei.testing.lessio.AllowDNSResolution;
 import org.kitei.testing.lessio.AllowNetworkAccess;
 
 import com.opentable.config.Config;
-import com.opentable.httpclient.HttpClient;
-import com.opentable.httpclient.response.StringContentConverter;
+import com.opentable.jaxrs.JaxRsClientModule;
 import com.opentable.jaxrs.ServerBaseModule;
-import com.opentable.jaxrs.types.DateParam;
+import com.opentable.jaxrs.json.OTJacksonJsonProvider;
 import com.opentable.lifecycle.junit.LifecycleRule;
 import com.opentable.lifecycle.junit.LifecycleRunner;
 import com.opentable.lifecycle.junit.LifecycleStatement;
@@ -68,27 +65,25 @@ public class DateParamTest
 
     @Rule
     public IntegrationTestRule test = IntegrationTestRuleBuilder.defaultBuilder()
-        .addService(DATE_TEST_SERVICE_NAME, TweakedModule.forServiceModule(DateToLongWadlModule.class))
-        .addTestCaseModules(lifecycleRule.getLifecycleModule())
+        .addService(DATE_TEST_SERVICE_NAME, TweakedModule.forServiceModule(DateToLongModule.class))
+        .addTestCaseModules(lifecycleRule.getLifecycleModule(), new AbstractModule() {
+            @Override
+            protected void configure()
+            {
+                install (new JaxRsClientModule("test"));
+                bind (OTJacksonJsonProvider.class);
+            }
+        })
         .build(this);
 
     @Inject
-    private final HttpClient httpClient = null;
-
-    private GuiceFilter guiceFilter = null;
+    @Named("test")
+    private Client httpClient;
 
     @Before
     public void setUp()
     {
-        guiceFilter = test.exposeBinding(DATE_TEST_SERVICE_NAME, Key.get(GuiceFilter.class));
         uriBuilder = UriBuilder.fromUri(test.locateService(DATE_TEST_SERVICE_NAME)).path("/date");
-    }
-
-    @After
-    public void tearDown()
-    {
-        Assert.assertNotNull(guiceFilter);
-        guiceFilter.destroy();
     }
 
     @Test
@@ -96,9 +91,9 @@ public class DateParamTest
     {
         Instant when = Instant.ofEpochMilli(1000);
         assertEquals(when.toEpochMilli(),
-                Long.parseLong(httpClient.get(
-                        uriBuilder.queryParam("date", when.toEpochMilli()).build(),
-                        StringContentConverter.DEFAULT_RESPONSE_HANDLER).perform()));
+                Long.parseLong(httpClient.target(
+                        uriBuilder.queryParam("date", when.toEpochMilli()).build())
+                        .request().get(String.class)));
     }
 
     @Test
@@ -106,9 +101,9 @@ public class DateParamTest
     {
         Instant when = Instant.ofEpochMilli(1000);
         assertEquals(when.toEpochMilli(),
-                Long.parseLong(httpClient.get(
-                        uriBuilder.queryParam("date", DateTimeFormatter.ISO_DATE_TIME.format(when.atZone(ZoneId.of("UTC")))).build(),
-                        StringContentConverter.DEFAULT_RESPONSE_HANDLER).perform()));
+                Long.parseLong(httpClient.target(
+                        uriBuilder.queryParam("date", DateTimeFormatter.ISO_DATE_TIME.format(when.atZone(ZoneId.of("UTC")))).build())
+                        .request().get(String.class)));
     }
 
     @Test
@@ -116,17 +111,16 @@ public class DateParamTest
     {
         Instant when = Instant.ofEpochMilli(1000);
         assertEquals(when.toEpochMilli(),
-                Long.parseLong(httpClient.get(
-                        uriBuilder.queryParam("date", when.atZone(ZoneId.of("America/Los_Angeles")).toString()).build(),
-                        StringContentConverter.DEFAULT_RESPONSE_HANDLER).perform()));
+                Long.parseLong(httpClient.target(
+                        uriBuilder.queryParam("date", when.atZone(ZoneId.of("America/Los_Angeles")).toString()).build())
+                        .request().get(String.class)));
     }
 
     @Test
     public void testNull() throws Exception
     {
-        assertEquals("asdf", httpClient.get(
-                        uriBuilder.build(),
-                        StringContentConverter.DEFAULT_RESPONSE_HANDLER).perform());
+        assertEquals("asdf", httpClient.target(
+                        uriBuilder.build()).request().get(String.class));
     }
 
     @Test
@@ -134,15 +128,15 @@ public class DateParamTest
     {
         Instant when = Instant.ofEpochMilli(-1000);
         assertEquals(when.toEpochMilli(),
-                Long.parseLong(httpClient.get(
-                        uriBuilder.queryParam("date", when.toEpochMilli()).build(),
-                        StringContentConverter.DEFAULT_RESPONSE_HANDLER).perform()));
+                Long.parseLong(httpClient.target(
+                        uriBuilder.queryParam("date", when.toEpochMilli()).build())
+                        .request().get(String.class)));
     }
 
-    public static class DateToLongWadlModule extends AbstractModule {
+    public static class DateToLongModule extends AbstractModule {
         private final Config config;
 
-        public DateToLongWadlModule(Config config)
+        public DateToLongModule(Config config)
         {
             this.config = config;
         }

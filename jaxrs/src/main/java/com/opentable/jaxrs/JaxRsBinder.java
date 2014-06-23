@@ -17,15 +17,27 @@ package com.opentable.jaxrs;
 
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.core.Feature;
 
 import com.google.inject.Binder;
 import com.google.inject.binder.LinkedBindingBuilder;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 
 public final class JaxRsBinder
 {
     private JaxRsBinder()
     {
+    }
+
+    public static LinkedBindingBuilder<Feature> bindFeatureForAllClients(final Binder binder)
+    {
+        return bindFeatureForGroup(binder, PrivateFeatureGroup.WILDCARD);
+    }
+
+    public static LinkedBindingBuilder<Feature> bindFeatureForGroup(final Binder binder, final JaxRsFeatureGroup feature)
+    {
+        return MapBinder.newMapBinder(binder, JaxRsFeatureGroup.class, Feature.class).permitDuplicates().addBinding(feature);
     }
 
     public static LinkedBindingBuilder<ContainerRequestFilter> bindRequestFilter(final Binder binder)

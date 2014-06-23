@@ -16,20 +16,22 @@
 package com.opentable.exception;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,16 +39,9 @@ import org.junit.runner.RunWith;
 import org.kitei.testing.lessio.AllowNetworkAccess;
 
 import com.opentable.config.Config;
-import com.opentable.exception.ExceptionType;
-import com.opentable.exception.OTApiException;
-import com.opentable.exception.OTApiExceptionBinder;
-import com.opentable.exception.OTApiExceptionModule;
-import com.opentable.httpclient.HttpClient;
-import com.opentable.httpclient.guice.HttpClientModule;
-import com.opentable.httpclient.response.HttpResponseException;
-import com.opentable.httpclient.response.Valid2xxContentConverter;
-import com.opentable.jackson.OpenTableJacksonModule;
-import com.opentable.jaxrs.OpenTableJaxRsServletModule;
+import com.opentable.jaxrs.JaxRsClientModule;
+import com.opentable.jaxrs.ServerBaseModule;
+import com.opentable.jaxrs.json.OTJacksonJsonProvider;
 import com.opentable.lifecycle.junit.LifecycleRunner;
 import com.opentable.lifecycle.junit.LifecycleStatement;
 import com.opentable.testing.IntegrationTestRule;
@@ -57,8 +52,6 @@ import com.opentable.testing.tweaked.TweakedModule;
 @RunWith(LifecycleRunner.class)
 public class TestExceptionMappingBinding
 {
-    private static final Config EMPTY_CONFIG = Config.getEmptyConfig();
-
     @Rule
     public LifecycleStatement lifecycle = LifecycleStatement.serviceDiscoveryLifecycle();
 
@@ -68,10 +61,9 @@ public class TestExceptionMappingBinding
             @Override
             protected void configure()
             {
-                install (new OpenTableJaxRsServletModule(EMPTY_CONFIG));
-                install (new OpenTableJacksonModule());
-                install (new OTApiExceptionModule("boom"));
-                OTApiExceptionBinder.of(binder(), "boom").registerExceptionClass(BoomException.class);
+                install (new ServerBaseModule(Config.getEmptyConfig()));
+                install (new OTApiExceptionModule());
+                OTApiExceptionBinder.of(binder()).registerExceptionClass(BoomException.class);
                 bind (BoomResource.class);
             }
         }))
@@ -80,38 +72,32 @@ public class TestExceptionMappingBinding
             protected void configure()
             {
                 install (lifecycle.getLifecycleModule());
-                install (new HttpClientModule("with"));
-                install (new HttpClientModule("without"));
+                bind (OTJacksonJsonProvider.class);
 
-                install (new OTApiExceptionModule("with"));
-                OTApiExceptionBinder.of(binder(), "with").registerExceptionClass(BoomException.class);
+                install (new JaxRsClientModule("mapping"));
+
+                install (new OTApiExceptionModule());
+                OTApiExceptionBinder.of(binder()).registerExceptionClass(BoomException.class);
             }
         });
 
     @Inject
-    @Named("with")
-    HttpClient mappingClient;
+    @Named("mapping")
+    Client mappingClient;
 
-    @Inject
-    @Named("without")
-    HttpClient regularClient;
+    Client regularClient = ClientBuilder.newClient();
 
     @Test(expected=BoomException.class)
     public void testWithMapping() throws Exception
     {
-        mappingClient.get(UriBuilder.fromUri(rule.locateService("boom")).path("/boom").build(), Valid2xxContentConverter.DEFAULT_FAILING_RESPONSE_HANDLER).perform();
+        mappingClient.target(UriBuilder.fromUri(rule.locateService("boom")).path("/boom")).request().get();
     }
 
     @Test
     public void testNoMapping() throws Exception
     {
-        try {
-            regularClient.get(UriBuilder.fromUri(rule.locateService("boom")).path("/boom").build(), Valid2xxContentConverter.DEFAULT_FAILING_RESPONSE_HANDLER).perform();
-        } catch (HttpResponseException e) {
-            assertEquals(BOOM_STATUS.getStatusCode(), e.getStatusCode());
-            return;
-        }
-        fail();
+        Response response = regularClient.target(UriBuilder.fromUri(rule.locateService("boom")).path("/boom")).request().get();
+        assertEquals(BOOM_STATUS.getStatusCode(), response.getStatus());
     }
 
     /** A status unlikely to be accidentally returned (i.e. not 500) */

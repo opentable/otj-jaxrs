@@ -18,13 +18,9 @@ package com.opentable.jaxrs;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.inject.Provides;
 import com.google.inject.Scopes;
-import com.google.inject.Singleton;
 import com.google.inject.servlet.ServletModule;
 
 import org.jboss.resteasy.plugins.guice.GuiceResteasyBootstrapServletContextListener;
@@ -57,6 +53,7 @@ public class OpenTableJaxRsServletModule extends ServletModule
     @Override
     protected void configureServlets()
     {
+        install (new JaxRsSharedModule());
         install (new OpenTableJaxRsExceptionMapperModule());
 
         JaxRsBinder.bindResponseFilter(binder()).to(JsonUtf8ResponseFilter.class);
@@ -65,22 +62,11 @@ public class OpenTableJaxRsServletModule extends ServletModule
         bind (GuiceResteasyBootstrapServletContextListener.class);
 
         bind (OTCorsFilter.class).asEagerSingleton();
+        bind (LZ4DecodingInterceptor.class).asEagerSingleton();
 
         String first = paths.get(0);
         String[] rest = paths.subList(1, paths.size()).toArray(new String[paths.size()-1]);
         bind (HttpServlet30Dispatcher.class).in(Scopes.SINGLETON);
         serve(first, rest).with(HttpServlet30Dispatcher.class);
-    }
-
-    /**
-     * Binds the JacksonJsonProvider to Jersey.
-     */
-    @Provides
-    @Singleton
-    JacksonJsonProvider getJacksonJsonProvider(final ObjectMapper objectMapper)
-    {
-        final JacksonJsonProvider provider = new JacksonJsonProvider();
-        provider.setMapper(objectMapper);
-        return provider;
     }
 }
