@@ -14,6 +14,8 @@ import javax.ws.rs.core.Feature;
 
 import com.google.common.collect.ImmutableSet;
 
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+
 import com.opentable.lifecycle.Lifecycle;
 import com.opentable.lifecycle.LifecycleStage;
 
@@ -62,6 +64,7 @@ class JaxRsClientProvider implements Provider<Client>
         }
 
         builder.property(JaxRsClientModule.CLIENT_PROPERTY, name);
+        ((ResteasyClientBuilder) builder).connectionPoolSize(10);
         final Client client = builder.build();
         lifecycle.addListener(LifecycleStage.STOP_STAGE, client::close);
         return client;
