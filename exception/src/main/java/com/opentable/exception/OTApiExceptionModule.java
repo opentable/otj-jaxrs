@@ -52,8 +52,8 @@ public final class OTApiExceptionModule extends AbstractModule
     {
         install(new SharedOTApiExceptionModule());
 
-        HttpClientModule.bindNewObserver(binder(), httpClientAnnotation).to(Key.get(ExceptionObserver.class, httpClientAnnotation));
-        bind(ExceptionObserver.class).annotatedWith(httpClientAnnotation).toProvider(new ExceptionObserverProvider()).in(Scopes.SINGLETON);
+        HttpClientModule.bindNewObserver(binder(), httpClientAnnotation).to(Key.get(ExceptionClientResponseFilter.class, httpClientAnnotation));
+        bind(ExceptionClientResponseFilter.class).annotatedWith(httpClientAnnotation).toProvider(new ExceptionObserverProvider()).in(Scopes.SINGLETON);
 
         // Constructing the binder creates the MapBinder, so we don't have undeclared dependencies
         // even if there end up being no bindings, just an empty map.
@@ -93,7 +93,7 @@ public final class OTApiExceptionModule extends AbstractModule
         return true;
     }
 
-    class ExceptionObserverProvider implements Provider<ExceptionObserver>
+    class ExceptionObserverProvider implements Provider<ExceptionClientResponseFilter>
     {
         private Injector injector;
 
@@ -104,7 +104,7 @@ public final class OTApiExceptionModule extends AbstractModule
         }
 
         @Override
-        public ExceptionObserver get()
+        public ExceptionClientResponseFilter get()
         {
             final TypeLiteral<Map<String, Set<ExceptionReviver>>> type = new TypeLiteral<Map<String, Set<ExceptionReviver>>>() {};
             final Key<Map<String, Set<ExceptionReviver>>> mapBindingKey = Key.get(type, httpClientAnnotation);
@@ -112,7 +112,7 @@ public final class OTApiExceptionModule extends AbstractModule
             final ObjectMapper mapper = injector.getInstance(ObjectMapper.class);
             final Map<String, Set<ExceptionReviver>> revivers = injector.getInstance(mapBindingKey);
 
-            return new ExceptionObserver(mapper, revivers);
+            return new ExceptionClientResponseFilter(mapper, revivers);
         }
     }
 

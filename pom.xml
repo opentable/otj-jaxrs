@@ -28,7 +28,6 @@
   </modules>
 
   <properties>
-    <dep.resteasy.version>3.0.7.Final</dep.resteasy.version>
     <dep.jackson.version>2.3.2</dep.jackson.version>
     <dep.httpclient.version>1.0.1</dep.httpclient.version>
   </properties>
@@ -49,6 +48,12 @@
       <dependency>
         <groupId>com.opentable.components</groupId>
         <artifactId>otj-core</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-lifecycle</artifactId>
         <version>1.0.0</version>
       </dependency>
 
@@ -84,63 +89,14 @@
 
       <dependency>
         <groupId>com.opentable.components</groupId>
-        <artifactId>otj-integration-testing</artifactId>
-        <version>1.0.0</version>
+        <artifactId>otj-serverinfo</artifactId>
+        <version>1.2.1-SNAPSHOT</version>
       </dependency>
 
       <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>async-http-servlet-3.0</artifactId>
-        <version>${dep.resteasy.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-guice</artifactId>
-        <version>${dep.resteasy.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.annotation</groupId>
-            <artifactId>jsr250-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-jaxrs</artifactId>
-        <version>${dep.resteasy.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>jaxrs-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.jboss.spec.javax.annotation</groupId>
-            <artifactId>jboss-annotations-api_1.1_spec</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-client</artifactId>
-        <version>${dep.resteasy.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>jaxrs-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.jboss.spec.javax.annotation</groupId>
-            <artifactId>jboss-annotations-api_1.1_spec</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-integration-testing</artifactId>
+        <version>1.2.0</version>
       </dependency>
 
       <dependency>
@@ -184,6 +140,12 @@
             <artifactId>xml-apis</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>net.jpountz.lz4</groupId>
+        <artifactId>lz4</artifactId>
+        <version>1.2.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

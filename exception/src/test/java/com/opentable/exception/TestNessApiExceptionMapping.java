@@ -35,13 +35,6 @@ import com.google.inject.name.Named;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.opentable.exception.ExceptionObserver;
-import com.opentable.exception.ExceptionSubtype;
-import com.opentable.exception.ExceptionType;
-import com.opentable.exception.OTApiException;
-import com.opentable.exception.OTApiExceptionBinder;
-import com.opentable.exception.OTApiExceptionModule;
-import com.opentable.exception.UnknownOTApiException;
 import com.opentable.httpclient.HttpClient;
 import com.opentable.httpclient.internal.HttpClientMethod;
 import com.opentable.httpclient.response.Valid2xxContentConverter;
@@ -52,7 +45,7 @@ public class TestNessApiExceptionMapping
 
     @Inject
     @Named("test")
-    ExceptionObserver observer;
+    ExceptionClientResponseFilter observer;
 
     @Before
     public void setUp()

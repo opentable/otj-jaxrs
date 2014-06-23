@@ -21,6 +21,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientResponseContext;
+import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -31,8 +34,6 @@ import com.google.common.base.Preconditions;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.opentable.httpclient.HttpClientObserver;
-import com.opentable.httpclient.HttpClientResponse;
 import com.opentable.logging.Log;
 
 /**
@@ -40,22 +41,21 @@ import com.opentable.logging.Log;
  * and rethrow them clientside.
  * Rudely consumes the http response body and never lets the actual response handler do anything.
  */
-class ExceptionObserver extends HttpClientObserver
+class ExceptionClientResponseFilter extends ClientResponseFilter
 {
     private static final Log LOG = Log.findLog();
     private final ObjectMapper mapper;
     private final Map<String, Set<ExceptionReviver>> revivers;
 
-    ExceptionObserver(ObjectMapper mapper, Map<String, Set<ExceptionReviver>> revivers) {
+    ExceptionClientResponseFilter(ObjectMapper mapper, Map<String, Set<ExceptionReviver>> revivers) {
         this.mapper = mapper;
         this.revivers = revivers;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public HttpClientResponse onResponseReceived(HttpClientResponse response) throws IOException
+    public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException
     {
-        if (StringUtils.isBlank(response.getContentType()))
+        if (StringUtils.isBlank(responseContext.getMediaType().getContentType()))
         {
             return response;
         }
