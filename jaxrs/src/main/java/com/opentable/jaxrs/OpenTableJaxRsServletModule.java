@@ -57,6 +57,7 @@ public class OpenTableJaxRsServletModule extends ServletModule
     @Override
     protected void configureServlets()
     {
+        install (new JaxRsSharedModule());
         install (new OpenTableJaxRsExceptionMapperModule());
 
         JaxRsBinder.bindResponseFilter(binder()).to(JsonUtf8ResponseFilter.class);

@@ -20,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.util.Collections;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -32,7 +34,6 @@ import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
-import javax.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.servlet.GuiceFilter;
@@ -48,6 +49,7 @@ import org.kitei.testing.lessio.AllowNetworkAccess;
 
 import com.opentable.config.Config;
 import com.opentable.httpserver.HttpServer;
+import com.opentable.jaxrs.JaxRsClientModule;
 import com.opentable.jaxrs.ServerBaseModule;
 import com.opentable.lifecycle.junit.LifecycleRule;
 import com.opentable.lifecycle.junit.LifecycleRunner;
@@ -77,7 +79,11 @@ public class TestArgumentExceptionMapping
     @Rule
     public IntegrationTestRule test = IntegrationTestRuleBuilder.defaultBuilder()
         .addService("http", TweakedModule.forServiceModule(badResourceModule))
-        .addTestCaseModules(OpenTableJaxRsExceptionMapperModule.class, lifecycleRule.getLifecycleModule(), badResourceModule)
+        .addTestCaseModules(
+                OpenTableJaxRsExceptionMapperModule.class,
+                lifecycleRule.getLifecycleModule(),
+                new JaxRsClientModule("test"),
+                badResourceModule)
         .build(this);
 
     private GuiceFilter guiceFilter = null;
@@ -133,6 +139,7 @@ public class TestArgumentExceptionMapping
     }
 
     @Inject
+    @Named("test")
     Client client;
 
     @Test

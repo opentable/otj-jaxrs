@@ -24,7 +24,6 @@ import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
@@ -38,10 +37,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kitei.testing.lessio.AllowNetworkAccess;
 
-import com.opentable.config.Config;
-import com.opentable.jackson.OpenTableJacksonModule;
 import com.opentable.jaxrs.JaxRsClientModule;
-import com.opentable.jaxrs.OpenTableJaxRsServletModule;
 import com.opentable.lifecycle.junit.LifecycleRunner;
 import com.opentable.lifecycle.junit.LifecycleStatement;
 import com.opentable.testing.IntegrationTestRule;
@@ -52,8 +48,6 @@ import com.opentable.testing.tweaked.TweakedModule;
 @RunWith(LifecycleRunner.class)
 public class TestExceptionMappingBinding
 {
-    private static final Config EMPTY_CONFIG = Config.getEmptyConfig();
-
     @Rule
     public LifecycleStatement lifecycle = LifecycleStatement.serviceDiscoveryLifecycle();
 
@@ -63,8 +57,6 @@ public class TestExceptionMappingBinding
             @Override
             protected void configure()
             {
-                install (new OpenTableJaxRsServletModule(EMPTY_CONFIG));
-                install (new OpenTableJacksonModule());
                 install (new OTApiExceptionModule());
                 OTApiExceptionBinder.of(binder()).registerExceptionClass(BoomException.class);
                 bind (BoomResource.class);
@@ -75,7 +67,8 @@ public class TestExceptionMappingBinding
             protected void configure()
             {
                 install (lifecycle.getLifecycleModule());
-                install (new JaxRsClientModule("test"));
+                install (new JaxRsClientModule("mapping"));
+                install (new JaxRsClientModule("regular"));
 
                 install (new OTApiExceptionModule());
                 OTApiExceptionBinder.of(binder()).registerExceptionClass(BoomException.class);
@@ -86,7 +79,9 @@ public class TestExceptionMappingBinding
     @Named("test")
     Client mappingClient;
 
-    Client regularClient = ClientBuilder.newClient();
+    @Inject
+    @Named("regular")
+    Client regularClient;
 
     @Test(expected=BoomException.class)
     public void testWithMapping() throws Exception

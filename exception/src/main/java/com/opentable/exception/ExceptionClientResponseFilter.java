@@ -26,6 +26,7 @@ import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Provider;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,6 +40,7 @@ import com.opentable.logging.Log;
  * and rethrow them clientside.
  * Rudely consumes the http response body and never lets the actual response handler do anything.
  */
+@Provider
 class ExceptionClientResponseFilter implements ClientResponseFilter
 {
     private static final Log LOG = Log.findLog();

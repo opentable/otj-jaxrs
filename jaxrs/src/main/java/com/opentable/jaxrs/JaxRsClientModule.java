@@ -19,6 +19,7 @@ public class JaxRsClientModule extends AbstractModule
     @Override
     protected void configure()
     {
+        install (new JaxRsSharedModule());
         bind (Client.class).annotatedWith(Names.named(name)).toProvider(new JaxRsClientProvider(name));
     }
 }
