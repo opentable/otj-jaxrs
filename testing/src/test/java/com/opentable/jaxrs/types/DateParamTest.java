@@ -21,6 +21,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -30,12 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
 import com.google.inject.AbstractModule;
-import javax.inject.Inject;
-import com.google.inject.Key;
-import com.google.inject.servlet.GuiceFilter;
 
-import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,6 +41,7 @@ import org.kitei.testing.lessio.AllowDNSResolution;
 import org.kitei.testing.lessio.AllowNetworkAccess;
 
 import com.opentable.config.Config;
+import com.opentable.jaxrs.JaxRsClientModule;
 import com.opentable.jaxrs.ServerBaseModule;
 import com.opentable.lifecycle.junit.LifecycleRule;
 import com.opentable.lifecycle.junit.LifecycleRunner;
@@ -67,26 +65,17 @@ public class DateParamTest
     @Rule
     public IntegrationTestRule test = IntegrationTestRuleBuilder.defaultBuilder()
         .addService(DATE_TEST_SERVICE_NAME, TweakedModule.forServiceModule(DateToLongWadlModule.class))
-        .addTestCaseModules(lifecycleRule.getLifecycleModule())
+        .addTestCaseModules(lifecycleRule.getLifecycleModule(), new JaxRsClientModule("test"))
         .build(this);
 
     @Inject
+    @Named("test")
     private Client httpClient;
-
-    private GuiceFilter guiceFilter = null;
 
     @Before
     public void setUp()
     {
-        guiceFilter = test.exposeBinding(DATE_TEST_SERVICE_NAME, Key.get(GuiceFilter.class));
         uriBuilder = UriBuilder.fromUri(test.locateService(DATE_TEST_SERVICE_NAME)).path("/date");
-    }
-
-    @After
-    public void tearDown()
-    {
-        Assert.assertNotNull(guiceFilter);
-        guiceFilter.destroy();
     }
 
     @Test

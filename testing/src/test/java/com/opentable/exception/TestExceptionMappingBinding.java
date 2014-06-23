@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.client.Client;
@@ -39,6 +40,7 @@ import org.kitei.testing.lessio.AllowNetworkAccess;
 
 import com.opentable.config.Config;
 import com.opentable.jackson.OpenTableJacksonModule;
+import com.opentable.jaxrs.JaxRsClientModule;
 import com.opentable.jaxrs.OpenTableJaxRsServletModule;
 import com.opentable.lifecycle.junit.LifecycleRunner;
 import com.opentable.lifecycle.junit.LifecycleStatement;
@@ -73,6 +75,7 @@ public class TestExceptionMappingBinding
             protected void configure()
             {
                 install (lifecycle.getLifecycleModule());
+                install (new JaxRsClientModule("test"));
 
                 install (new OTApiExceptionModule());
                 OTApiExceptionBinder.of(binder()).registerExceptionClass(BoomException.class);
@@ -80,6 +83,7 @@ public class TestExceptionMappingBinding
         });
 
     @Inject
+    @Named("test")
     Client mappingClient;
 
     Client regularClient = ClientBuilder.newClient();

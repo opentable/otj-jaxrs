@@ -15,8 +15,6 @@
  */
 package com.opentable.exception;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import java.util.Map;
 import java.util.Objects;
 
@@ -86,7 +84,8 @@ public abstract class OTApiException extends RuntimeException
 
     private static void checkNotBlank(Map<String, ? extends Object> fields, String fieldName)
     {
-        Preconditions.checkArgument(!isBlank(Objects.toString(fields.get(fieldName))), "Field %s may not be missing", fieldName);
+        final String field = Objects.toString(fields.get(fieldName), null);
+        Preconditions.checkArgument(field != null && !field.trim().equals(""), "Field %s may not be missing", fieldName);
     }
 
     @Override

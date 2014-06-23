@@ -22,44 +22,38 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Provider;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.opentable.logging.Log;
 
-import org.apache.commons.collections.CollectionUtils;
+import com.opentable.logging.Log;
 
 /**
  * Intercept exceptions that have been mapped to <code>x-ot/error</code> responses,
  * and rethrow them clientside.
  * Rudely consumes the http response body and never lets the actual response handler do anything.
  */
-@Provider
-@Singleton
-public class ExceptionFilter implements ClientResponseFilter
+class ExceptionClientResponseFilter implements ClientResponseFilter
 {
     private static final Log LOG = Log.findLog();
     private final ObjectMapper mapper;
     private final Map<String, Set<ExceptionReviver>> revivers;
 
     @Inject
-    ExceptionFilter(ObjectMapper mapper, Map<String, Set<ExceptionReviver>> revivers) {
+    ExceptionClientResponseFilter(ObjectMapper mapper, Map<String, Set<ExceptionReviver>> revivers) {
         this.mapper = mapper;
         this.revivers = revivers;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext)
-    throws IOException
+    public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException
     {
         final MediaType type = responseContext.getMediaType();
         if (type == null)
@@ -101,7 +95,7 @@ public class ExceptionFilter implements ClientResponseFilter
         final String type = Objects.toString(fields.get(OTApiException.ERROR_TYPE));
 
         final Set<ExceptionReviver> set = revivers.get(type);
-        if (CollectionUtils.isEmpty(set))
+        if (set.isEmpty())
         {
             LOG.error("Unknown exception type '%s'", type);
             return makeUnknownException(fields);
@@ -117,7 +111,7 @@ public class ExceptionFilter implements ClientResponseFilter
         return makeUnknownException(fields);
     }
 
-    private static OTApiException makeUnknownException(Map<String, Object> fields)
+    private OTApiException makeUnknownException(Map<String, Object> fields)
     {
         return new UnknownOTApiException(fields);
     }

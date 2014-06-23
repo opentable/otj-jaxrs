@@ -36,12 +36,10 @@ import com.google.inject.Guice;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-
 public class TestOTApiExceptionMapping
 {
-
     @Inject
-    ExceptionFilter filter;
+    ExceptionClientResponseFilter filter;
 
     @Before
     public void setUp()

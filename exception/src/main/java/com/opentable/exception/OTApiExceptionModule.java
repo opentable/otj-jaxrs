@@ -31,7 +31,8 @@ public final class OTApiExceptionModule extends AbstractModule
     protected void configure()
     {
         bind(ResponseMapper.class);
-        bind(ExceptionFilter.class).in(Scopes.SINGLETON);
+
+        bind(ExceptionClientResponseFilter.class).in(Scopes.SINGLETON);
 
         // Constructing the binder creates the MapBinder, so we don't have undeclared dependencies
         // even if there end up being no bindings, just an empty map.

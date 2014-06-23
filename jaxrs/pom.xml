@@ -46,22 +46,22 @@
     </dependency>
 
     <dependency>
+      <groupId>net.jpountz.lz4</groupId>
+      <artifactId>lz4</artifactId>
+    </dependency>
+
+    <!-- RestEasy -->
+    <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-guice</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
-      <artifactId>async-http-servlet-3.0</artifactId>
+      <artifactId>resteasy-jaxrs</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>net.jpountz.lz4</groupId>
-      <artifactId>lz4</artifactId>
-      <version>1.2.0</version>
+      <artifactId>async-http-servlet-3.0</artifactId>
     </dependency>
 
     <dependency>
@@ -109,12 +109,12 @@
       <artifactId>javax.ws.rs-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
     </dependency>
 
     <dependency>

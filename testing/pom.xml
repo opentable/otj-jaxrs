@@ -32,12 +32,10 @@
     <dependency>
       <groupId>com.opentable.components</groupId>
       <artifactId>otj-jaxrs</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.opentable.components</groupId>
       <artifactId>otj-jaxrs-exception</artifactId>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -76,6 +74,11 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-client</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-guice</artifactId>
