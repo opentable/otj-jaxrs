@@ -64,7 +64,7 @@ class JaxRsClientProvider implements Provider<Client>
         }
 
         builder.property(JaxRsClientModule.CLIENT_PROPERTY, name);
-        ((ResteasyClientBuilder) builder).connectionPoolSize(10);
+        ((ResteasyClientBuilder) builder).connectionPoolSize(40);
         final Client client = builder.build();
         lifecycle.addListener(LifecycleStage.STOP_STAGE, client::close);
         return client;
