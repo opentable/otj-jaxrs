@@ -43,7 +43,7 @@ public class JaxRsJsonStreamer<T>
     private static final Log LOG = Log.findLog();
 
     private final ObjectMapper mapper;
-    @SuppressWarnings("PMD.UnusedPrivateField")
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "unused" })
     private final TypeReference<T> type;
     private final Callback<JsonGenerator> header;
     private final Callback<JsonGenerator> footer;
@@ -68,21 +68,21 @@ public class JaxRsJsonStreamer<T>
             this.type = type;
         }
 
-        public Builder<T> withHeader(Callback<JsonGenerator> header)
+        public Builder<T> withHeader(Callback<JsonGenerator> withHeader)
         {
-            this.header = header;
+            this.header = withHeader;
             return this;
         }
 
-        public Builder<T> withFooter(Callback<JsonGenerator> footer)
+        public Builder<T> withFooter(Callback<JsonGenerator> withFooter)
         {
-            this.footer = footer;
+            this.footer = withFooter;
             return this;
         }
 
-        public Builder<T> withEmitter(JsonEmitter<T> emitter)
+        public Builder<T> withEmitter(JsonEmitter<T> withEmitter)
         {
-            this.emitter = emitter;
+            this.emitter = withEmitter;
             return this;
         }
 
@@ -162,9 +162,8 @@ public class JaxRsJsonStreamer<T>
             LOG.trace("Start streaming %s", JaxRsJsonStreamer.this);
             final AtomicLong count = new AtomicLong();
             boolean success = false;
-            final JsonGenerator jg = mapper.getFactory().createJsonGenerator(output);
 
-            try {
+            try (final JsonGenerator jg = mapper.getFactory().createGenerator(output)) {
 
                 header.call(jg);
 
@@ -189,7 +188,6 @@ public class JaxRsJsonStreamer<T>
                 } else {
                     LOG.debug("Failed streaming after %d results in %dms for %s", count.get(), sw.getTime(), JaxRsJsonStreamer.this);
                 }
-                jg.close();
             }
         }
     }
