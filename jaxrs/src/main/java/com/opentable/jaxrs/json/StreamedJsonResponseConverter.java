@@ -49,40 +49,7 @@ public class StreamedJsonResponseConverter
             return;
         case 200:
             try (final JsonParser jp = mapper.getFactory().createParser(response.readEntity(InputStream.class))) {
-                expect(jp, jp.nextToken(), JsonToken.START_OBJECT);
-                expect(jp, jp.nextToken(), JsonToken.FIELD_NAME);
-                if (!"results".equals(jp.getCurrentName())) {
-                    throw new JsonParseException("expecting results field", jp.getCurrentLocation());
-                }
-                expect(jp, jp.nextToken(), JsonToken.START_ARRAY);
-                // As noted in a well-hidden comment in the MappingIterator constructor,
-                // readValuesAs requires the parser to be positioned after the START_ARRAY
-                // token with an empty current token
-                jp.clearCurrentToken();
-
-                Iterator<T> iter = jp.readValuesAs(type);
-
-                while (iter.hasNext()) {
-                    try {
-                        callback.call(iter.next());
-                    }
-                    catch (CallbackRefusedException e) {
-                        LOG.debug(e, "callback refused execution, finishing.");
-                        return;
-                    }
-                    catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        throw new IOException("Callback interrupted", e);
-                    }
-                    catch (Exception e) {
-                        Throwables.propagateIfPossible(e, IOException.class);
-                        throw new IOException("Callback failure", e);
-                    }
-                }
-                if (jp.nextValue() != JsonToken.VALUE_TRUE || !jp.getCurrentName().equals("success")) {
-                    throw new IOException("Streamed receive did not terminate normally; inspect server logs for cause.");
-                }
-                return;
+                doRead(callback, type, jp);
             }
 
         default:
@@ -90,6 +57,47 @@ public class StreamedJsonResponseConverter
                 throw new ClientErrorException(response);
             }
             throw new ServerErrorException(response);
+        }
+    }
+
+    private <T> void doRead(
+            Callback<T> callback,
+            TypeReference<T> type,
+            final JsonParser jp)
+    throws IOException
+    {
+        expect(jp, jp.nextToken(), JsonToken.START_OBJECT);
+        expect(jp, jp.nextToken(), JsonToken.FIELD_NAME);
+        if (!"results".equals(jp.getCurrentName())) {
+            throw new JsonParseException("expecting results field", jp.getCurrentLocation());
+        }
+        expect(jp, jp.nextToken(), JsonToken.START_ARRAY);
+        // As noted in a well-hidden comment in the MappingIterator constructor,
+        // readValuesAs requires the parser to be positioned after the START_ARRAY
+        // token with an empty current token
+        jp.clearCurrentToken();
+
+        Iterator<T> iter = jp.readValuesAs(type);
+
+        while (iter.hasNext()) {
+            try {
+                callback.call(iter.next());
+            }
+            catch (CallbackRefusedException e) {
+                LOG.debug(e, "callback refused execution, finishing.");
+                return;
+            }
+            catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException("Callback interrupted", e);
+            }
+            catch (Exception e) {
+                Throwables.propagateIfPossible(e, IOException.class);
+                throw new IOException("Callback failure", e);
+            }
+        }
+        if (jp.nextValue() != JsonToken.VALUE_TRUE || !jp.getCurrentName().equals("success")) {
+            throw new IOException("Streamed receive did not terminate normally; inspect server logs for cause.");
         }
     }
 
