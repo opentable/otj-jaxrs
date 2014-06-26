@@ -11,6 +11,7 @@ import com.google.inject.Scopes;
 import org.jboss.resteasy.plugins.guice.ext.JaxrsModule;
 
 import com.opentable.jaxrs.json.OTJacksonJsonProvider;
+import com.opentable.jaxrs.json.StreamedJsonResponseConverter;
 
 final class JaxRsSharedModule extends AbstractModule
 {
@@ -20,6 +21,8 @@ final class JaxRsSharedModule extends AbstractModule
         JaxRsBinder.bindFeatureForAllClients(binder()).to(ClientJsonFeature.class);
         bind (OTJacksonJsonProvider.class).in(Scopes.SINGLETON);
         install (new JaxrsModule());
+
+        bind (StreamedJsonResponseConverter.class).in(Scopes.SINGLETON);
     }
 
     @Override
