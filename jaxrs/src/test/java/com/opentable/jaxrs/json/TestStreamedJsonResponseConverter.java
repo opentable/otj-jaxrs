@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,10 +36,11 @@ public class TestStreamedJsonResponseConverter
     {
         return new ByteArrayInputStream(json.getBytes(Charsets.UTF_8));
     }
-    private static Response response(int status, InputStream entity)
+    private static Response response(Status status, InputStream entity)
     {
         Response response = EasyMock.createMock(Response.class);
-        EasyMock.expect(response.getStatus()).andReturn(status);
+        EasyMock.expect(response.getStatus()).andReturn(status.getStatusCode()).anyTimes();
+        EasyMock.expect(response.getStatusInfo()).andReturn(status).anyTimes();
         EasyMock.expect(response.readEntity(InputStream.class)).andReturn(entity);
         EasyMock.replay(response);
         return response;
@@ -48,7 +50,7 @@ public class TestStreamedJsonResponseConverter
     public void testSuccess() throws Exception
     {
         CallbackCollector<Integer> callback = new CallbackCollector<>();
-        streamer.read(response(200, inputStream(TEST_JSON)), callback, INT_TYPE_REF);
+        streamer.read(response(Status.OK, inputStream(TEST_JSON)), callback, INT_TYPE_REF);
 
         assertEquals(ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), callback.getItems());
     }
@@ -68,7 +70,7 @@ public class TestStreamedJsonResponseConverter
                 items.add(item);
             }
         };
-        streamer.read(response(200, inputStream(TEST_JSON)), callback, INT_TYPE_REF);
+        streamer.read(response(Status.OK, inputStream(TEST_JSON)), callback, INT_TYPE_REF);
 
         assertEquals(ImmutableList.of(1, 2, 3, 4), items);
     }
@@ -77,6 +79,6 @@ public class TestStreamedJsonResponseConverter
     public void testEmpty() throws Exception
     {
         CallbackCollector<Integer> callback = new CallbackCollector<>();
-        streamer.read(response(200, inputStream(EMPTY_JSON)), callback, INT_TYPE_REF);
+        streamer.read(response(Status.OK, inputStream(EMPTY_JSON)), callback, INT_TYPE_REF);
     }
 }

@@ -51,7 +51,7 @@ public class StreamedJsonResponseConverter
             try (final JsonParser jp = mapper.getFactory().createParser(response.readEntity(InputStream.class))) {
                 doRead(callback, type, jp);
             }
-
+            return;
         default:
             if (sc >= 400 && sc < 500) {
                 throw new ClientErrorException(response);
