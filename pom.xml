@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.opentable</groupId>
     <artifactId>otj-parent</artifactId>
-    <version>13</version>
+    <version>14</version>
   </parent>
 
   <scm>
@@ -22,6 +22,10 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>clientfactory-api</module>
+    <module>clientfactory-dummy</module>
+    <module>clientfactory-jersey</module>
+    <module>clientfactory-resteasy</module>
     <module>jaxrs</module>
     <module>exception</module>
     <module>testing</module>
