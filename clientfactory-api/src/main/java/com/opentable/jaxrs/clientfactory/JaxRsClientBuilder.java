@@ -27,8 +27,7 @@ public interface JaxRsClientBuilder
     JaxRsClientBuilder register(Class<?> clazz);
 
     /**
-     * Register a filter for performing HTTP Basic Auth using the
-     * requested username and password.
+     * Apply a configuration to this client builder, to apply settings in the HttpClient.
      * @return this for continued building
      */
     JaxRsClientBuilder withConfiguration(JaxRsClientConfig config);

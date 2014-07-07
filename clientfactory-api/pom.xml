@@ -33,7 +33,6 @@
     dependency, and be one of:
     - otj-jaxrs-clientfactory-jersey (if you are using Jersey), or
     - otj-jaxrs-clientfactory-resteasy (if you are using RESTeasy).
-    - otj-jaxrs-clientfactory-dummy (for testing).
     -->
   </dependencies>
 </project>
