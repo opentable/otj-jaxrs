@@ -23,7 +23,6 @@
 
   <modules>
     <module>clientfactory-api</module>
-    <module>clientfactory-dummy</module>
     <module>clientfactory-jersey</module>
     <module>clientfactory-resteasy</module>
     <module>jaxrs</module>
@@ -34,6 +33,7 @@
   <properties>
     <dep.jackson.version>2.3.2</dep.jackson.version>
     <dep.httpclient.version>1.0.1</dep.httpclient.version>
+    <dep.apache.httpclient.version>4.3.3</dep.apache.httpclient.version>
   </properties>
 
   <dependencyManagement>
@@ -145,6 +145,26 @@
         <artifactId>lz4</artifactId>
         <version>1.2.0</version>
       </dependency>
+
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>${dep.apache.httpclient.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>1.9.5</version>
+        <scope>test</scope>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 </project>

@@ -22,6 +22,11 @@
       <artifactId>javax.ws.rs-api</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.skife.config</groupId>
+      <artifactId>config-magic</artifactId>
+    </dependency>
+
     <!-- Heads up!
     If you are using otj-jaxrs-clientfactory-api you will also need to include
     an implementation of it in your project's POM file. That must be a runtime

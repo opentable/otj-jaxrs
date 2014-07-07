@@ -10,7 +10,7 @@ class JaxRsClientBuilderUtil
 {
     private static Class<JaxRsClientBuilder> builderClass = findBuilderClass();
 
-    static JaxRsClientBuilder getInstance()
+    static JaxRsClientBuilder newInstance()
     {
         try {
             return builderClass.newInstance();

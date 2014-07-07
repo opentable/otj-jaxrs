@@ -14,9 +14,11 @@
   <properties>
     <ot.jersey.version>2.10.1</ot.jersey.version>
     <ot.build.allow-jersey>true</ot.build.allow-jersey>
+    <ot.apache.httpclient.version>4.3.2</ot.apache.httpclient.version>
   </properties>
 
   <dependencies>
+    <!-- OT -->
     <dependency>
       <groupId>com.opentable.components</groupId>
       <artifactId>otj-jaxrs-clientfactory-api</artifactId>
@@ -24,16 +26,53 @@
     </dependency>
 
     <dependency>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-logging</artifactId>
+    </dependency>
+
+    <!-- Javax -->
+    <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>javax.ws.rs-api</artifactId>
     </dependency>
 
+    <!-- Jersey dependencies -->
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-client</artifactId>
       <version>${ot.jersey.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-common</artifactId>
+      <version>${ot.jersey.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish.jersey.media</groupId>
+      <artifactId>jersey-media-json-jackson</artifactId>
+      <version>${ot.jersey.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish.jersey.connectors</groupId>
+      <artifactId>jersey-apache-connector</artifactId>
+      <version>${ot.jersey.version}</version>
+    </dependency>
+
+    <!-- Apache -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+    </dependency>
+
+    <!-- test -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -43,7 +82,6 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>1.9.5</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

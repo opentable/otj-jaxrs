@@ -1,39 +1,32 @@
 package com.opentable.jaxrs.clientfactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
+import java.util.Optional;
 
 import javax.ws.rs.client.Client;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.glassfish.jersey.apache.connector.ApacheClientProperties;
+import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.message.GZipEncoder;
+
+import com.opentable.logging.Log;
 
 /**
  * Jersey implementation of JaxRsClientBuilder
  */
 public class JaxRsClientBuilderImpl implements JaxRsClientBuilder
 {
+    private static final Log LOG = Log.findLog();
+
     private final JerseyClientBuilder clientBuilder = new JerseyClientBuilder();
-    private final List<Consumer<JerseyClient>> clientSetup = new ArrayList<>();
 
-    @Override
-    public JaxRsClientBuilder connectTimeout(int value, TimeUnit units)
-    {
-        clientSetup.add(client -> client.property(ClientProperties.CONNECT_TIMEOUT, units.toMillis(value)));
-        return this;
-    }
-
-    @Override
-    public JaxRsClientBuilder socketTimeout(int value, TimeUnit units)
-    {
-        clientSetup.add(client -> client.property(ClientProperties.READ_TIMEOUT, units.toMillis(value)));
-        return this;
-    }
+    private Optional<ClientConfig> clientConfig = Optional.empty();
 
     @Override
     public JaxRsClientBuilder register(Object object)
@@ -50,25 +43,47 @@ public class JaxRsClientBuilderImpl implements JaxRsClientBuilder
     }
 
     @Override
-    public JaxRsClientBuilder withBasicAuth(String username, String password)
+    public JaxRsClientBuilder withConfiguration(JaxRsClientConfig config)
     {
-        HttpAuthenticationFeature feature = HttpAuthenticationFeature.basic(username, password);
-        clientBuilder.register(feature);
+        this.clientConfig = Optional.of(createClientConfig(config));
+        configureAuthenticationIfNeeded(config);
         return this;
     }
 
     @Override
     public Client build()
     {
-        JerseyClient client = clientBuilder.build();
-        clientSetup.forEach(setup -> setup.accept(client));
-        return client;
+        LOG.info("creating Jersey JAX-RS client");
+
+        return clientConfig // if there's a config
+                .map(clientBuilder::withConfig)  // then use client with config
+                .orElse(clientBuilder)           // otherwise go without
+                .register(JacksonFeature.class)
+                .register(GZipEncoder.class)
+                .build();
     }
 
-    private void installStandardFeatures() {
-        this.restClient.addFilter(new GZIPContentEncodingFilter(false));
-        ClientConfig config = new ClientConfig();
-        config.Fea.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+    private ClientConfig createClientConfig(JaxRsClientConfig config)
+    {
+        final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(config.httpClientMaxTotalConnections());
+        connectionManager.setDefaultMaxPerRoute(config.httpClientDefaultMaxPerRoute());
 
+        final ClientConfig clientConfig = new ClientConfig();
+        clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
+        clientConfig.connectorProvider(new ApacheConnectorProvider());
+        clientConfig.property(ClientProperties.CONNECT_TIMEOUT, config.connectTimeoutMillis());
+        clientConfig.property(ClientProperties.READ_TIMEOUT, config.socketTimeoutMillis());
+        return clientConfig;
+    }
+
+    private void configureAuthenticationIfNeeded(JaxRsClientConfig config)
+    {
+        if (!StringUtils.isEmpty(config.basicAuthUserName()) && !StringUtils.isEmpty(config.basicAuthPassword()))
+        {
+            HttpAuthenticationFeature auth = HttpAuthenticationFeature.basic(
+                    config.basicAuthUserName(), config.basicAuthPassword());
+            clientBuilder.register(auth);
+        }
     }
 }
