@@ -25,6 +25,7 @@
     <module>clientfactory-api</module>
     <module>clientfactory-jersey</module>
     <module>clientfactory-resteasy</module>
+    <module>clientfactory-testing</module>
     <module>jaxrs</module>
     <module>exception</module>
     <module>testing</module>
