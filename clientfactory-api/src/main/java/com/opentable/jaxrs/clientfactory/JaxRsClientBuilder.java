@@ -1,6 +1,10 @@
 package com.opentable.jaxrs.clientfactory;
 
+import java.util.Properties;
+
 import javax.ws.rs.client.Client;
+
+import org.skife.config.ConfigurationObjectFactory;
 
 /**
  * A factory for producing JAX-RS clients with low-level socket-handling
@@ -31,6 +35,15 @@ public interface JaxRsClientBuilder
      * @return this for continued building
      */
     JaxRsClientBuilder withConfiguration(JaxRsClientConfig config);
+
+    /**
+     * Apply a configuration to this client builder, to apply settings in the HttpClient.
+     * @return this for continued building
+     */
+    default JaxRsClientBuilder withConfiguration(Properties configProperties) {
+        final JaxRsClientConfig config = new ConfigurationObjectFactory(configProperties).build(JaxRsClientConfig.class);
+        return withConfiguration(config);
+    }
 
     /**
      * @return the completed JAX-RS client
