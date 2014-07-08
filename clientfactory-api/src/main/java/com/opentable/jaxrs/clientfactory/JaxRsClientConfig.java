@@ -6,11 +6,11 @@ import org.skife.config.Default;
 public interface JaxRsClientConfig
 {
     @Config("jaxrs.client.connect-timeout.millis")
-    @Default("10000")
+    @Default("1000")
     long connectTimeoutMillis();
 
     @Config("jaxrs.client.socket-timeout.millis")
-    @Default("1000")
+    @Default("10000")
     long socketTimeoutMillis();
 
     @Config("jaxrs.client.auth.basic.username")
