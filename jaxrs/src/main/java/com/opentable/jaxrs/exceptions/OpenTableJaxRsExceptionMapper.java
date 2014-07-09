@@ -56,7 +56,7 @@ public abstract class OpenTableJaxRsExceptionMapper<U extends Throwable> impleme
     public Response toResponse(final U exception)
     {
         final Map<String, String> response = ImmutableMap.of("code", statusCode.toString(),
-                                                             "trace", Objects.firstNonNull(MDC.get("track"), ""),
+                                                             "requestid", Objects.firstNonNull(MDC.get("requestid"), ""),
                                                              "message", ObjectUtils.firstNonNull(exception.getMessage(), "(no message)"));
 
         return Response.status(statusCode)

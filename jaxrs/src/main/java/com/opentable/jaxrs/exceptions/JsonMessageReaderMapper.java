@@ -49,7 +49,7 @@ public class JsonMessageReaderMapper extends OpenTableJaxRsExceptionMapper<JsonP
             if (CLASS_NAMES.contains(e.getClassName())) {
                 final Map<String, String> response = ImmutableMap.of(
                         "code", "400",
-                        "track", Objects.firstNonNull(MDC.get("track"), ""),
+                        "requestid", Objects.firstNonNull(MDC.get("requestid"), ""),
                         "message", Objects.firstNonNull(exception.getMessage(), "(no message)"));
 
                 return Response.status(400)
