@@ -18,6 +18,7 @@ package com.opentable.jaxrs.exceptions;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.time.Clock;
 import java.util.Collections;
 
 import javax.inject.Inject;
@@ -66,6 +67,7 @@ public class TestArgumentExceptionMapping
     private final Module badResourceModule = new AbstractModule() {
         @Override
         public void configure() {
+            bind (Clock.class).toInstance(Clock.systemUTC());
             install (new ServerBaseModule(Config.getEmptyConfig()));
             bind(BadResource.class);
         }

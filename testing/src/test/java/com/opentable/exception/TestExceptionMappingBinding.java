@@ -17,6 +17,7 @@ package com.opentable.exception;
 
 import static org.junit.Assert.assertEquals;
 
+import java.time.Clock;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -60,6 +61,7 @@ public class TestExceptionMappingBinding
             @Override
             protected void configure()
             {
+                bind (Clock.class).toInstance(Clock.systemUTC());
                 install (new ServerBaseModule(Config.getEmptyConfig()));
                 install (new OTApiExceptionModule());
                 OTApiExceptionBinder.of(binder()).registerExceptionClass(BoomException.class);

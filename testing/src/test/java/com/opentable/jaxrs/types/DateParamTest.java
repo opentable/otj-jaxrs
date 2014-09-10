@@ -17,6 +17,7 @@ package com.opentable.jaxrs.types;
 
 import static org.junit.Assert.assertEquals;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -67,6 +68,7 @@ public class DateParamTest
             @Override
             protected void configure()
             {
+                bind (Clock.class).toInstance(Clock.systemUTC());
                 install (new JaxRsClientModule("test", StandardFeatureGroup.PLATFORM_INTERNAL));
                 bind (OTJacksonJsonProvider.class);
             }
@@ -140,6 +142,7 @@ public class DateParamTest
 
         @Override
         protected void configure() {
+            bind (Clock.class).toInstance(Clock.systemUTC());
             install (new ServerBaseModule(config));
             bind (DateToLongResource.class);
         }
