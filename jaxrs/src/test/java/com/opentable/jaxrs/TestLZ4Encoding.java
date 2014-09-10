@@ -4,6 +4,7 @@ import static java.lang.String.format;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Clock;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -22,14 +23,13 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Stage;
 import com.google.inject.servlet.ServletModule;
+
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.kitei.testing.lessio.AllowNetworkAccess;
-import org.kitei.testing.lessio.AllowNetworkListen;
 
 import com.opentable.config.Config;
 import com.opentable.config.ConfigModule;
@@ -39,14 +39,12 @@ import com.opentable.lifecycle.LifecycleStage;
 import com.opentable.lifecycle.guice.LifecycleModule;
 import com.opentable.server.PortNumberProvider;
 
-@AllowNetworkListen(ports= {0})
-@AllowNetworkAccess(endpoints= {"127.0.0.1:*"})
 public class TestLZ4Encoding
 {
     private static final String BIG_CONTENT_RESOURCE = "/test-resources/big-content.txt";
 
     @Inject
-    private Lifecycle lifecycle = null;
+    private Lifecycle lifecycle;
 
     @Inject
     private PortNumberProvider pnp;
@@ -68,6 +66,7 @@ public class TestLZ4Encoding
                                                                 binder().requireExplicitBindings();
                                                                 binder().disableCircularProxies();
 
+                                                                bind (Clock.class).toInstance(Clock.systemUTC());
                                                                 bind (ContentServlet.class);
                                                                 serve("/content").with(ContentServlet.class);
                                                             }

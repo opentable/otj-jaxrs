@@ -19,6 +19,12 @@
       <artifactId>otj-jaxrs-clientfactory-resteasy</artifactId>
       <groupId>com.opentable.components</groupId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>jcip-annotations</artifactId>
+          <groupId>net.jcip</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- this is only needed if running standalone apps that don't use otj-jackson -->
     <dependency>

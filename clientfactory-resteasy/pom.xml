@@ -40,6 +40,12 @@
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>jcip-annotations</artifactId>
+          <groupId>net.jcip</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

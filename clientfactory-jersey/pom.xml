@@ -39,12 +39,24 @@
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-client</artifactId>
       <version>${ot.jersey.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>javax.inject</artifactId>
+          <groupId>org.glassfish.hk2.external</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-common</artifactId>
       <version>${ot.jersey.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>javax.inject</artifactId>
+          <groupId>org.glassfish.hk2.external</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

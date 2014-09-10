@@ -119,13 +119,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- Annotations used in the integration test builder -->
-    <dependency>
-      <groupId>org.kitei.testing</groupId>
-      <artifactId>kitei-lessio</artifactId>
-      <scope>test</scope>
-    </dependency>
-
     <dependency>
       <groupId>xom</groupId>
       <artifactId>xom</artifactId>
