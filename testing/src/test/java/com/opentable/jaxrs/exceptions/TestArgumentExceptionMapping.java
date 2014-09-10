@@ -42,8 +42,6 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kitei.testing.lessio.AllowDNSResolution;
-import org.kitei.testing.lessio.AllowNetworkAccess;
 
 import com.opentable.config.Config;
 import com.opentable.httpserver.HttpServer;
@@ -57,8 +55,6 @@ import com.opentable.testing.IntegrationTestRule;
 import com.opentable.testing.IntegrationTestRuleBuilder;
 import com.opentable.testing.tweaked.TweakedModule;
 
-@AllowNetworkAccess(endpoints= {"127.0.0.1:*"})
-@AllowDNSResolution
 @RunWith(LifecycleRunner.class)
 public class TestArgumentExceptionMapping
 {

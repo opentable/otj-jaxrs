@@ -37,8 +37,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kitei.testing.lessio.AllowDNSResolution;
-import org.kitei.testing.lessio.AllowNetworkAccess;
 
 import com.opentable.config.Config;
 import com.opentable.jaxrs.JaxRsClientModule;
@@ -52,8 +50,6 @@ import com.opentable.testing.IntegrationTestRule;
 import com.opentable.testing.IntegrationTestRuleBuilder;
 import com.opentable.testing.tweaked.TweakedModule;
 
-@AllowNetworkAccess(endpoints= {"0.0.0.0:*"})
-@AllowDNSResolution
 @RunWith(LifecycleRunner.class)
 public class DateParamTest
 {

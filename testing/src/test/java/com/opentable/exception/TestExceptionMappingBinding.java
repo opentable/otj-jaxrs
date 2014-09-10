@@ -36,7 +36,6 @@ import com.google.inject.AbstractModule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kitei.testing.lessio.AllowNetworkAccess;
 
 import com.opentable.config.Config;
 import com.opentable.jaxrs.JaxRsClientModule;
@@ -49,7 +48,6 @@ import com.opentable.testing.IntegrationTestRule;
 import com.opentable.testing.IntegrationTestRuleBuilder;
 import com.opentable.testing.tweaked.TweakedModule;
 
-@AllowNetworkAccess(endpoints= {"0.0.0.0:8080"})
 @RunWith(LifecycleRunner.class)
 public class TestExceptionMappingBinding
 {
