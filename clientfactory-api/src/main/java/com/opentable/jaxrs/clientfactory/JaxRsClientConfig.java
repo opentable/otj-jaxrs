@@ -5,31 +5,31 @@ import org.skife.config.Default;
 
 public interface JaxRsClientConfig
 {
-    @Config("jaxrs.client.connect-timeout.millis")
+    @Config({"jaxrs.client.${clientName}.connect-timeout.millis", "jaxrs.client.default.connect-timeout.millis"})
     @Default("1000")
     long connectTimeoutMillis();
 
-    @Config("jaxrs.client.socket-timeout.millis")
+    @Config({"jaxrs.client.${clientName}.socket-timeout.millis", "jaxrs.client.default.socket-timeout.millis"})
     @Default("10000")
     long socketTimeoutMillis();
 
-    @Config("jaxrs.client.auth.basic.username")
+    @Config({"jaxrs.client.${clientName}.auth.basic.username", "jaxrs.client.default.auth.basic.username"})
     @Default("")
     String basicAuthUserName();
 
-    @Config("jaxrs.client.auth.basic.password")
+    @Config({"jaxrs.client.${clientName}.auth.basic.password", "jaxrs.client.default.auth.basic.password"})
     @Default("")
     String basicAuthPassword();
 
-    @Config("jaxrs.client.connection-pool.size")
+    @Config({"jaxrs.client.${clientName}.connection-pool.size", "jaxrs.client.default.connection-pool.size"})
     @Default("40")
     int connectionPoolSize();
 
-    @Config("jaxrs.client.http.max.total.connections")
+    @Config({"jaxrs.client.${clientName}.http.max.total.connections", "jaxrs.client.default.http.max.total.connections"})
     @Default("100")
     int httpClientMaxTotalConnections();
 
-    @Config("jaxrs.client.http.max.per.route.connections")
+    @Config({"jaxrs.client.${clientName}.http.max.per.route.connections", "jaxrs.client.default.http.max.per.route.connections"})
     @Default("20")
     int httpClientDefaultMaxPerRoute();
 }

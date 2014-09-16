@@ -1,13 +1,13 @@
 package com.opentable.jaxrs;
 
+import javax.inject.Singleton;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+
 import com.opentable.jaxrs.json.OTJacksonJsonProvider;
-
-import javax.inject.Singleton;
-
 
 final class JaxRsSharedModule extends AbstractModule {
     @Override

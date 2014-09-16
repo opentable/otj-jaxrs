@@ -1,12 +1,18 @@
 package com.opentable.jaxrs;
 
+import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
+import javax.ws.rs.client.Client;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
-import javax.ws.rs.client.Client;
-import java.util.Arrays;
-import java.util.Collection;
+import com.opentable.config.ConfigProvider;
+import com.opentable.jaxrs.clientfactory.JaxRsClientConfig;
 
 public class JaxRsClientModule extends AbstractModule
 {
@@ -27,8 +33,14 @@ public class JaxRsClientModule extends AbstractModule
     @Override
     protected void configure()
     {
+        final Annotation annotation = Names.named(name);
+
+        bind (JaxRsClientConfig.class).annotatedWith(annotation).toProvider(
+                ConfigProvider.of(JaxRsClientConfig.class,
+                                  Collections.singletonMap("clientName", name)));
+
         install (new JaxRsSharedModule());
-        bind (Client.class).annotatedWith(Names.named(name)).toProvider(new JaxRsClientProvider(name, features));
+        bind (Client.class).annotatedWith(annotation).toProvider(new JaxRsClientProvider(name, features));
         JaxRsClientBinder.bindFeatureForAllClients(binder()).to(ClientJsonFeature.class);
     }
 }

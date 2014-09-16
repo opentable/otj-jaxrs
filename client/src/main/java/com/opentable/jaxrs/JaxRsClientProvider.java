@@ -1,31 +1,36 @@
 package com.opentable.jaxrs;
 
-import com.google.common.collect.ImmutableSet;
-import com.opentable.jaxrs.clientfactory.JaxRsClientBuilder;
-import com.opentable.jaxrs.clientfactory.JaxRsClientConfig;
-import com.opentable.lifecycle.Lifecycle;
-import com.opentable.lifecycle.LifecycleStage;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.Feature;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+
+import com.opentable.jaxrs.clientfactory.JaxRsClientBuilder;
+import com.opentable.jaxrs.clientfactory.JaxRsClientConfig;
+import com.opentable.lifecycle.Lifecycle;
+import com.opentable.lifecycle.LifecycleStage;
 
 @Singleton
 class JaxRsClientProvider implements Provider<Client>
 {
     private final String name;
     private final Set<JaxRsFeatureGroup> featureGroups;
-    private JaxRsClientConfig clientConfig;
 
+    private JaxRsClientBuilder clientBuilder;
     private Map<JaxRsFeatureGroup, Set<Feature>> features;
     private Lifecycle lifecycle;
-    private JaxRsClientBuilder clientBuilder;
+    private Injector injector;
 
     JaxRsClientProvider(String name, Collection<JaxRsFeatureGroup> featureGroups)
     {
@@ -37,8 +42,8 @@ class JaxRsClientProvider implements Provider<Client>
     }
 
     @Inject
-    public void setClientConfig(JaxRsClientConfig clientConfig) {
-        this.clientConfig = clientConfig;
+    public void setInjector(Injector injector) {
+        this.injector = injector;
     }
 
     @Inject
@@ -61,6 +66,7 @@ class JaxRsClientProvider implements Provider<Client>
     @Override
     public Client get()
     {
+        final JaxRsClientConfig clientConfig = injector.getInstance(Key.get(JaxRsClientConfig.class, Names.named(name)));
         final JaxRsClientBuilder builder = clientBuilder.withConfiguration(clientConfig);
 
         for (Entry<JaxRsFeatureGroup, Set<Feature>> e : features.entrySet()) {
