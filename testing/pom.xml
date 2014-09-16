@@ -31,11 +31,15 @@
   <dependencies>
     <dependency>
       <groupId>com.opentable.components</groupId>
-      <artifactId>otj-jaxrs</artifactId>
+      <artifactId>otj-jaxrs-shared</artifactId>
     </dependency>
     <dependency>
       <groupId>com.opentable.components</groupId>
       <artifactId>otj-jaxrs-exception</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-jaxrs-server</artifactId>
     </dependency>
 
     <dependency>
@@ -129,6 +133,10 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
     </dependency>
   </dependencies>
 </project>

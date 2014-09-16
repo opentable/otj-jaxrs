@@ -9,42 +9,39 @@
     <version>1.3.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>otj-jaxrs-exception</artifactId>
-  <name>otj-jaxrs-exception</name>
+  <artifactId>otj-jaxrs-server</artifactId>
+  <name>otj-jaxrs-server</name>
   <packaging>jar</packaging>
-  <description>Exception handling for JAX-RS through HttpClient</description>
+  <description>OpenTable specific jaxrs glue code</description>
 
   <dependencies>
     <dependency>
       <groupId>com.opentable.components</groupId>
-      <artifactId>otj-jaxrs-client</artifactId>
+      <artifactId>otj-jaxrs-shared</artifactId>
     </dependency>
 
     <dependency>
       <groupId>com.opentable.components</groupId>
-      <artifactId>otj-logging</artifactId>
+      <artifactId>otj-config</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-httpserver</artifactId>
     </dependency>
 
+    <!-- RestEasy -->
     <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-guice</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jaxrs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>async-http-servlet-3.0</artifactId>
     </dependency>
 
     <dependency>
@@ -56,20 +53,32 @@
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>com.google.inject.extensions</groupId>
+      <artifactId>guice-servlet</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.google.inject.extensions</groupId>
       <artifactId>guice-multibindings</artifactId>
     </dependency>
-
     <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>annotations</artifactId>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-client</artifactId>
+      <groupId>xom</groupId>
+      <artifactId>xom</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -80,8 +89,8 @@
     </dependency>
 
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <groupId>org.weakref</groupId>
+      <artifactId>jmxutils</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -26,9 +26,11 @@
     <module>clientfactory-jersey</module>
     <module>clientfactory-resteasy</module>
     <module>clientfactory-testing</module>
-    <module>jaxrs</module>
+    <module>server</module>
     <module>exception</module>
     <module>testing</module>
+    <module>shared</module>
+    <module>client</module>
   </modules>
 
   <properties>
@@ -41,12 +43,27 @@
     <dependencies>
       <dependency>
         <groupId>com.opentable.components</groupId>
-        <artifactId>otj-jaxrs</artifactId>
+        <artifactId>otj-jaxrs-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-jaxrs-clientfactory-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.opentable.components</groupId>
         <artifactId>otj-jaxrs-exception</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-jaxrs-shared</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.opentable.components</groupId>
+        <artifactId>otj-jaxrs-server</artifactId>
         <version>${project.version}</version>
       </dependency>
 
