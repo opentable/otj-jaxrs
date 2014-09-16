@@ -32,4 +32,8 @@ public interface JaxRsClientConfig
     @Config({"jaxrs.client.${clientName}.http.max.per.route.connections", "jaxrs.client.default.http.max.per.route.connections"})
     @Default("20")
     int httpClientDefaultMaxPerRoute();
+
+    @Config({"jaxrs.client.${clientName}.enable-etcd-hacks", "jaxrs.client.default.enable-etcd-hacks"})
+    @Default("true")
+    boolean isEtcdHacksEnabled();
 }
