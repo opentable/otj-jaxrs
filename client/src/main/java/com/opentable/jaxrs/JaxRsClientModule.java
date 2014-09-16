@@ -39,6 +39,7 @@ public class JaxRsClientModule extends AbstractModule
                 ConfigProvider.of(JaxRsClientConfig.class,
                                   Collections.singletonMap("clientName", name)));
 
+        install (new JaxRsClientSharedModule());
         install (new JaxRsSharedModule());
         bind (Client.class).annotatedWith(annotation).toProvider(new JaxRsClientProvider(name, features));
         JaxRsClientBinder.bindFeatureForAllClients(binder()).to(ClientJsonFeature.class);
