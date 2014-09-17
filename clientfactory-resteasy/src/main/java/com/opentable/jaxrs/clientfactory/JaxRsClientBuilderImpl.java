@@ -27,7 +27,6 @@ import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 public class JaxRsClientBuilderImpl implements JaxRsClientBuilder
 {
     private final ResteasyClientBuilder clientBuilder = getResteasyClientBuilder();
-    private JaxRsClientConfig config;
 
     @Override
     public JaxRsClientBuilder register(Object object)
@@ -46,7 +45,6 @@ public class JaxRsClientBuilderImpl implements JaxRsClientBuilder
     @Override
     public JaxRsClientBuilder withConfiguration(JaxRsClientConfig config)
     {
-        this.config = config;
         configureHttpEngine(config);
         configureAuthenticationIfNeeded(config);
         return this;
