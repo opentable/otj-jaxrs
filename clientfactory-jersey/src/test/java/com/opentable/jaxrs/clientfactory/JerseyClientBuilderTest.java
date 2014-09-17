@@ -5,9 +5,12 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.ws.rs.client.Client;
 
 import org.junit.Test;
+import org.skife.config.TimeSpan;
 
 public class JerseyClientBuilderTest
 {
@@ -29,7 +32,7 @@ public class JerseyClientBuilderTest
     public void socketTimeoutPropagates() throws NoSuchFieldException, IllegalAccessException
     {
         final JaxRsClientConfig conf = mock(JaxRsClientConfig.class);
-        when(conf.socketTimeoutMillis()).thenReturn(6600);
+        when(conf.socketTimeout()).thenReturn(new TimeSpan(6600, TimeUnit.MILLISECONDS));
         final Client client = JaxRsClientBuilder.newInstance().withConfiguration(conf).build();
         String result = client.getConfiguration().getProperty("jersey.config.client.readTimeout").toString();
         assertEquals("6600", result);
@@ -39,12 +42,9 @@ public class JerseyClientBuilderTest
     public void connectTimeoutPropagates() throws NoSuchFieldException, IllegalAccessException
     {
         final JaxRsClientConfig conf = mock(JaxRsClientConfig.class);
-        when(conf.connectTimeoutMillis()).thenReturn(4400);
+        when(conf.connectTimeout()).thenReturn(new TimeSpan(4400, TimeUnit.MILLISECONDS));
         final Client client = JaxRsClientBuilder.newInstance().withConfiguration(conf).build();
         final String result = client.getConfiguration().getProperty("jersey.config.client.connectTimeout").toString();
         assertEquals("4400", result);
     }
-
-
-
 }

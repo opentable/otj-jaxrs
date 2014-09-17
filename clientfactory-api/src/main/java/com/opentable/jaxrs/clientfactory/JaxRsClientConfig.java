@@ -2,27 +2,29 @@ package com.opentable.jaxrs.clientfactory;
 
 import org.skife.config.Config;
 import org.skife.config.Default;
+import org.skife.config.DefaultNull;
+import org.skife.config.TimeSpan;
 
 public interface JaxRsClientConfig
 {
-    @Config({"jaxrs.client.${clientName}.pool-timeout.millis", "jaxrs.client.default.pool-timeout.millis"})
-    @Default("1000")
-    int connectionPoolTimeoutMillis();
+    @Config({"jaxrs.client.${clientName}.pool-timeout", "jaxrs.client.default.pool-timeout"})
+    @Default("1s")
+    TimeSpan connectionPoolTimeout();
 
-    @Config({"jaxrs.client.${clientName}.connect-timeout.millis", "jaxrs.client.default.connect-timeout.millis"})
-    @Default("1000")
-    int connectTimeoutMillis();
+    @Config({"jaxrs.client.${clientName}.connect-timeout", "jaxrs.client.default.connect-timeout"})
+    @Default("1s")
+    TimeSpan connectTimeout();
 
-    @Config({"jaxrs.client.${clientName}.socket-timeout.millis", "jaxrs.client.default.socket-timeout.millis"})
-    @Default("10000")
-    int socketTimeoutMillis();
+    @Config({"jaxrs.client.${clientName}.socket-timeout", "jaxrs.client.default.socket-timeout"})
+    @Default("10s")
+    TimeSpan socketTimeout();
 
     @Config({"jaxrs.client.${clientName}.auth.basic.username", "jaxrs.client.default.auth.basic.username"})
-    @Default("")
+    @DefaultNull
     String basicAuthUserName();
 
     @Config({"jaxrs.client.${clientName}.auth.basic.password", "jaxrs.client.default.auth.basic.password"})
-    @Default("")
+    @DefaultNull
     String basicAuthPassword();
 
     @Config({"jaxrs.client.${clientName}.connection-pool.size", "jaxrs.client.default.connection-pool.size"})

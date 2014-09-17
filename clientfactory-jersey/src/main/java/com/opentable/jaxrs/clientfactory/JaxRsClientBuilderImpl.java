@@ -72,8 +72,8 @@ public class JaxRsClientBuilderImpl implements JaxRsClientBuilder
         final ClientConfig clientConfig = new ClientConfig();
         clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
         clientConfig.connectorProvider(new ApacheConnectorProvider());
-        clientConfig.property(ClientProperties.CONNECT_TIMEOUT, config.connectTimeoutMillis());
-        clientConfig.property(ClientProperties.READ_TIMEOUT, config.socketTimeoutMillis());
+        clientConfig.property(ClientProperties.CONNECT_TIMEOUT, config.connectTimeout());
+        clientConfig.property(ClientProperties.READ_TIMEOUT, config.socketTimeout());
         return clientConfig;
     }
 

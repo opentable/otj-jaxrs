@@ -12,6 +12,7 @@ import javax.ws.rs.client.Client;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.skife.config.TimeSpan;
 
 public class ResteasyClientBuilderTest
 {
@@ -34,7 +35,7 @@ public class ResteasyClientBuilderTest
     public void socketTimeoutPropagates() throws NoSuchFieldException, IllegalAccessException
     {
         final JaxRsClientConfig conf = mock(JaxRsClientConfig.class);
-        when(conf.socketTimeoutMillis()).thenReturn(6600);
+        when(conf.socketTimeout()).thenReturn(new TimeSpan(6600, TimeUnit.MILLISECONDS));
         final ResteasyClientBuilder underlying = mock(ResteasyClientBuilder.class);
 
         final Client client = builderWithMockResteasy(underlying).withConfiguration(conf).build();
@@ -46,7 +47,7 @@ public class ResteasyClientBuilderTest
     public void connectTimeoutPropagates() throws NoSuchFieldException, IllegalAccessException
     {
         final JaxRsClientConfig conf = mock(JaxRsClientConfig.class);
-        when(conf.connectTimeoutMillis()).thenReturn(4400);
+        when(conf.connectTimeout()).thenReturn(new TimeSpan(4400, TimeUnit.MILLISECONDS));
         final ResteasyClientBuilder underlying = mock(ResteasyClientBuilder.class);
 
         final Client client = builderWithMockResteasy(underlying).withConfiguration(conf).build();

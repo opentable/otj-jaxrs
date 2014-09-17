@@ -74,7 +74,7 @@ public class JaxRsClientBuilderImpl implements JaxRsClientBuilder
         }
         final HttpClient client = builder
                 .setDefaultSocketConfig(SocketConfig.custom()
-                        .setSoTimeout(config.socketTimeoutMillis())
+                        .setSoTimeout((int) config.socketTimeout().getMillis())
                         .build())
                 .setDefaultRequestConfig(customRequestConfig(config, RequestConfig.custom()))
                 .setMaxConnTotal(config.httpClientMaxTotalConnections())
@@ -87,9 +87,9 @@ public class JaxRsClientBuilderImpl implements JaxRsClientBuilder
     private static RequestConfig customRequestConfig(JaxRsClientConfig config, RequestConfig.Builder base) {
         base.setRedirectsEnabled(true);
         if (config != null) {
-            base.setConnectionRequestTimeout(config.connectionPoolTimeoutMillis())
-                .setConnectTimeout(config.connectTimeoutMillis())
-                .setSocketTimeout(config.socketTimeoutMillis());
+            base.setConnectionRequestTimeout((int) config.connectionPoolTimeout().getMillis())
+                .setConnectTimeout((int) config.connectTimeout().getMillis())
+                .setSocketTimeout((int) config.socketTimeout().getMillis());
         }
         return base.build();
     }
