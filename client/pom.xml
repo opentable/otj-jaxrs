@@ -21,12 +21,7 @@
 
     <dependency>
       <groupId>com.opentable.components</groupId>
-      <artifactId>otj-config-guice</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.inject</groupId>
-      <artifactId>guice</artifactId>
+      <artifactId>otj-config</artifactId>
     </dependency>
 
     <dependency>
