@@ -58,6 +58,11 @@
     </dependency>
     <dependency>
       <groupId>com.opentable.components</groupId>
+      <artifactId>otj-config-guice</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.opentable.components</groupId>
       <artifactId>otj-serverinfo</artifactId>
       <scope>test</scope>
     </dependency>
@@ -71,6 +76,11 @@
     <dependency>
       <groupId>com.opentable.components</groupId>
       <artifactId>otj-lifecycle</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-lifecycle-guice</artifactId>
       <scope>test</scope>
     </dependency>
 
