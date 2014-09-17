@@ -1,7 +1,6 @@
 package com.opentable.jaxrs.clientfactory;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.Client;
 
@@ -14,6 +13,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HttpContext;
 import org.jboss.resteasy.client.jaxrs.BasicAuthentication;
@@ -27,6 +27,7 @@ import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 public class JaxRsClientBuilderImpl implements JaxRsClientBuilder
 {
     private final ResteasyClientBuilder clientBuilder = getResteasyClientBuilder();
+    private JaxRsClientConfig config;
 
     @Override
     public JaxRsClientBuilder register(Object object)
@@ -45,10 +46,9 @@ public class JaxRsClientBuilderImpl implements JaxRsClientBuilder
     @Override
     public JaxRsClientBuilder withConfiguration(JaxRsClientConfig config)
     {
+        this.config = config;
         configureHttpEngine(config);
         configureAuthenticationIfNeeded(config);
-        clientBuilder.establishConnectionTimeout(config.connectTimeoutMillis(), TimeUnit.MILLISECONDS);
-        clientBuilder.socketTimeout(config.socketTimeoutMillis(), TimeUnit.MILLISECONDS);
         return this;
     }
 
@@ -73,11 +73,25 @@ public class JaxRsClientBuilderImpl implements JaxRsClientBuilder
                 .addInterceptorFirst(new SwallowHeaderInterceptor(HttpHeaders.CONTENT_LENGTH));
         }
         final HttpClient client = builder
+                .setDefaultSocketConfig(SocketConfig.custom()
+                        .setSoTimeout(config.socketTimeoutMillis())
+                        .build())
+                .setDefaultRequestConfig(customRequestConfig(config, RequestConfig.custom()))
                 .setMaxConnTotal(config.httpClientMaxTotalConnections())
                 .setMaxConnPerRoute(config.httpClientDefaultMaxPerRoute())
                 .build();
-        final ApacheHttpClient4Engine engine = new HackedApacheHttpClient4Engine(client);
+        final ApacheHttpClient4Engine engine = new HackedApacheHttpClient4Engine(config, client);
         clientBuilder.httpEngine(engine);
+    }
+
+    private static RequestConfig customRequestConfig(JaxRsClientConfig config, RequestConfig.Builder base) {
+        base.setRedirectsEnabled(true);
+        if (config != null) {
+            base.setConnectionRequestTimeout(config.connectionPoolTimeoutMillis())
+                .setConnectTimeout(config.connectTimeoutMillis())
+                .setSocketTimeout(config.socketTimeoutMillis());
+        }
+        return base.build();
     }
 
     private void configureAuthenticationIfNeeded(JaxRsClientConfig config)
@@ -91,15 +105,18 @@ public class JaxRsClientBuilderImpl implements JaxRsClientBuilder
     }
 
     private static class HackedApacheHttpClient4Engine extends ApacheHttpClient4Engine {
-        HackedApacheHttpClient4Engine(HttpClient client) {
+        private final JaxRsClientConfig config;
+
+        HackedApacheHttpClient4Engine(JaxRsClientConfig config, HttpClient client) {
             super(client);
+            this.config = config;
         }
 
         @Override
         protected HttpRequestBase createHttpMethod(String url, String restVerb) {
             final HttpRequestBase result = super.createHttpMethod(url, restVerb);
             final Builder base = result.getConfig() == null ? RequestConfig.custom() : RequestConfig.copy(result.getConfig());
-            result.setConfig(base.setRedirectsEnabled(true).build());
+            result.setConfig(customRequestConfig(config, base));
             return result;
         }
     }

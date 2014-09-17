@@ -34,7 +34,7 @@ public class ResteasyClientBuilderTest
     public void socketTimeoutPropagates() throws NoSuchFieldException, IllegalAccessException
     {
         final JaxRsClientConfig conf = mock(JaxRsClientConfig.class);
-        when(conf.socketTimeoutMillis()).thenReturn(6600L);
+        when(conf.socketTimeoutMillis()).thenReturn(6600);
         final ResteasyClientBuilder underlying = mock(ResteasyClientBuilder.class);
 
         final Client client = builderWithMockResteasy(underlying).withConfiguration(conf).build();
@@ -46,7 +46,7 @@ public class ResteasyClientBuilderTest
     public void connectTimeoutPropagates() throws NoSuchFieldException, IllegalAccessException
     {
         final JaxRsClientConfig conf = mock(JaxRsClientConfig.class);
-        when(conf.connectTimeoutMillis()).thenReturn(4400L);
+        when(conf.connectTimeoutMillis()).thenReturn(4400);
         final ResteasyClientBuilder underlying = mock(ResteasyClientBuilder.class);
 
         final Client client = builderWithMockResteasy(underlying).withConfiguration(conf).build();

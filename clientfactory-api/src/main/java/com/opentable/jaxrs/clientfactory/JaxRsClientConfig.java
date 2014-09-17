@@ -5,13 +5,17 @@ import org.skife.config.Default;
 
 public interface JaxRsClientConfig
 {
+    @Config({"jaxrs.client.${clientName}.pool-timeout.millis", "jaxrs.client.default.pool-timeout.millis"})
+    @Default("1000")
+    int connectionPoolTimeoutMillis();
+
     @Config({"jaxrs.client.${clientName}.connect-timeout.millis", "jaxrs.client.default.connect-timeout.millis"})
     @Default("1000")
-    long connectTimeoutMillis();
+    int connectTimeoutMillis();
 
     @Config({"jaxrs.client.${clientName}.socket-timeout.millis", "jaxrs.client.default.socket-timeout.millis"})
     @Default("10000")
-    long socketTimeoutMillis();
+    int socketTimeoutMillis();
 
     @Config({"jaxrs.client.${clientName}.auth.basic.username", "jaxrs.client.default.auth.basic.username"})
     @Default("")
