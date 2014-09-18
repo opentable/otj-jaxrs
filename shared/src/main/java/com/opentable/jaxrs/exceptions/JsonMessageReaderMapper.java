@@ -15,21 +15,23 @@
  */
 package com.opentable.jaxrs.exceptions;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.jaxrs.base.ProviderBase;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import org.slf4j.MDC;
+import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.Provider;
-import java.util.Map;
-import java.util.Set;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.jaxrs.base.ProviderBase;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
+import org.slf4j.MDC;
 
 @Provider
 public class JsonMessageReaderMapper extends OpenTableJaxRsExceptionMapper<JsonParseException>
@@ -47,8 +49,8 @@ public class JsonMessageReaderMapper extends OpenTableJaxRsExceptionMapper<JsonP
             if (CLASS_NAMES.contains(e.getClassName())) {
                 final Map<String, String> response = ImmutableMap.of(
                         "code", "400",
-                        "requestid", Objects.firstNonNull(MDC.get("requestid"), ""),
-                        "message", Objects.firstNonNull(exception.getMessage(), "(no message)"));
+                        "requestid", MoreObjects.firstNonNull(MDC.get("requestid"), ""),
+                        "message", MoreObjects.firstNonNull(exception.getMessage(), "(no message)"));
 
                 return Response.status(400)
                         .entity(response)

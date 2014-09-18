@@ -15,16 +15,17 @@
  */
 package com.opentable.jaxrs.exceptions;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.ObjectUtils;
-import org.slf4j.MDC;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
-import java.util.Map;
+
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableMap;
+
+import org.slf4j.MDC;
 
 /**
  * A generic base class to map an exception to a Ness response. This must be implemented by a concrete
@@ -54,8 +55,8 @@ public abstract class OpenTableJaxRsExceptionMapper<U extends Throwable> impleme
     public Response toResponse(final U exception)
     {
         final Map<String, String> response = ImmutableMap.of("code", statusCode.toString(),
-                                                             "requestid", Objects.firstNonNull(MDC.get("requestid"), ""),
-                                                             "message", ObjectUtils.firstNonNull(exception.getMessage(), "(no message)"));
+                                                             "requestid", MoreObjects.firstNonNull(MDC.get("requestid"), ""),
+                                                             "message", MoreObjects.firstNonNull(exception.getMessage(), "(no message)"));
 
         return Response.status(statusCode)
         .entity(response)
