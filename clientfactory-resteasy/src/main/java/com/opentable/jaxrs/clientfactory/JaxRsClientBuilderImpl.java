@@ -20,6 +20,9 @@ import org.jboss.resteasy.client.jaxrs.BasicAuthentication;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 
+import com.opentable.jaxrs.JaxRsClientBuilder;
+import com.opentable.jaxrs.JaxRsClientConfig;
+
 /**
  * The RESTEasy implementation of ClientFactory. Hides RESTEasy specific stuff
  * behind a common facade.

@@ -22,7 +22,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>clientfactory-api</module>
     <module>clientfactory-jersey</module>
     <module>clientfactory-resteasy</module>
     <module>clientfactory-testing</module>

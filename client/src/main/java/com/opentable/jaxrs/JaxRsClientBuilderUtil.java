@@ -1,4 +1,4 @@
-package com.opentable.jaxrs.clientfactory;
+package com.opentable.jaxrs;
 
 /**
  * Hides gory details of reflection from main builder API.

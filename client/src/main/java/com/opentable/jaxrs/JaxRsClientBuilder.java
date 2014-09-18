@@ -1,4 +1,4 @@
-package com.opentable.jaxrs.clientfactory;
+package com.opentable.jaxrs;
 
 import java.util.Properties;
 

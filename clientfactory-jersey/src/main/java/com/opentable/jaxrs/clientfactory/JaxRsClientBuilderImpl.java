@@ -15,6 +15,8 @@ import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.message.GZipEncoder;
 
+import com.opentable.jaxrs.JaxRsClientBuilder;
+import com.opentable.jaxrs.JaxRsClientConfig;
 import com.opentable.logging.Log;
 
 /**

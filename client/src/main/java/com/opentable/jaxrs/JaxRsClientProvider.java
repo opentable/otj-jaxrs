@@ -16,8 +16,6 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
-import com.opentable.jaxrs.clientfactory.JaxRsClientBuilder;
-import com.opentable.jaxrs.clientfactory.JaxRsClientConfig;
 import com.opentable.lifecycle.Lifecycle;
 import com.opentable.lifecycle.LifecycleStage;
 

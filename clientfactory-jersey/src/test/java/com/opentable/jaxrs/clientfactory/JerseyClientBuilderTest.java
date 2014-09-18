@@ -12,6 +12,9 @@ import javax.ws.rs.client.Client;
 import org.junit.Test;
 import org.skife.config.TimeSpan;
 
+import com.opentable.jaxrs.JaxRsClientBuilder;
+import com.opentable.jaxrs.JaxRsClientConfig;
+
 public class JerseyClientBuilderTest
 {
     @Test

@@ -14,10 +14,6 @@
       <groupId>com.opentable.components</groupId>
       <artifactId>otj-jaxrs-shared</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.opentable.components</groupId>
-      <artifactId>otj-jaxrs-clientfactory-api</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>com.opentable.components</groupId>

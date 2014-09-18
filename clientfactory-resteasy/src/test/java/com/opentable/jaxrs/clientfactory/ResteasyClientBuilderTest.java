@@ -13,6 +13,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.skife.config.TimeSpan;
 
+import com.opentable.jaxrs.JaxRsClientBuilder;
+import com.opentable.jaxrs.JaxRsClientConfig;
+
 // It sucks that this test is ignored, but I have no idea how to test e.g. socket
 // connect timeouts without a lot of harnessing...
 @Ignore

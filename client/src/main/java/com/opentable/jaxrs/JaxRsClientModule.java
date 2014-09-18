@@ -12,7 +12,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
 import com.opentable.config.ConfigProvider;
-import com.opentable.jaxrs.clientfactory.JaxRsClientConfig;
 
 public class JaxRsClientModule extends AbstractModule
 {
