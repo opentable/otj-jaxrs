@@ -48,7 +48,7 @@ import com.opentable.config.Config;
 public class JaxRsClientFactory {
     /** Client property that holds the client name as provided to the factory. */
     public static final String CLIENT_NAME_PROPERTY = "ot.jaxrs.client-name";
-    /** Client property that holds a {@code List<JaxRsFeatureGroup}. */
+    /** Client property that holds a {@code List<JaxRsFeatureGroup>}. */
     public static final String FEATURE_GROUP_PROPERTY = "ot.jaxrs.feature-groups";
 
     private static final Logger LOG = LoggerFactory.getLogger(JaxRsClientFactory.class);
