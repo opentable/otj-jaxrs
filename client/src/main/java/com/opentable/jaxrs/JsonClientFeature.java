@@ -4,6 +4,7 @@ import javax.inject.Inject;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import com.opentable.jaxrs.json.OTJacksonJsonProvider;
@@ -12,7 +13,7 @@ import com.opentable.jaxrs.json.OTJacksonJsonProvider;
  * Feature which enables Jackson JSON reading of {@code application/json}
  * for clients.
  */
-class JsonClientFeature implements Feature
+public class JsonClientFeature implements Feature
 {
     private final OTJacksonJsonProvider custom;
     private final JacksonJsonProvider standard;
@@ -22,6 +23,13 @@ class JsonClientFeature implements Feature
     {
         this.custom = custom;
         this.standard = standard;
+    }
+
+    public static JsonClientFeature forMapper(ObjectMapper mapper)
+    {
+        final JacksonJsonProvider provider = new JacksonJsonProvider(mapper);
+        final OTJacksonJsonProvider otProvider = new OTJacksonJsonProvider(provider);
+        return new JsonClientFeature(otProvider, provider);
     }
 
     @Override

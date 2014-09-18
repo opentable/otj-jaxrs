@@ -31,11 +31,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.opentable.components</groupId>
-      <artifactId>otj-logging</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.skife.config</groupId>
       <artifactId>config-magic</artifactId>
     </dependency>

@@ -15,9 +15,11 @@
  */
 package com.opentable.jaxrs.json;
 
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.core.Versioned;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -28,11 +30,10 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
+
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.core.Versioned;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 /**
  * Jersey Provider class that allows Jackson to serialize any media type starting
@@ -48,7 +49,7 @@ public class OTJacksonJsonProvider implements MessageBodyReader<Object>, Message
     private final JacksonJsonProvider delegate;
 
     @Inject
-    OTJacksonJsonProvider(JacksonJsonProvider delegate)
+    public OTJacksonJsonProvider(JacksonJsonProvider delegate)
     {
         this.delegate = delegate;
     }
