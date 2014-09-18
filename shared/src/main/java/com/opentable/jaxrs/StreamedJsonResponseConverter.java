@@ -1,5 +1,15 @@
 package com.opentable.jaxrs;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.ServerErrorException;
+import javax.ws.rs.core.Response;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -7,23 +17,17 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
 import com.google.common.base.Throwables;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.opentable.callback.Callback;
 import com.opentable.callback.CallbackRefusedException;
-import com.opentable.logging.Log;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.ServerErrorException;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Iterator;
 
 @Singleton
 public class StreamedJsonResponseConverter
 {
-    private static final Log LOG = Log.findLog();
+    private static final Logger LOG = LoggerFactory.getLogger(StreamedJsonResponseConverter.class);
 
     private final ObjectMapper mapper;
 
@@ -43,7 +47,7 @@ public class StreamedJsonResponseConverter
         {
         case 201:
         case 204:
-            LOG.debug("Return code is %d, finishing.", response.getStatus());
+            LOG.debug("Return code is {}, finishing.", response.getStatus());
             return;
         case 200:
             try (final JsonParser jp = mapper.getFactory().createParser(response.readEntity(InputStream.class))) {
@@ -82,7 +86,7 @@ public class StreamedJsonResponseConverter
                 callback.call(iter.next());
             }
             catch (CallbackRefusedException e) {
-                LOG.debug(e, "callback refused execution, finishing.");
+                LOG.debug("callback refused execution, finishing.", e);
                 return;
             }
             catch (InterruptedException e) {

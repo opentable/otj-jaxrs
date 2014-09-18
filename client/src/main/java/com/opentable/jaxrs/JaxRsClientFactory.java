@@ -22,8 +22,10 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.opentable.config.Config;
-import com.opentable.logging.Log;
 
 /**
  * Central registry for creating JAX-RS Clients.
@@ -49,7 +51,7 @@ public class JaxRsClientFactory {
     /** Client property that holds a {@code List<JaxRsFeatureGroup}. */
     public static final String FEATURE_GROUP_PROPERTY = "ot.jaxrs.feature-groups";
 
-    private static final Log LOG = Log.findLog();
+    private static final Logger LOG = LoggerFactory.getLogger(JaxRsClientFactory.class);
 
     private final Config config;
 
@@ -101,7 +103,7 @@ public class JaxRsClientFactory {
         featureMap.putAll(group, Arrays.asList(features));
 
         for (Feature f : features) {
-            LOG.trace("Group %s registers feature %s", group, f);
+            LOG.trace("Group {} registers feature {}", group, f);
         }
         return this;
     }
@@ -123,7 +125,7 @@ public class JaxRsClientFactory {
         classFeatureMap.putAll(group, Arrays.asList(features));
 
         for (Class<Feature> f : features) {
-            LOG.trace("Group %s registers feature %s", group, f);
+            LOG.trace("Group {} registers feature {}", group, f);
         }
         return this;
     }
@@ -147,11 +149,11 @@ public class JaxRsClientFactory {
         builder.property(CLIENT_NAME_PROPERTY, clientName);
         builder.property(FEATURE_GROUP_PROPERTY, featureGroups);
 
-        LOG.debug("Building client '%s' with feature groups %s and config '%s'", clientName, featureGroups, jaxRsConfig);
+        LOG.debug("Building client '{}' with feature groups {} and config '{}'", clientName, featureGroups, jaxRsConfig);
 
         for (JaxRsFeatureGroup group : featureGroups) {
             for (Feature f : featureMap.get(group)) {
-                LOG.trace("Client '%s' enabling feature %s", clientName, f);
+                LOG.trace("Client '{}' enabling feature {}", clientName, f);
                 builder.register(f);
             }
         }

@@ -15,21 +15,25 @@
  */
 package com.opentable.jaxrs.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Throwables;
-import com.opentable.callback.Callback;
-import com.opentable.logging.Log;
-import org.apache.commons.lang3.time.StopWatch;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.StreamingOutput;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Throwables;
+
+import org.apache.commons.lang3.time.StopWatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.opentable.callback.Callback;
 
 /**
  * A configurable JAX-RS Json output streamer.  Allows customization of the header, footer, and how
@@ -37,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class JaxRsJsonStreamer<T>
 {
-    private static final Log LOG = Log.findLog();
+    private static final Logger LOG = LoggerFactory.getLogger(JaxRsJsonStreamer.class);
 
     private final ObjectMapper mapper;
     @SuppressWarnings({ "PMD.UnusedPrivateField", "unused" })
@@ -156,7 +160,7 @@ public class JaxRsJsonStreamer<T>
             final StopWatch sw = new StopWatch();
             sw.start();
 
-            LOG.trace("Start streaming %s", JaxRsJsonStreamer.this);
+            LOG.trace("Start streaming {}", JaxRsJsonStreamer.this);
             final AtomicLong count = new AtomicLong();
             boolean success = false;
 
@@ -181,9 +185,9 @@ public class JaxRsJsonStreamer<T>
                 throw Throwables.propagate(t);
             } finally {
                 if (success) {
-                    LOG.trace("Succeeded streaming %d results in %dms for %s", count.get(), sw.getTime(), JaxRsJsonStreamer.this);
+                    LOG.trace("Succeeded streaming {} results in {}ms for {}", count.get(), sw.getTime(), JaxRsJsonStreamer.this);
                 } else {
-                    LOG.debug("Failed streaming after %d results in %dms for %s", count.get(), sw.getTime(), JaxRsJsonStreamer.this);
+                    LOG.debug("Failed streaming after {} results in {}ms for {}", count.get(), sw.getTime(), JaxRsJsonStreamer.this);
                 }
             }
         }
