@@ -73,56 +73,59 @@ public class JaxRsClientFactory {
     /**
      * Register many features at once.  Mostly a convenience for DI environments.
      */
-    public synchronized void addFeatureMap(SetMultimap<JaxRsFeatureGroup, Feature> map) {
-        addFeatureMap(Multimaps.asMap(map));
+    public synchronized JaxRsClientFactory addFeatureMap(SetMultimap<JaxRsFeatureGroup, Feature> map) {
+        return addFeatureMap(Multimaps.asMap(map));
     }
 
     /**
      * Register many features at once.  Mostly a convenience for DI environments.
      */
     @Inject
-    public synchronized void addFeatureMap(Map<JaxRsFeatureGroup, Set<Feature>> map) {
+    public synchronized JaxRsClientFactory addFeatureMap(Map<JaxRsFeatureGroup, Set<Feature>> map) {
         map.forEach((g, fs) -> fs.forEach(f -> addFeatureToGroup(g, f)));
+        return this;
     }
 
     /**
      * Register a list of features for all created clients.
      */
-    public synchronized void addFeatureToAllClients(Feature... features) {
-        addFeatureToGroup(PrivateFeatureGroup.WILDCARD, features);
+    public synchronized JaxRsClientFactory addFeatureToAllClients(Feature... features) {
+        return addFeatureToGroup(PrivateFeatureGroup.WILDCARD, features);
     }
 
     /**
      * Register a list of features to all clients marked with the given group.
      */
-    public synchronized void addFeatureToGroup(JaxRsFeatureGroup group, Feature... features) {
+    public synchronized JaxRsClientFactory addFeatureToGroup(JaxRsFeatureGroup group, Feature... features) {
         Preconditions.checkState(!started, "Already started building clients");
         featureMap.putAll(group, Arrays.asList(features));
 
         for (Feature f : features) {
             LOG.trace("Group %s registers feature %s", group, f);
         }
+        return this;
     }
 
     /**
      * Register a list of features for all created clients.
      */
     @SafeVarargs
-    public final synchronized void addFeatureToAllClients(Class<Feature>... features) {
-        addFeatureToGroup(PrivateFeatureGroup.WILDCARD, features);
+    public final synchronized JaxRsClientFactory addFeatureToAllClients(Class<Feature>... features) {
+        return addFeatureToGroup(PrivateFeatureGroup.WILDCARD, features);
     }
 
     /**
      * Register a list of features to all clients marked with the given group.
      */
     @SafeVarargs
-    public final synchronized void addFeatureToGroup(JaxRsFeatureGroup group, Class<Feature>... features) {
+    public final synchronized JaxRsClientFactory addFeatureToGroup(JaxRsFeatureGroup group, Class<Feature>... features) {
         Preconditions.checkState(!started, "Already started building clients");
         classFeatureMap.putAll(group, Arrays.asList(features));
 
         for (Class<Feature> f : features) {
             LOG.trace("Group %s registers feature %s", group, f);
         }
+        return this;
     }
 
     /**
