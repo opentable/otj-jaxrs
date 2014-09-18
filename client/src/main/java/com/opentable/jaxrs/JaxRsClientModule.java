@@ -41,6 +41,6 @@ public class JaxRsClientModule extends AbstractModule
         install (new JaxRsClientSharedModule());
         install (new JaxRsSharedModule());
         bind (Client.class).annotatedWith(annotation).toProvider(new JaxRsClientProvider(name, features));
-        JaxRsClientBinder.bindFeatureForAllClients(binder()).to(ClientJsonFeature.class);
+        JaxRsClientBinder.bindFeatureForAllClients(binder()).to(JsonClientFeature.class);
     }
 }

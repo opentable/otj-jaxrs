@@ -7,13 +7,13 @@ import javax.inject.Inject;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
-class ClientJsonFeature implements Feature
+class JsonClientFeature implements Feature
 {
     private final OTJacksonJsonProvider custom;
     private final JacksonJsonProvider standard;
 
     @Inject
-    ClientJsonFeature(OTJacksonJsonProvider custom, JacksonJsonProvider standard)
+    JsonClientFeature(OTJacksonJsonProvider custom, JacksonJsonProvider standard)
     {
         this.custom = custom;
         this.standard = standard;
