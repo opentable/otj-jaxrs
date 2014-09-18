@@ -9,6 +9,9 @@ import com.google.inject.Provides;
 
 import com.opentable.jaxrs.json.OTJacksonJsonProvider;
 
+/**
+ * Bindings that all client and server modules share.
+ */
 final class JaxRsSharedModule extends AbstractModule {
     @Override
     public void configure()
@@ -40,5 +43,4 @@ final class JaxRsSharedModule extends AbstractModule {
         provider.setMapper(objectMapper);
         return provider;
     }
-
 }

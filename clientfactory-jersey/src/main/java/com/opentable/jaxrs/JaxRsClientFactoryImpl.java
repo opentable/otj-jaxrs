@@ -1,8 +1,6 @@
-package com.opentable.jaxrs.clientfactory;
+package com.opentable.jaxrs;
 
-import java.util.Optional;
-
-import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -15,54 +13,18 @@ import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.message.GZipEncoder;
 
-import com.opentable.jaxrs.JaxRsClientBuilder;
-import com.opentable.jaxrs.JaxRsClientConfig;
-import com.opentable.logging.Log;
-
 /**
- * Jersey implementation of JaxRsClientBuilder
+ * Jersey implementation of InternalClientFactory
  */
-public class JaxRsClientBuilderImpl implements JaxRsClientBuilder
+public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
-    private static final Log LOG = Log.findLog();
-
-    private final JerseyClientBuilder clientBuilder = new JerseyClientBuilder();
-
-    private Optional<ClientConfig> clientConfig = Optional.empty();
-
     @Override
-    public JaxRsClientBuilder register(Object object)
-    {
-        clientBuilder.register(object);
-        return this;
-    }
-
-    @Override
-    public JaxRsClientBuilder register(Class<?> clazz)
-    {
-        clientBuilder.register(clazz);
-        return this;
-    }
-
-    @Override
-    public JaxRsClientBuilder withConfiguration(JaxRsClientConfig config)
-    {
-        this.clientConfig = Optional.of(createClientConfig(config));
-        configureAuthenticationIfNeeded(config);
-        return this;
-    }
-
-    @Override
-    public Client build()
-    {
-        LOG.info("creating Jersey JAX-RS client");
-
-        return clientConfig // if there's a config
-                .map(clientBuilder::withConfig)  // then use client with config
-                .orElse(clientBuilder)           // otherwise go without
-                .register(JacksonFeature.class)
-                .register(GZipEncoder.class)
-                .build();
+    public ClientBuilder newBuilder(JaxRsClientConfig config) {
+        final JerseyClientBuilder builder = new JerseyClientBuilder();
+        builder.withConfig(createClientConfig(config));
+        configureAuthenticationIfNeeded(builder, config);
+        return builder.register(JacksonFeature.class)
+                      .register(GZipEncoder.class);
     }
 
     private ClientConfig createClientConfig(JaxRsClientConfig config)
@@ -79,13 +41,13 @@ public class JaxRsClientBuilderImpl implements JaxRsClientBuilder
         return clientConfig;
     }
 
-    private void configureAuthenticationIfNeeded(JaxRsClientConfig config)
+    private static void configureAuthenticationIfNeeded(ClientBuilder builder, JaxRsClientConfig config)
     {
         if (!StringUtils.isEmpty(config.basicAuthUserName()) && !StringUtils.isEmpty(config.basicAuthPassword()))
         {
             HttpAuthenticationFeature auth = HttpAuthenticationFeature.basic(
                     config.basicAuthUserName(), config.basicAuthPassword());
-            clientBuilder.register(auth);
+            builder.register(auth);
         }
     }
 }

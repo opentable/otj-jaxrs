@@ -14,10 +14,14 @@
   <packaging>jar</packaging>
   <description>Exception handling for JAX-RS through HttpClient</description>
 
+  <properties>
+    <ot.build.allow-guice>true</ot.build.allow-guice>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.opentable.components</groupId>
-      <artifactId>otj-jaxrs-client</artifactId>
+      <artifactId>otj-jaxrs-client-guice</artifactId>
     </dependency>
 
     <dependency>

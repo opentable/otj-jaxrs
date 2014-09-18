@@ -15,18 +15,20 @@
  */
 package com.opentable.jaxrs;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Scopes;
 import com.google.inject.servlet.ServletModule;
-import com.opentable.config.Config;
-import com.opentable.httpserver.HttpServerHandlerBinder;
-import com.opentable.jaxrs.exceptions.OpenTableJaxRsExceptionMapperModule;
+
 import org.jboss.resteasy.plugins.guice.GuiceResteasyBootstrapServletContextListener;
 import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
 
-import java.util.Arrays;
-import java.util.List;
+import com.opentable.config.Config;
+import com.opentable.httpserver.HttpServerHandlerBinder;
+import com.opentable.jaxrs.exceptions.OpenTableJaxRsExceptionMapperModule;
 
 public class OpenTableJaxRsServletModule extends ServletModule
 {

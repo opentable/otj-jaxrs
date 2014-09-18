@@ -11,13 +11,20 @@
 
   <artifactId>otj-jaxrs-server</artifactId>
   <name>otj-jaxrs-server</name>
-  <packaging>jar</packaging>
-  <description>OpenTable specific jaxrs glue code</description>
+  <description>OpenTable Jaxrs Server code</description>
+
+  <properties>
+    <ot.build.allow-guice>true</ot.build.allow-guice>
+  </properties>
 
   <dependencies>
     <dependency>
       <groupId>com.opentable.components</groupId>
       <artifactId>otj-jaxrs-shared</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.opentable.components</groupId>
+      <artifactId>otj-jaxrs-client-guice</artifactId>
     </dependency>
 
     <dependency>

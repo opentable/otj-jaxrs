@@ -1,7 +1,6 @@
-package com.opentable.jaxrs.clientfactory;
+package com.opentable.jaxrs;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -12,30 +11,15 @@ import javax.ws.rs.client.Client;
 import org.junit.Test;
 import org.skife.config.TimeSpan;
 
-import com.opentable.jaxrs.JaxRsClientBuilder;
-import com.opentable.jaxrs.JaxRsClientConfig;
+import com.opentable.config.Config;
 
 public class JerseyClientBuilderTest
 {
     @Test
-    public void instanceCreatesBuilderImpls()
-    {
-        JaxRsClientBuilder builder = JaxRsClientBuilder.newInstance();
-        assertEquals(JaxRsClientBuilderImpl.class, builder.getClass());
-    }
-
-    @Test
-    public void builderImplsImplementBuilder()
-    {
-        JaxRsClientBuilder builder = JaxRsClientBuilder.newInstance();
-        assertTrue(JaxRsClientBuilder.class.isAssignableFrom(builder.getClass()));
-    }
-
-    @Test
     public void socketTimeoutPropagates() throws NoSuchFieldException, IllegalAccessException
     {
         final JaxRsClientConfig conf = makeConfig();
-        final Client client = JaxRsClientBuilder.newInstance().withConfiguration(conf).build();
+        final Client client = factoryForConfig(conf).newClient("test", StandardFeatureGroup.PUBLIC);
         String result = client.getConfiguration().getProperty("jersey.config.client.readTimeout").toString();
         assertEquals("6600", result);
     }
@@ -44,9 +28,18 @@ public class JerseyClientBuilderTest
     public void connectTimeoutPropagates() throws NoSuchFieldException, IllegalAccessException
     {
         final JaxRsClientConfig conf = makeConfig();
-        final Client client = JaxRsClientBuilder.newInstance().withConfiguration(conf).build();
+        final Client client = factoryForConfig(conf).newClient("test", StandardFeatureGroup.PUBLIC);
         final String result = client.getConfiguration().getProperty("jersey.config.client.connectTimeout").toString();
         assertEquals("4400", result);
+    }
+
+    private static JaxRsClientFactory factoryForConfig(JaxRsClientConfig config) {
+        return new JaxRsClientFactory(Config.getEmptyConfig()) {
+            @Override
+            protected JaxRsClientConfig configForClient(String clientName) {
+                return config;
+            }
+        };
     }
 
     private static JaxRsClientConfig makeConfig() {

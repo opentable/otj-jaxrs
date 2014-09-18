@@ -11,8 +11,11 @@
 
   <artifactId>otj-jaxrs-testing</artifactId>
   <name>otj-jaxrs-testing</name>
-  <packaging>jar</packaging>
   <description>OpenTable jaxrs testing support</description>
+
+  <properties>
+    <ot.build.allow-guice>true</ot.build.allow-guice>
+  </properties>
 
   <build>
     <pluginManagement>
@@ -39,15 +42,11 @@
     </dependency>
     <dependency>
       <groupId>com.opentable.components</groupId>
-      <artifactId>otj-jaxrs-client</artifactId>
+      <artifactId>otj-jaxrs-client-guice</artifactId>
     </dependency>
     <dependency>
       <groupId>com.opentable.components</groupId>
       <artifactId>otj-jaxrs-server</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.opentable.components</groupId>
-      <artifactId>otj-jaxrs-guice</artifactId>
     </dependency>
     <dependency>
       <groupId>com.opentable.components</groupId>

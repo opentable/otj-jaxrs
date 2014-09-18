@@ -12,7 +12,7 @@
   <dependencies>
     <dependency>
       <groupId>com.opentable.components</groupId>
-      <artifactId>otj-jaxrs-clientfactory-api</artifactId>
+      <artifactId>otj-jaxrs-client</artifactId>
     </dependency>
 
     <dependency>

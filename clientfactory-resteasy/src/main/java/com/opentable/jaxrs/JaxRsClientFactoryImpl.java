@@ -1,8 +1,8 @@
-package com.opentable.jaxrs.clientfactory;
+package com.opentable.jaxrs;
 
 import java.io.IOException;
 
-import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
@@ -20,52 +20,21 @@ import org.jboss.resteasy.client.jaxrs.BasicAuthentication;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 
-import com.opentable.jaxrs.JaxRsClientBuilder;
-import com.opentable.jaxrs.JaxRsClientConfig;
-
 /**
  * The RESTEasy implementation of ClientFactory. Hides RESTEasy specific stuff
  * behind a common facade.
  */
-public class JaxRsClientBuilderImpl implements JaxRsClientBuilder
+public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
-    private final ResteasyClientBuilder clientBuilder = getResteasyClientBuilder();
-
     @Override
-    public JaxRsClientBuilder register(Object object)
-    {
-        clientBuilder.register(object);
-        return this;
+    public ClientBuilder newBuilder(JaxRsClientConfig config) {
+        final ResteasyClientBuilder builder = new ResteasyClientBuilder();
+        configureHttpEngine(builder, config);
+        configureAuthenticationIfNeeded(builder, config);
+        return builder;
     }
 
-    @Override
-    public JaxRsClientBuilder register(Class<?> clazz)
-    {
-        clientBuilder.register(clazz);
-        return this;
-    }
-
-    @Override
-    public JaxRsClientBuilder withConfiguration(JaxRsClientConfig config)
-    {
-        configureHttpEngine(config);
-        configureAuthenticationIfNeeded(config);
-        return this;
-    }
-
-    @Override
-    public Client build()
-    {
-        return clientBuilder.build();
-    }
-
-    /** package-public, used in test only */
-    ResteasyClientBuilder getResteasyClientBuilder()
-    {
-        return new ResteasyClientBuilder();
-    }
-
-    private void configureHttpEngine(JaxRsClientConfig config)
+    private void configureHttpEngine(ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
     {
         final HttpClientBuilder builder = HttpClientBuilder.create();
         if (config.isEtcdHacksEnabled()) {
@@ -95,7 +64,7 @@ public class JaxRsClientBuilderImpl implements JaxRsClientBuilder
         return base.build();
     }
 
-    private void configureAuthenticationIfNeeded(JaxRsClientConfig config)
+    private void configureAuthenticationIfNeeded(ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
     {
         if (!StringUtils.isEmpty(config.basicAuthUserName()) && !StringUtils.isEmpty(config.basicAuthPassword()))
         {
