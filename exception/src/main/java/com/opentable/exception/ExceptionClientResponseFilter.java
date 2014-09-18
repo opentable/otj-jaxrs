@@ -33,7 +33,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 
-import com.opentable.logging.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Intercept exceptions that have been mapped to <code>x-ot/error</code> responses,
@@ -43,7 +44,7 @@ import com.opentable.logging.Log;
 @Provider
 class ExceptionClientResponseFilter implements ClientResponseFilter
 {
-    private static final Log LOG = Log.findLog();
+    private static final Logger LOG = LoggerFactory.getLogger(ExceptionClientResponseFilter.class);
     private final ObjectMapper mapper;
     private final Map<String, Set<ExceptionReviver>> revivers;
 
@@ -71,20 +72,20 @@ class ExceptionClientResponseFilter implements ClientResponseFilter
             Preconditions.checkState(causes instanceof List, "bad causes");
             final List<?> causesList = (List<?>) causes;
 
-            LOG.debug("Received error responses %s", Joiner.on('\t').join(causesList));
+            LOG.debug("Received error responses {}", Joiner.on('\t').join(causesList));
 
             Preconditions.checkState(causesList.get(0) instanceof Map, "bad cause");
 
             final OTApiException exn = toException((Map<String, Object>) causesList.get(0));
 
             if (causesList.size() > 1) {
-                LOG.debug(exn, "Multi-exception found.  first exception, remainder following.");
+                LOG.debug("Multi-exception found.  first exception, remainder following.", exn);
             }
 
             for (int i = 1; i < causesList.size(); i++)
             {
                 final OTApiException suppressed = toException((Map<String, Object>) causesList.get(i));
-                LOG.debug(suppressed, "Multiple exceptions, continuation from prior backtrace...");
+                LOG.debug("Multiple exceptions, continuation from prior backtrace...", suppressed);
                 exn.addSuppressed(suppressed);
             }
 
@@ -99,7 +100,7 @@ class ExceptionClientResponseFilter implements ClientResponseFilter
         final Set<ExceptionReviver> set = revivers.get(type);
         if (set.isEmpty())
         {
-            LOG.error("Unknown exception type '%s'", type);
+            LOG.error("Unknown exception type '{}'", type);
             return makeUnknownException(fields);
         }
         for (final ExceptionReviver er : set) {
@@ -109,7 +110,7 @@ class ExceptionClientResponseFilter implements ClientResponseFilter
                 return ex;
             }
         }
-        LOG.error("No registered handler handled %s", fields);
+        LOG.error("No registered handler handled {}", fields);
         return makeUnknownException(fields);
     }
 

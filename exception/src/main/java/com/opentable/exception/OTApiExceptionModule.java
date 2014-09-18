@@ -17,8 +17,7 @@ package com.opentable.exception;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
-
-import com.opentable.jaxrs.JaxRsBinder;
+import com.opentable.jaxrs.JaxRsClientBinder;
 
 /**
  * Add support for mapping NessApiException subclasses to and from HTTP responses.
@@ -35,7 +34,7 @@ public final class OTApiExceptionModule extends AbstractModule
         bind(ResponseMapper.class);
 
         bind(ExceptionClientResponseFilter.class).in(Scopes.SINGLETON);
-        JaxRsBinder.bindFeatureForAllClients(binder()).to(ExceptionClientResponseFeature.class);
+        JaxRsClientBinder.bindFeatureForAllClients(binder()).to(ExceptionClientResponseFeature.class);
 
         // Constructing the binder creates the MapBinder, so we don't have undeclared dependencies
         // even if there end up being no bindings, just an empty map.
