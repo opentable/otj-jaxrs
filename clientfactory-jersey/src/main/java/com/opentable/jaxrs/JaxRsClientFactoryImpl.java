@@ -10,7 +10,6 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
-import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.message.GZipEncoder;
 
 /**
@@ -23,8 +22,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         final JerseyClientBuilder builder = new JerseyClientBuilder();
         builder.withConfig(createClientConfig(config));
         configureAuthenticationIfNeeded(builder, config);
-        return builder.register(JacksonFeature.class)
-                      .register(GZipEncoder.class);
+        return builder.register(GZipEncoder.class);
     }
 
     private ClientConfig createClientConfig(JaxRsClientConfig config)
