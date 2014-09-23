@@ -42,23 +42,27 @@ public class StreamedJsonResponseConverter
             TypeReference<T> type)
     throws IOException
     {
-        final int sc = response.getStatus();
-        switch(sc)
-        {
-        case 201:
-        case 204:
-            LOG.debug("Return code is {}, finishing.", response.getStatus());
-            return;
-        case 200:
-            try (final JsonParser jp = mapper.getFactory().createParser(response.readEntity(InputStream.class))) {
-                doRead(callback, type, jp);
+        try {
+            final int sc = response.getStatus();
+            switch(sc)
+            {
+            case 201:
+            case 204:
+                LOG.debug("Return code is {}, finishing.", response.getStatus());
+                return;
+            case 200:
+                try (final JsonParser jp = mapper.getFactory().createParser(response.readEntity(InputStream.class))) {
+                    doRead(callback, type, jp);
+                }
+                return;
+            default:
+                if (sc >= 400 && sc < 500) {
+                    throw new ClientErrorException(response);
+                }
+                throw new ServerErrorException(response);
             }
-            return;
-        default:
-            if (sc >= 400 && sc < 500) {
-                throw new ClientErrorException(response);
-            }
-            throw new ServerErrorException(response);
+        } finally {
+            response.close();
         }
     }
 
