@@ -1,0 +1,113 @@
+package com.opentable.jaxrs.test;
+
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.URI;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.sun.net.httpserver.HttpServer;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.opentable.config.Config;
+import com.opentable.jaxrs.JaxRsClientFactory;
+import com.opentable.jaxrs.JaxRsClientModule;
+import com.opentable.jaxrs.StandardFeatureGroup;
+import com.opentable.lifecycle.guice.LifecycleModule;
+import com.opentable.logging.Log;
+
+public class ClientIntegrationTest {
+
+    public static final int SERVER_PORT = 8910;
+    private static final Log LOG = Log.findLog();
+    private Injector injector;
+    private JaxRsClientFactory factory;
+
+    private InetSocketAddress address;
+    private HttpServer httpServer;
+
+
+    @Before
+    public void setup() throws IOException {
+        injector = Guice.createInjector(
+                new JaxRsClientModule("test", StandardFeatureGroup.PUBLIC),
+                new LifecycleModule(),
+                new AbstractModule() {
+                    @Override
+                    protected void configure() {
+                        bind(Config.class).toInstance(Config.getFixedConfig(
+                                "jaxrs.client.default.http.max-route-connections", "10"
+                        ));
+                    }
+                }
+        );
+        factory = injector.getInstance(JaxRsClientFactory.class);
+        address = new InetSocketAddress(SERVER_PORT);
+        LOG.debug("creating server at address " + address);
+        httpServer = HttpServer.create(address, 0);
+        final byte[] response = "Hello!\n".getBytes();
+        httpServer.createContext("/", exchange -> {
+            exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
+            exchange.getResponseBody().write(response);
+            exchange.close();
+        });
+        httpServer.start();
+    }
+
+    @After
+    public void after() {
+        httpServer.stop(0);
+    }
+
+    @Test(expected=Exception.class)
+    public void exhaustConnectionPoolWithoutClose() throws InterruptedException {
+        final Client client = factory.newClient("test", StandardFeatureGroup.PUBLIC);
+        final URI uri = UriBuilder.fromUri("http://"+address.getHostName()).port(SERVER_PORT).build();
+
+        for (int i = 0; i < 100; i++) {
+            LOG.trace("trying connection number " + i + " for " + uri);
+            final Response response = client.target(uri).request().get();
+
+            assertEquals("status should be 200", 200, response.getStatus());
+        }
+    }
+
+    @Test
+    public void closedConnectionPoolNotExhaused() throws InterruptedException {
+        final Client client = factory.newClient("test", StandardFeatureGroup.PUBLIC);
+
+        final URI uri = UriBuilder.fromUri("http://"+address.getHostName()).port(SERVER_PORT).build();
+        for (int i = 0; i < 100; i++) {
+            LOG.trace("trying connection number " + i + " for " + uri);
+            final Response response = client.target(uri).request().get();
+
+            response.close();
+            assertEquals("status should be 200", 200, response.getStatus());
+        }
+    }
+
+    @Test
+    public void entityReadClosesToo() throws InterruptedException {
+        final Client client = factory.newClient("test", StandardFeatureGroup.PUBLIC);
+
+        final URI uri = UriBuilder.fromUri("http://"+address.getHostName()).port(SERVER_PORT).build();
+        for (int i = 0; i < 100; i++) {
+            LOG.trace("trying connection number " + i + " for " + uri);
+            final Response response = client.target(uri).request().get();
+            final String result = response.readEntity(String.class);
+            assertEquals("status should be 200", 200, response.getStatus());
+        }
+    }
+
+
+}
