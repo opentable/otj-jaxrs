@@ -15,6 +15,7 @@ import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.jboss.resteasy.client.jaxrs.BasicAuthentication;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -42,6 +43,10 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 .setRedirectStrategy(new ExtraLaxRedirectStrategy())
                 .addInterceptorFirst(new SwallowHeaderInterceptor(HttpHeaders.CONTENT_LENGTH));
         }
+        final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(config.connectionPoolSize());
+        connectionManager.closeExpiredConnections();
+
         final HttpClient client = builder
                 .setDefaultSocketConfig(SocketConfig.custom()
                         .setSoTimeout((int) config.socketTimeout().getMillis())
@@ -49,6 +54,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 .setDefaultRequestConfig(customRequestConfig(config, RequestConfig.custom()))
                 .setMaxConnTotal(config.httpClientMaxTotalConnections())
                 .setMaxConnPerRoute(config.httpClientDefaultMaxPerRoute())
+                .setConnectionManager(connectionManager)
                 .build();
         final ApacheHttpClient4Engine engine = new HackedApacheHttpClient4Engine(config, client);
         clientBuilder.httpEngine(engine);
