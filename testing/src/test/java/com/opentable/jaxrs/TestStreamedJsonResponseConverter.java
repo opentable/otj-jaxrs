@@ -38,6 +38,8 @@ public class TestStreamedJsonResponseConverter
         EasyMock.expect(response.getStatus()).andReturn(status.getStatusCode()).anyTimes();
         EasyMock.expect(response.getStatusInfo()).andReturn(status).anyTimes();
         EasyMock.expect(response.readEntity(InputStream.class)).andReturn(entity);
+        response.close();
+        EasyMock.expectLastCall();
         EasyMock.replay(response);
         return response;
     }
