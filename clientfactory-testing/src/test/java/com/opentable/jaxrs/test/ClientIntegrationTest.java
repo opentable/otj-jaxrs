@@ -11,25 +11,28 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import com.sun.net.httpserver.HttpServer;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.sun.net.httpserver.HttpServer;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.opentable.config.Config;
 import com.opentable.jaxrs.JaxRsClientFactory;
 import com.opentable.jaxrs.JaxRsClientModule;
 import com.opentable.jaxrs.StandardFeatureGroup;
 import com.opentable.lifecycle.guice.LifecycleModule;
-import com.opentable.logging.Log;
 
 public class ClientIntegrationTest {
 
     public static final int SERVER_PORT = 8910;
-    private static final Log LOG = Log.findLog();
+    private static final Logger LOG = LoggerFactory.getLogger(ClientIntegrationTest.class);
     private Injector injector;
     private JaxRsClientFactory factory;
 
@@ -53,7 +56,7 @@ public class ClientIntegrationTest {
         );
         factory = injector.getInstance(JaxRsClientFactory.class);
         address = new InetSocketAddress(SERVER_PORT);
-        LOG.debug("creating server at address " + address);
+        LOG.debug("creating server at address {}", address);
         httpServer = HttpServer.create(address, 0);
         final byte[] response = "Hello!\n".getBytes();
         httpServer.createContext("/", exchange -> {
@@ -75,7 +78,7 @@ public class ClientIntegrationTest {
         final URI uri = UriBuilder.fromUri("http://"+address.getHostName()).port(SERVER_PORT).build();
 
         for (int i = 0; i < 100; i++) {
-            LOG.trace("trying connection number " + i + " for " + uri);
+            LOG.trace("trying connection number {} for {}", i, uri);
             final Response response = client.target(uri).request().get();
 
             assertEquals("status should be 200", 200, response.getStatus());
@@ -88,7 +91,7 @@ public class ClientIntegrationTest {
 
         final URI uri = UriBuilder.fromUri("http://"+address.getHostName()).port(SERVER_PORT).build();
         for (int i = 0; i < 100; i++) {
-            LOG.trace("trying connection number " + i + " for " + uri);
+            LOG.trace("trying connection number {} for {}", i, uri);
             final Response response = client.target(uri).request().get();
 
             response.close();
@@ -102,12 +105,10 @@ public class ClientIntegrationTest {
 
         final URI uri = UriBuilder.fromUri("http://"+address.getHostName()).port(SERVER_PORT).build();
         for (int i = 0; i < 100; i++) {
-            LOG.trace("trying connection number " + i + " for " + uri);
+            LOG.trace("trying connection number {} for {}", i, uri);
             final Response response = client.target(uri).request().get();
             final String result = response.readEntity(String.class);
             assertEquals("status should be 200", 200, response.getStatus());
         }
     }
-
-
 }
