@@ -14,7 +14,6 @@
     <!-- need this for testing, and runtime if not using otj-jackson -->
     <ot.build.allow-resteasy-jackson2-provider>true</ot.build.allow-resteasy-jackson2-provider>
     <ot.build.allow-guice>true</ot.build.allow-guice>
-    <ot.lifecycle.version>1.2.0-SNAPSHOT</ot.lifecycle.version>
   </properties>
 
   <dependencies>
@@ -61,7 +60,6 @@
     <dependency>
       <groupId>com.opentable.components</groupId>
       <artifactId>otj-logging</artifactId>
-      <version>1.3.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>javax.ws.rs</groupId>
@@ -70,7 +68,6 @@
     <dependency>
       <groupId>com.opentable.components</groupId>
       <artifactId>otj-lifecycle-guice</artifactId>
-      <version>${ot.lifecycle.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
