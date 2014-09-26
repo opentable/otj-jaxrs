@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -66,7 +65,6 @@ class JaxRsClientProvider implements Provider<Client>
 
         builder.property(JaxRsClientModule.CLIENT_PROPERTY, name);
         ((ResteasyClientBuilder) builder).connectionPoolSize(40);
-        ((ResteasyClientBuilder) builder).connectionCheckoutTimeout(5, TimeUnit.SECONDS);
         final Client client = builder.build();
         lifecycle.addListener(LifecycleStage.STOP_STAGE, client::close);
         return client;
