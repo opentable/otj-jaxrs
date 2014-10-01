@@ -14,7 +14,7 @@ interface JaxRsClientConfig
      * Timeout to check out a connection from the connection pool.
      */
     @Config({"jaxrs.client.${clientName}.pool.timeout", "jaxrs.client.default.pool.timeout"})
-    @Default("1s")
+    @Default("5s")
     TimeSpan connectionPoolTimeout();
 
     /**
@@ -28,14 +28,14 @@ interface JaxRsClientConfig
      * Timeout to establish initial connection.
      */
     @Config({"jaxrs.client.${clientName}.connect-timeout", "jaxrs.client.default.connect-timeout"})
-    @Default("1s")
+    @Default("10s")
     TimeSpan connectTimeout();
 
     /**
      * Socket timeout.
      */
     @Config({"jaxrs.client.${clientName}.socket-timeout", "jaxrs.client.default.socket-timeout"})
-    @Default("10s")
+    @Default("30s")
     TimeSpan socketTimeout();
 
     /**
