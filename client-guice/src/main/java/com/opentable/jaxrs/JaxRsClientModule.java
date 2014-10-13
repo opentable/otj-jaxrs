@@ -5,10 +5,12 @@ import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.ws.rs.client.Client;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
+import com.google.inject.Scopes;
 import com.google.inject.name.Names;
 
 import com.opentable.lifecycle.Lifecycle;
@@ -39,9 +41,10 @@ public class JaxRsClientModule extends AbstractModule
     {
         install (new JaxRsClientSharedModule());
         install (new JaxRsSharedModule());
-        bind (Client.class).annotatedWith(Names.named(name)).toProvider(new ClientProvider(name, features));
+        bind (Client.class).annotatedWith(Names.named(name)).toProvider(new ClientProvider(name, features)).in(Scopes.SINGLETON);
     }
 
+    @Singleton
     private static class ClientProvider implements Provider<Client> {
         private final String name;
         private final Collection<JaxRsFeatureGroup> features;
