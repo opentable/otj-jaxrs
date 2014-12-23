@@ -62,7 +62,7 @@ interface JaxRsClientConfig
     /**
      * Maximum connections per-route.
      */
-    @Config({"jaxrs.client.${clientName}.max-route-connections", "jaxrs.client.default.http.max-route-connections"})
+    @Config({"jaxrs.client.${clientName}.max-route-connections", "jaxrs.client.default.max-route-connections"})
     @Default("20")
     int httpClientDefaultMaxPerRoute();
 
