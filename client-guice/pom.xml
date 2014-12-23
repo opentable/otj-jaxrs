@@ -4,7 +4,7 @@
   <parent>
     <artifactId>otj-jaxrs-parent</artifactId>
     <groupId>com.opentable.components</groupId>
-    <version>1.4.4-SNAPSHOT</version>
+    <version>1.4.3</version>
   </parent>
 
   <artifactId>otj-jaxrs-client-guice</artifactId>
