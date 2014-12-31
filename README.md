@@ -1,6 +1,8 @@
 OpenTable JAX-RS Component
 ==========================
 
+[![Build Status](https://travis-ci.org/opentable/otj-jaxrs.svg)](https://travis-ci.org/opentable/otj-jaxrs)
+
 Component Charter
 -----------------
 
