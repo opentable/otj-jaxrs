@@ -7,6 +7,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -22,6 +23,7 @@ public class TestJaxRsMocking {
         HttpMockSpec spec = HttpMockSpec.create();
         spec.on().get("/test").respond(Response.ok("Test", MediaType.TEXT_PLAIN));
         spec.on().post("/test").respond(new EchoResponder());
+        spec.on().get("/404").respond(Response.status(Status.NOT_FOUND).entity("Not found!"));
 
         // Create a client that uses the service
         Client client = JaxRsMocking.mockClient(ClientBuilder.newBuilder().register(JacksonJsonProvider.class), spec).build();
@@ -29,9 +31,13 @@ public class TestJaxRsMocking {
         // Give it a whirl
         assertEquals("Test", client.target("http://example.com/test").request().get(String.class));
 
-        SimplePojo response = client.target("/test").request(MediaType.APPLICATION_JSON).post(Entity.json(new SimplePojo(3, "b")), SimplePojo.class);
-        assertEquals(3, response.a);
-        assertEquals("b", response.b);
+        SimplePojo sp = client.target("/test").request(MediaType.APPLICATION_JSON).post(Entity.json(new SimplePojo(3, "b")), SimplePojo.class);
+        assertEquals(3, sp.a);
+        assertEquals("b", sp.b);
+
+        Response r = client.target("/404").request().get();
+        assertEquals(Status.NOT_FOUND.getStatusCode(), r.getStatus());
+        assertEquals("Not found!", r.readEntity(String.class));
     }
 
     public static class SimplePojo {

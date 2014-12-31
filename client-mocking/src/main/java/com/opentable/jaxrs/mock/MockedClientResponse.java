@@ -6,8 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyWriter;
+
+import com.google.common.base.MoreObjects;
 
 import org.jboss.resteasy.client.jaxrs.internal.ClientConfiguration;
 import org.jboss.resteasy.client.jaxrs.internal.ClientResponse;
@@ -35,14 +38,15 @@ class MockedClientResponse extends ClientResponse {
         final Annotation[] annotations = new Annotation[0];
         T entity = (T) builtResponse.getEntity();
         final Class<T> entityType = (Class<T>) entity.getClass();
-        final MessageBodyWriter<T> mbw = configuration.getMessageBodyWriter(entityType, entityType, annotations, builtResponse.getMediaType());
+        final MediaType mediaType = MoreObjects.firstNonNull(builtResponse.getMediaType(), MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        final MessageBodyWriter<T> mbw = configuration.getMessageBodyWriter(entityType, entityType, annotations, mediaType);
 
         if (mbw == null) {
             throw new AssertionError("No message body writer found for entity " + entity);
         }
 
         try {
-            mbw.writeTo(entity, entityType, entityType, annotations, builtResponse.getMediaType(), getHeaders(), bytes);
+            mbw.writeTo(entity, entityType, entityType, annotations, mediaType, getHeaders(), bytes);
         } catch (IOException e) {
             throw new AssertionError(e);
         }
