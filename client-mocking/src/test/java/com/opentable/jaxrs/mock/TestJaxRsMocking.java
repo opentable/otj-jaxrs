@@ -40,6 +40,12 @@ public class TestJaxRsMocking {
         assertEquals("Not found!", r.readEntity(String.class));
     }
 
+    @Test(expected=NoExpectationAssertionError.class)
+    public void testMockNoSpec() throws Exception {
+        Client client = JaxRsMocking.mockClient(ClientBuilder.newBuilder(), HttpMockSpec.create()).build();
+        client.target("/").request().get();
+    }
+
     public static class SimplePojo {
         public final int a;
         public final String b;

@@ -26,11 +26,11 @@ class InOrderExpectationFinder implements Function<ClientInvocation, InvocationE
     public InvocationExpectation apply(ClientInvocation t) {
         final int nextIndex = index.getAndIncrement();
         if (expectations.size() <= nextIndex) {
-            throw new AssertionError("Unexpected invocation #" + nextIndex + " is past end of expectations");
+            throw new NoExpectationAssertionError("Unexpected invocation #" + nextIndex + " is past end of expectations");
         }
         InvocationExpectation e = expectations.get(nextIndex);
         if (!e.matches(t)) {
-            throw new AssertionError("Invocation #" + nextIndex + " doesn't match: " + t);
+            throw new NoExpectationAssertionError("Invocation #" + nextIndex + " doesn't match: " + t);
         }
         LOG.debug("Invocation #{} matches expectation {}", nextIndex, e);
         return e;

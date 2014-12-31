@@ -29,6 +29,6 @@ class AnyOrderExpectationFinder implements Function<ClientInvocation, Invocation
             LOG.trace("ClientInvocation '{}' fails to match expectation '{}'", t, e);
         }
 
-        throw new AssertionError("ClientInvocation failed to match any expectation: " + t);
+        throw new NoExpectationAssertionError("ClientInvocation failed to match any expectation: " + t);
     }
 }
