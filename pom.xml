@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.opentable</groupId>
-    <artifactId>otj-parent</artifactId>
+    <artifactId>otj-parent-oss</artifactId>
     <version>29</version>
   </parent>
 
@@ -143,10 +143,15 @@
       </dependency>
 
       <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymock</artifactId>
+        <version>3.1</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>1.9.5</version>
-        <scope>test</scope>
+        <version>1.10.17</version>
       </dependency>
 
     </dependencies>
