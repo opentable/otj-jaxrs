@@ -58,7 +58,6 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         }
         final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(config.connectionPoolSize());
-        connectionManager.closeExpiredConnections();
 
         final HttpClient client = builder
                 .setDefaultSocketConfig(SocketConfig.custom()
