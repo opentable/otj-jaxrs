@@ -31,6 +31,13 @@ interface JaxRsClientConfig
     TimeSpan connectionPoolTimeout();
 
     /**
+     * Monitor connection pool for failure to acquire leases.
+     */
+    @Config({"jaxrs.client.${clientName}.pool.warn-time", "jaxrs.client.default.pool.warn-time"})
+    @Default("1s")
+    TimeSpan connectionPoolWarnTime();
+
+    /**
      * Connection pool size.
      */
     @Config({"jaxrs.client.${clientName}.pool.size", "jaxrs.client.default.pool.size"})
