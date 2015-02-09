@@ -16,6 +16,7 @@ package org.apache.http.impl.conn;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -25,9 +26,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpClientConnection;
 import org.apache.http.conn.ConnectionPoolTimeoutException;
+import org.apache.http.conn.routing.HttpRoute;
+import org.apache.http.pool.PoolStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
@@ -45,6 +49,8 @@ public class MonitoredPoolingHttpClientConnectionManager extends PoolingHttpClie
     private volatile long warnTimeMs = -1;
 
     private final ScheduledThreadPoolExecutor scheduler;
+
+    private final Set<HttpRoute> knownRoutes = Sets.newConcurrentHashSet();
 
     public MonitoredPoolingHttpClientConnectionManager(String clientName) {
         this.clientName = clientName;
@@ -74,6 +80,10 @@ public class MonitoredPoolingHttpClientConnectionManager extends PoolingHttpClie
         final HttpClientConnection result = super.leaseConnection(future, timeout, tunit);
         final Duration time = Duration.between(start, Instant.now());
 
+        if (future.isDone()) {
+            knownRoutes.add(future.get().getRoute());
+        }
+
         warnFuture.ifPresent(f -> f.cancel(false));
 
         if (time.toMillis() > warnTimeMs) {
@@ -92,8 +102,14 @@ public class MonitoredPoolingHttpClientConnectionManager extends PoolingHttpClie
     private void warnIfStalling() {
         if (lastBlockedAt.isAfter(Instant.now().minusSeconds(WARN_INTERVAL_SECONDS))) {
             final int nBlockedThreads = scheduler.getQueue().size() - 1; // don't count the notification task itself
-            LOG.warn("Pool \"{}\" is stalling!  {} threads currently awaiting checkout", clientName, nBlockedThreads);
+            LOG.warn("Pool \"{}\" is stalling!  {} threads currently awaiting checkout.  Pool stats {}", clientName, nBlockedThreads, getTotalStats());
+            knownRoutes.forEach(r ->
+                LOG.warn("Pool \"{}\" route \"{}\" stats {}", clientName, r, getStats(r)));
         }
+        knownRoutes.removeIf(r -> {
+            PoolStats stats = getStats(r);
+            return stats.getLeased() == 0 && stats.getPending() == 0;
+        });
     }
 
     @Override
