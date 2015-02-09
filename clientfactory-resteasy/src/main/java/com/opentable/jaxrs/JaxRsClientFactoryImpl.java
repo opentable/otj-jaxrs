@@ -14,6 +14,7 @@
 package com.opentable.jaxrs;
 
 import java.io.IOException;
+import java.time.Duration;
 
 import javax.ws.rs.client.ClientBuilder;
 
@@ -28,7 +29,7 @@ import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.impl.conn.MonitoredPoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.jboss.resteasy.client.jaxrs.BasicAuthentication;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -41,14 +42,14 @@ import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
     @Override
-    public ClientBuilder newBuilder(JaxRsClientConfig config) {
+    public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config) {
         final ResteasyClientBuilder builder = new ResteasyClientBuilder();
-        configureHttpEngine(builder, config);
-        configureAuthenticationIfNeeded(builder, config);
+        configureHttpEngine(clientName, builder, config);
+        configureAuthenticationIfNeeded(clientName, builder, config);
         return builder;
     }
 
-    private void configureHttpEngine(ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
+    private void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
     {
         final HttpClientBuilder builder = HttpClientBuilder.create();
         if (config.isEtcdHacksEnabled()) {
@@ -56,7 +57,9 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 .setRedirectStrategy(new ExtraLaxRedirectStrategy())
                 .addInterceptorFirst(new SwallowHeaderInterceptor(HttpHeaders.CONTENT_LENGTH));
         }
-        final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        final MonitoredPoolingHttpClientConnectionManager connectionManager = new MonitoredPoolingHttpClientConnectionManager(clientName);
+
+        connectionManager.setCheckoutWarnTime(Duration.ofMillis(config.connectionPoolWarnTime().getMillis()));
         connectionManager.setMaxTotal(config.connectionPoolSize());
         connectionManager.setDefaultMaxPerRoute(config.httpClientDefaultMaxPerRoute());
 
@@ -81,7 +84,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         return base.build();
     }
 
-    private void configureAuthenticationIfNeeded(ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
+    private void configureAuthenticationIfNeeded(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
     {
         if (!StringUtils.isEmpty(config.basicAuthUserName()) && !StringUtils.isEmpty(config.basicAuthPassword()))
         {
