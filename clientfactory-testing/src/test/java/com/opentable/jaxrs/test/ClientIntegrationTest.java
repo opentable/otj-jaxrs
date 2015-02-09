@@ -42,7 +42,9 @@ import com.opentable.jaxrs.JaxRsClientModule;
 import com.opentable.jaxrs.StandardFeatureGroup;
 import com.opentable.lifecycle.guice.LifecycleModule;
 
+@SuppressWarnings("restriction")
 public class ClientIntegrationTest {
+    private static final String HELLO = "Hello!\n";
 
     public static final int SERVER_PORT = 8910;
     private static final Logger LOG = LoggerFactory.getLogger(ClientIntegrationTest.class);
@@ -71,7 +73,7 @@ public class ClientIntegrationTest {
         address = new InetSocketAddress(SERVER_PORT);
         LOG.debug("creating server at address {}", address);
         httpServer = HttpServer.create(address, 0);
-        final byte[] response = "Hello!\n".getBytes();
+        final byte[] response = HELLO.getBytes();
         httpServer.createContext("/", exchange -> {
             exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
             exchange.getResponseBody().write(response);
@@ -122,6 +124,7 @@ public class ClientIntegrationTest {
             final Response response = client.target(uri).request().get();
             final String result = response.readEntity(String.class);
             assertEquals("status should be 200", 200, response.getStatus());
+            assertEquals(HELLO, result);
         }
     }
 }
