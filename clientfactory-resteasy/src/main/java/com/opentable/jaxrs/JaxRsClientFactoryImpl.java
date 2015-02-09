@@ -58,14 +58,13 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         }
         final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(config.connectionPoolSize());
+        connectionManager.setDefaultMaxPerRoute(config.httpClientDefaultMaxPerRoute());
 
         final HttpClient client = builder
                 .setDefaultSocketConfig(SocketConfig.custom()
                         .setSoTimeout((int) config.socketTimeout().getMillis())
                         .build())
                 .setDefaultRequestConfig(customRequestConfig(config, RequestConfig.custom()))
-                .setMaxConnTotal(config.httpClientMaxTotalConnections())
-                .setMaxConnPerRoute(config.httpClientDefaultMaxPerRoute())
                 .setConnectionManager(connectionManager)
                 .build();
         final ApacheHttpClient4Engine engine = new HackedApacheHttpClient4Engine(config, client);
