@@ -41,14 +41,14 @@ import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
     @Override
-    public ClientBuilder newBuilder(JaxRsClientConfig config) {
+    public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config) {
         final ResteasyClientBuilder builder = new ResteasyClientBuilder();
-        configureHttpEngine(builder, config);
-        configureAuthenticationIfNeeded(builder, config);
+        configureHttpEngine(clientName, builder, config);
+        configureAuthenticationIfNeeded(clientName, builder, config);
         return builder;
     }
 
-    private void configureHttpEngine(ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
+    private void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
     {
         final HttpClientBuilder builder = HttpClientBuilder.create();
         if (config.isEtcdHacksEnabled()) {
@@ -81,7 +81,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         return base.build();
     }
 
-    private void configureAuthenticationIfNeeded(ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
+    private void configureAuthenticationIfNeeded(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
     {
         if (!StringUtils.isEmpty(config.basicAuthUserName()) && !StringUtils.isEmpty(config.basicAuthPassword()))
         {

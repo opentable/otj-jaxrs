@@ -31,7 +31,7 @@ import org.glassfish.jersey.message.GZipEncoder;
 public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
     @Override
-    public ClientBuilder newBuilder(JaxRsClientConfig config) {
+    public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config) {
         final JerseyClientBuilder builder = new JerseyClientBuilder();
         builder.withConfig(createClientConfig(config));
         configureAuthenticationIfNeeded(builder, config);
