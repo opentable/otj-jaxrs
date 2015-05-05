@@ -104,9 +104,9 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config) {
         ExecutorService executor = new ThreadPoolExecutor(1, 10, 1, TimeUnit.HOURS,
                 new SynchronousQueue<Runnable>(),
-                new ThreadFactoryBuilder().setDaemon(true).setNameFormat(clientName + "-worker-%s").build(),
+                new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
                 new ThreadPoolExecutor.AbortPolicy());
-        clientBuilder.asyncExecutor(executor);
+        clientBuilder.asyncExecutor(executor, true);
     }
 
     private static class HackedApacheHttpClient4Engine extends ApacheHttpClient4Engine {
