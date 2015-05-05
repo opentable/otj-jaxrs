@@ -15,8 +15,14 @@ package com.opentable.jaxrs;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.ClientBuilder;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
@@ -46,6 +52,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         final ResteasyClientBuilder builder = new ResteasyClientBuilder();
         configureHttpEngine(clientName, builder, config);
         configureAuthenticationIfNeeded(clientName, builder, config);
+        configureThreadPool(clientName, builder, config);
         return builder;
     }
 
@@ -92,6 +99,14 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                     config.basicAuthUserName(), config.basicAuthPassword());
             clientBuilder.register(auth);
         }
+    }
+
+    private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config) {
+        ExecutorService executor = new ThreadPoolExecutor(1, 10, 1, TimeUnit.HOURS,
+                new SynchronousQueue<Runnable>(),
+                new ThreadFactoryBuilder().setDaemon(true).setNameFormat(clientName + "-worker-%s").build(),
+                new ThreadPoolExecutor.AbortPolicy());
+        clientBuilder.asyncExecutor(executor);
     }
 
     private static class HackedApacheHttpClient4Engine extends ApacheHttpClient4Engine {
