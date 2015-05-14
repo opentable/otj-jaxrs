@@ -19,7 +19,7 @@
   <parent>
     <groupId>com.opentable</groupId>
     <artifactId>otj-parent-oss</artifactId>
-    <version>35</version>
+    <version>36</version>
   </parent>
 
   <scm>
