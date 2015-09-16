@@ -60,7 +60,6 @@ public class OpenTableJaxRsServletModule extends ServletModule
         bind (GuiceResteasyBootstrapServletContextListener.class);
 
         bind (OTCorsFilter.class).asEagerSingleton();
-        bind (LZ4DecodingInterceptor.class).asEagerSingleton();
 
         String first = paths.get(0);
         String[] rest = paths.subList(1, paths.size()).toArray(new String[paths.size()-1]);
