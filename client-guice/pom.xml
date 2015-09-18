@@ -17,7 +17,7 @@
   <parent>
     <artifactId>otj-jaxrs-parent</artifactId>
     <groupId>com.opentable.components</groupId>
-    <version>1.6.0</version>
+    <version>1.6.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>otj-jaxrs-client-guice</artifactId>
