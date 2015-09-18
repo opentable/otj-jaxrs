@@ -19,7 +19,7 @@
   <parent>
     <groupId>com.opentable</groupId>
     <artifactId>otj-parent-oss</artifactId>
-    <version>39</version>
+    <version>40-SNAPSHOT</version>
   </parent>
 
   <scm>
@@ -31,7 +31,7 @@
 
   <groupId>com.opentable.components</groupId>
   <artifactId>otj-jaxrs-parent</artifactId>
-  <version>1.5.3-SNAPSHOT</version>
+  <version>1.6.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -128,7 +128,7 @@
       <dependency>
         <groupId>com.opentable.components</groupId>
         <artifactId>otj-httpserver</artifactId>
-        <version>1.5.2</version>
+        <version>1.6.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
@@ -147,12 +147,6 @@
             <artifactId>xml-apis</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>net.jpountz.lz4</groupId>
-        <artifactId>lz4</artifactId>
-        <version>1.2.0</version>
       </dependency>
 
       <dependency>
