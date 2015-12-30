@@ -40,6 +40,7 @@ import org.apache.http.protocol.HttpContext;
 import org.jboss.resteasy.client.jaxrs.BasicAuthentication;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+import org.jboss.resteasy.client.jaxrs.internal.ClientInvocation;
 
 /**
  * The RESTEasy implementation of ClientFactory. Hides RESTEasy specific stuff
@@ -123,6 +124,14 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
             final Builder base = result.getConfig() == null ? RequestConfig.custom() : RequestConfig.copy(result.getConfig());
             result.setConfig(customRequestConfig(config, base));
             return result;
+        }
+
+        @Override
+        protected void loadHttpMethod(ClientInvocation request, HttpRequestBase httpMethod) throws Exception {
+            super.loadHttpMethod(request, httpMethod);
+            if (Boolean.FALSE.equals(request.getMutableProperties().get(JaxRsClientProperties.FOLLOW_REDIRECTS))) {
+                httpMethod.setConfig(RequestConfig.copy(httpMethod.getConfig()).setRedirectsEnabled(false).build());
+            }
         }
     }
 
