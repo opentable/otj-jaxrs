@@ -13,12 +13,58 @@
  */
 package com.opentable.jaxrs;
 
-import org.junit.Ignore;
+import static org.junit.Assert.assertEquals;
 
-// It sucks that this test is ignored, but I have no idea how to test e.g. socket
-// connect timeouts without a lot of harnessing...
-@Ignore
-public class ResteasyClientBuilderTest
-{
-// TODO
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
+
+import org.junit.Test;
+
+import com.opentable.config.Config;
+
+public class ResteasyClientBuilderTest {
+    private static final String BAD_URI = "http://example.invalid";
+    private final JaxRsClientConfig config = Config.getEmptyConfig().getBean(JaxRsClientConfig.class);
+
+    @Test
+    public void testNoRedirect() throws Exception {
+        final HttpServer server = HttpServer.create(new InetSocketAddress(InetAddress.getLocalHost(), 0), 1);
+        try {
+            server.createContext("/", new RedirectHandler());
+            server.start();
+
+            final InetSocketAddress addr = server.getAddress();
+            Client client = new JaxRsClientFactoryImpl().newBuilder("test", config).build();
+            try {
+                Response r = client.target("http://" + addr.getHostString() + ":" + addr.getPort()).request()
+                        .property(JaxRsClientProperties.FOLLOW_REDIRECTS, false)
+                        .get();
+                assertEquals(301, r.getStatus());
+                assertEquals(BAD_URI, r.getHeaderString(HttpHeaders.LOCATION));
+            } finally {
+                client.close();
+            }
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    private static class RedirectHandler implements HttpHandler
+    {
+        @Override
+        public void handle(HttpExchange h) throws IOException {
+            h.getResponseHeaders().add(HttpHeaders.LOCATION, BAD_URI);
+            h.sendResponseHeaders(301, -1);
+            h.close();
+        }
+    }
 }
