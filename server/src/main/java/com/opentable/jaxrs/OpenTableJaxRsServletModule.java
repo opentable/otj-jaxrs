@@ -27,6 +27,7 @@ import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
 import com.opentable.config.Config;
 import com.opentable.httpserver.HttpServerHandlerBinder;
 import com.opentable.jaxrs.exceptions.OpenTableJaxRsExceptionMapperModule;
+import com.opentable.server.OTCorsFilter;
 
 public class OpenTableJaxRsServletModule extends ServletModule
 {
