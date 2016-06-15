@@ -19,6 +19,7 @@ import static com.opentable.exception.OTApiException.ERROR_TYPE;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -28,8 +29,6 @@ import javax.ws.rs.core.Response.Status;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -42,13 +41,8 @@ public class TestOTApiExceptionMapping
     @Before
     public void setUp()
     {
-        Guice.createInjector(new OTApiExceptionModule(), new AbstractModule() {
-            @Override
-            protected void configure()
-            {
-                OTApiExceptionBinder.of(binder()).registerExceptionClass(TestingException.class);
-            }
-        }).injectMembers(this);
+        filter = new ExceptionClientResponseFilter(new ObjectMapper(),
+                Collections.singletonMap("foo", Collections.singleton(new ExceptionReviver(TestingException.class))));
     }
 
     @ExceptionType("foo")
