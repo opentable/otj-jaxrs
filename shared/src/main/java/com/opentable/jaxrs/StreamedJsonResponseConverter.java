@@ -88,7 +88,7 @@ public class StreamedJsonResponseConverter
         expect(jp, jp.nextToken(), JsonToken.START_OBJECT);
         expect(jp, jp.nextToken(), JsonToken.FIELD_NAME);
         if (!"results".equals(jp.getCurrentName())) {
-            throw new JsonParseException("expecting results field", jp.getCurrentLocation());
+            throw new JsonParseException(jp, "expecting results field");
         }
         expect(jp, jp.nextToken(), JsonToken.START_ARRAY);
         // As noted in a well-hidden comment in the MappingIterator constructor,
@@ -123,7 +123,7 @@ public class StreamedJsonResponseConverter
     private void expect(final JsonParser jp, final JsonToken token, final JsonToken expected) throws JsonParseException
     {
         if (!Objects.equal(token, expected)) {
-            throw new JsonParseException(String.format("Expected %s, found %s", expected, token), jp.getCurrentLocation());
+            throw new JsonParseException(jp, String.format("Expected %s, found %s", expected, token));
         }
     }
 }
