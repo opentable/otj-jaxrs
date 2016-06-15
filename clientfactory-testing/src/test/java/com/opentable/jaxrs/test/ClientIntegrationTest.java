@@ -26,21 +26,15 @@ import javax.ws.rs.core.UriBuilder;
 
 import com.sun.net.httpserver.HttpServer;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opentable.config.Config;
+import com.opentable.jaxrs.JaxRsClientConfiguration;
 import com.opentable.jaxrs.JaxRsClientFactory;
-import com.opentable.jaxrs.JaxRsClientModule;
 import com.opentable.jaxrs.StandardFeatureGroup;
-import com.opentable.lifecycle.guice.LifecycleModule;
 
 @SuppressWarnings("restriction")
 public class ClientIntegrationTest {
@@ -48,7 +42,6 @@ public class ClientIntegrationTest {
 
     public static final int SERVER_PORT = 8910;
     private static final Logger LOG = LoggerFactory.getLogger(ClientIntegrationTest.class);
-    private Injector injector;
     private JaxRsClientFactory factory;
 
     private InetSocketAddress address;
@@ -57,19 +50,12 @@ public class ClientIntegrationTest {
 
     @Before
     public void setup() throws IOException {
-        injector = Guice.createInjector(
-                new JaxRsClientModule("test", StandardFeatureGroup.PUBLIC),
-                new LifecycleModule(),
-                new AbstractModule() {
-                    @Override
-                    protected void configure() {
-                        bind(Config.class).toInstance(Config.getFixedConfig(
-                                "jaxrs.client.default.http.max-route-connections", "10"
-                        ));
-                    }
-                }
-        );
-        factory = injector.getInstance(JaxRsClientFactory.class);
+        factory = new JaxRsClientFactory(new JaxRsClientConfiguration() {
+            @Override
+            public int httpClientDefaultMaxPerRoute() {
+                return 10;
+            }
+        });
         address = new InetSocketAddress(SERVER_PORT);
         LOG.debug("creating server at address {}", address);
         httpServer = HttpServer.create(address, 0);
