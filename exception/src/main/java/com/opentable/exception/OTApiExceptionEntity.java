@@ -26,12 +26,12 @@ class OTApiExceptionEntity
     private final String statusText;
     private final List<Object> causes;
 
-    public OTApiExceptionEntity(StatusType status, Object... causes)
+    OTApiExceptionEntity(StatusType status, Object... causes)
     {
         this(status, Arrays.asList(causes));
     }
 
-    public OTApiExceptionEntity(StatusType status, List<Object> causes)
+    OTApiExceptionEntity(StatusType status, List<Object> causes)
     {
         this.statusCode = status.getStatusCode();
         this.statusText = status.getReasonPhrase();

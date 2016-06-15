@@ -15,11 +15,11 @@ package com.opentable.jaxrs;
 
 import static org.junit.Assert.assertEquals;
 
+import java.time.Duration;
+
 import javax.ws.rs.client.Client;
 
 import org.junit.Test;
-
-import com.opentable.config.Config;
 
 public class JerseyClientBuilderTest
 {
@@ -46,9 +46,15 @@ public class JerseyClientBuilderTest
     }
 
     private static JaxRsClientConfiguration makeConfig() {
-        return Config.getFixedConfig(
-                "jaxrs.client.default.socket-timeout", "6600ms",
-                "jaxrs.client.default.connect-timeout", "4400ms")
-            .getBean(JaxRsClientConfiguration.class);
+        return new JaxRsClientConfiguration() {
+            @Override
+            public Duration socketTimeout() {
+                return Duration.ofMillis(6600);
+            }
+            @Override
+            public Duration connectTimeout() {
+                return Duration.ofMillis(4400);
+            }
+        };
     }
 }
