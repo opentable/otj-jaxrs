@@ -26,7 +26,7 @@ public class JerseyClientBuilderTest
     @Test
     public void socketTimeoutPropagates() throws NoSuchFieldException, IllegalAccessException
     {
-        final JaxRsClientConfig conf = makeConfig();
+        final JaxRsClientConfiguration conf = makeConfig();
         final Client client = factoryForConfig(conf).newClient("test", StandardFeatureGroup.PUBLIC);
         String result = client.getConfiguration().getProperty("jersey.config.client.readTimeout").toString();
         assertEquals("6600", result);
@@ -35,25 +35,20 @@ public class JerseyClientBuilderTest
     @Test
     public void connectTimeoutPropagates() throws NoSuchFieldException, IllegalAccessException
     {
-        final JaxRsClientConfig conf = makeConfig();
+        final JaxRsClientConfiguration conf = makeConfig();
         final Client client = factoryForConfig(conf).newClient("test", StandardFeatureGroup.PUBLIC);
         final String result = client.getConfiguration().getProperty("jersey.config.client.connectTimeout").toString();
         assertEquals("4400", result);
     }
 
-    private static JaxRsClientFactory factoryForConfig(JaxRsClientConfig config) {
-        return new JaxRsClientFactory(Config.getEmptyConfig()) {
-            @Override
-            protected JaxRsClientConfig configForClient(String clientName) {
-                return config;
-            }
-        };
+    private static JaxRsClientFactory factoryForConfig(JaxRsClientConfiguration config) {
+        return new JaxRsClientFactory(config);
     }
 
-    private static JaxRsClientConfig makeConfig() {
+    private static JaxRsClientConfiguration makeConfig() {
         return Config.getFixedConfig(
                 "jaxrs.client.default.socket-timeout", "6600ms",
                 "jaxrs.client.default.connect-timeout", "4400ms")
-            .getBean(JaxRsClientConfig.class);
+            .getBean(JaxRsClientConfiguration.class);
     }
 }

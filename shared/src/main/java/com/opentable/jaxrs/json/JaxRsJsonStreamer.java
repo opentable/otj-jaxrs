@@ -147,7 +147,7 @@ public class JaxRsJsonStreamer<T>
     {
         private final Callback<Callback<T>> callback;
 
-        public JsonStreamingOutput(Callback<Callback<T>> callback)
+        JsonStreamingOutput(Callback<Callback<T>> callback)
         {
             this.callback = callback;
         }

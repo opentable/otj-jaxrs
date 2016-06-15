@@ -49,7 +49,7 @@ import org.jboss.resteasy.client.jaxrs.internal.ClientInvocation;
 public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
     @Override
-    public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config) {
+    public ClientBuilder newBuilder(String clientName, JaxRsClientConfiguration config) {
         final ResteasyClientBuilder builder = new ResteasyClientBuilder();
         configureHttpEngine(clientName, builder, config);
         configureAuthenticationIfNeeded(clientName, builder, config);
@@ -57,7 +57,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         return builder;
     }
 
-    private void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
+    private void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfiguration config)
     {
         final HttpClientBuilder builder = HttpClientBuilder.create();
         if (config.isEtcdHacksEnabled()) {
@@ -67,13 +67,13 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         }
         final MonitoredPoolingHttpClientConnectionManager connectionManager = new MonitoredPoolingHttpClientConnectionManager(clientName);
 
-        connectionManager.setCheckoutWarnTime(Duration.ofMillis(config.connectionPoolWarnTime().getMillis()));
+        connectionManager.setCheckoutWarnTime(Duration.ofMillis(config.connectionPoolWarnTime().toMillis()));
         connectionManager.setMaxTotal(config.connectionPoolSize());
         connectionManager.setDefaultMaxPerRoute(config.httpClientDefaultMaxPerRoute());
 
         final HttpClient client = builder
                 .setDefaultSocketConfig(SocketConfig.custom()
-                        .setSoTimeout((int) config.socketTimeout().getMillis())
+                        .setSoTimeout((int) config.socketTimeout().toMillis())
                         .build())
                 .setDefaultRequestConfig(customRequestConfig(config, RequestConfig.custom()))
                 .setConnectionManager(connectionManager)
@@ -82,17 +82,17 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         clientBuilder.httpEngine(engine);
     }
 
-    private static RequestConfig customRequestConfig(JaxRsClientConfig config, RequestConfig.Builder base) {
+    private static RequestConfig customRequestConfig(JaxRsClientConfiguration config, RequestConfig.Builder base) {
         base.setRedirectsEnabled(true);
         if (config != null) {
-            base.setConnectionRequestTimeout((int) config.connectionPoolTimeout().getMillis())
-                .setConnectTimeout((int) config.connectTimeout().getMillis())
-                .setSocketTimeout((int) config.socketTimeout().getMillis());
+            base.setConnectionRequestTimeout((int) config.connectionPoolTimeout().toMillis())
+                .setConnectTimeout((int) config.connectTimeout().toMillis())
+                .setSocketTimeout((int) config.socketTimeout().toMillis());
         }
         return base.build();
     }
 
-    private void configureAuthenticationIfNeeded(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
+    private void configureAuthenticationIfNeeded(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfiguration config)
     {
         if (!StringUtils.isEmpty(config.basicAuthUserName()) && !StringUtils.isEmpty(config.basicAuthPassword()))
         {
@@ -102,7 +102,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         }
     }
 
-    private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config) {
+    private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfiguration config) {
         ExecutorService executor = new ThreadPoolExecutor(1, 10, 1, TimeUnit.HOURS,
                 new SynchronousQueue<Runnable>(),
                 new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
@@ -111,9 +111,9 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     }
 
     private static class HackedApacheHttpClient4Engine extends ApacheHttpClient4Engine {
-        private final JaxRsClientConfig config;
+        private final JaxRsClientConfiguration config;
 
-        HackedApacheHttpClient4Engine(JaxRsClientConfig config, HttpClient client) {
+        HackedApacheHttpClient4Engine(JaxRsClientConfiguration config, HttpClient client) {
             super(client);
             this.config = config;
         }

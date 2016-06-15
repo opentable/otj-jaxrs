@@ -19,5 +19,5 @@ import javax.ws.rs.client.ClientBuilder;
  * SPI for creating {@link ClientBuilder} instances.
  */
 interface InternalClientFactory {
-    ClientBuilder newBuilder(String clientName, JaxRsClientConfig config);
+    ClientBuilder newBuilder(String clientName, JaxRsClientConfiguration config);
 }

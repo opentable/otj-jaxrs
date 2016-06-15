@@ -29,11 +29,10 @@ import com.sun.net.httpserver.HttpServer;
 
 import org.junit.Test;
 
-import com.opentable.config.Config;
-
+@SuppressWarnings("restriction")
 public class ResteasyClientBuilderTest {
     private static final String BAD_URI = "http://example.invalid";
-    private final JaxRsClientConfig config = Config.getEmptyConfig().getBean(JaxRsClientConfig.class);
+    private final JaxRsClientConfiguration config = new JaxRsClientConfiguration() {};
 
     @Test
     public void testNoRedirect() throws Exception {

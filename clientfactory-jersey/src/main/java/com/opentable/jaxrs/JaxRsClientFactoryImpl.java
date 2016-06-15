@@ -31,14 +31,14 @@ import org.glassfish.jersey.message.GZipEncoder;
 public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
     @Override
-    public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config) {
+    public ClientBuilder newBuilder(String clientName, JaxRsClientConfiguration config) {
         final JerseyClientBuilder builder = new JerseyClientBuilder();
         builder.withConfig(createClientConfig(config));
         configureAuthenticationIfNeeded(builder, config);
         return builder.register(GZipEncoder.class);
     }
 
-    private ClientConfig createClientConfig(JaxRsClientConfig config)
+    private ClientConfig createClientConfig(JaxRsClientConfiguration config)
     {
         final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(config.httpClientMaxTotalConnections());
@@ -47,12 +47,12 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         final ClientConfig clientConfig = new ClientConfig();
         clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
         clientConfig.connectorProvider(new ApacheConnectorProvider());
-        clientConfig.property(ClientProperties.CONNECT_TIMEOUT, (int) config.connectTimeout().getMillis());
-        clientConfig.property(ClientProperties.READ_TIMEOUT, (int) config.socketTimeout().getMillis());
+        clientConfig.property(ClientProperties.CONNECT_TIMEOUT, (int) config.connectTimeout().toMillis());
+        clientConfig.property(ClientProperties.READ_TIMEOUT, (int) config.socketTimeout().toMillis());
         return clientConfig;
     }
 
-    private static void configureAuthenticationIfNeeded(ClientBuilder builder, JaxRsClientConfig config)
+    private static void configureAuthenticationIfNeeded(ClientBuilder builder, JaxRsClientConfiguration config)
     {
         if (!StringUtils.isEmpty(config.basicAuthUserName()) && !StringUtils.isEmpty(config.basicAuthPassword()))
         {

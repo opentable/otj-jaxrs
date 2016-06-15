@@ -15,13 +15,11 @@ package com.opentable.jaxrs;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.concurrent.GuardedBy;
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -38,14 +36,12 @@ import com.google.common.collect.SetMultimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opentable.config.Config;
-
 /**
  * Central registry for creating JAX-RS Clients.
  *
  * <p>This factory centralizes configuration and registration of JAX-RS extensions
  * through the {@link Feature} abstraction.  After the factory is constructed, you may
- * register features.  Configuration is declared by the {@link JaxRsClientConfig} class.
+ * register features.  Configuration is declared by the {@link JaxRsClientConfiguration} class.
  *
  * <p>Each client is given a {@code clientName} and a list of {@link JaxRsFeatureGroup}s.
  * Feature groups provide a way to indirectly register features in a many-to-many relationship.
@@ -66,7 +62,7 @@ public class JaxRsClientFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(JaxRsClientFactory.class);
 
-    private final Config config;
+    private final JaxRsClientConfiguration config;
 
     @GuardedBy("this")
     private final Multimap<JaxRsFeatureGroup, Feature> featureMap = HashMultimap.create();
@@ -80,8 +76,7 @@ public class JaxRsClientFactory {
      * Initialize a new factory.  This factory is intended to be a singleton and should be
      * created once during application startup.
      */
-    @Inject
-    public JaxRsClientFactory(Config config) {
+    public JaxRsClientFactory(JaxRsClientConfiguration config) {
         this.config = config;
     }
 
@@ -95,7 +90,7 @@ public class JaxRsClientFactory {
     /**
      * Register many features at once.  Mostly a convenience for DI environments.
      */
-    @Inject
+    //@Inject TODO
     public synchronized JaxRsClientFactory addFeatureMap(Map<JaxRsFeatureGroup, Set<Feature>> map) {
         map.forEach((g, fs) -> fs.forEach(f -> addFeatureToGroup(g, f)));
         return this;
@@ -150,7 +145,7 @@ public class JaxRsClientFactory {
     public synchronized ClientBuilder newBuilder(String clientName, Collection<JaxRsFeatureGroup> featureGroupsIn) {
         started = true;
 
-        final JaxRsClientConfig jaxRsConfig = configForClient(clientName);
+        final JaxRsClientConfiguration jaxRsConfig = configForClient(clientName);
 
         final List<JaxRsFeatureGroup> featureGroups = ImmutableList.<JaxRsFeatureGroup>builder()
                 .add(PrivateFeatureGroup.WILDCARD)
@@ -175,10 +170,8 @@ public class JaxRsClientFactory {
     }
 
     @VisibleForTesting
-    protected JaxRsClientConfig configForClient(String clientName) {
-        return config.getBean(
-                JaxRsClientConfig.class,
-                Collections.singletonMap("clientName", clientName));
+    protected JaxRsClientConfiguration configForClient(String clientName) {
+        return config; // XXX ignored clientname?
     }
 
     /**
