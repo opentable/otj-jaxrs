@@ -20,6 +20,8 @@ import java.time.Duration;
  */
 public interface JaxRsClientConfiguration
 {
+    JaxRsClientConfiguration DEFAULT = new JaxRsClientConfiguration() {};
+
     /**
      * Timeout to check out a connection from the connection pool.
      */
