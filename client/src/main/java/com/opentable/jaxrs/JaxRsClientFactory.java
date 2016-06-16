@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import javax.annotation.concurrent.GuardedBy;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -91,10 +92,14 @@ public class JaxRsClientFactory {
     /**
      * Register many features at once.  Mostly a convenience for DI environments.
      */
-    //@Inject TODO
     public synchronized JaxRsClientFactory addFeatureMap(Map<JaxRsFeatureGroup, Set<Feature>> map) {
         map.forEach((g, fs) -> fs.forEach(f -> addFeatureToGroup(g, f)));
         return this;
+    }
+
+    @Inject
+    void injectBindings(Collection<JaxRsFeatureBinding> bindings) {
+        bindings.forEach(b -> addFeatureToGroup(b.getGroup(), b.getFeature()));
     }
 
     /**
