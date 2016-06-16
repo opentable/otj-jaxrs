@@ -32,7 +32,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opentable.jaxrs.JaxRsClientConfiguration;
+import com.opentable.jaxrs.JaxRsClientConfig;
 import com.opentable.jaxrs.JaxRsClientFactory;
 import com.opentable.jaxrs.StandardFeatureGroup;
 
@@ -50,7 +50,7 @@ public class ClientIntegrationTest {
 
     @Before
     public void setup() throws IOException {
-        factory = new JaxRsClientFactory(new JaxRsClientConfiguration() {
+        factory = new JaxRsClientFactory(new JaxRsClientConfig() {
             @Override
             public int httpClientDefaultMaxPerRoute() {
                 return 10;

@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  *
  * <p>This factory centralizes configuration and registration of JAX-RS extensions
  * through the {@link Feature} abstraction.  After the factory is constructed, you may
- * register features.  Configuration is declared by the {@link JaxRsClientConfiguration} class.
+ * register features.  Configuration is declared by the {@link JaxRsClientConfig} class.
  *
  * <p>Each client is given a {@code clientName} and a list of {@link JaxRsFeatureGroup}s.
  * Feature groups provide a way to indirectly register features in a many-to-many relationship.
@@ -62,7 +62,7 @@ public class JaxRsClientFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(JaxRsClientFactory.class);
 
-    private final JaxRsClientConfiguration config;
+    private final JaxRsClientConfig config;
 
     @GuardedBy("this")
     private final Multimap<JaxRsFeatureGroup, Feature> featureMap = HashMultimap.create();
@@ -76,7 +76,7 @@ public class JaxRsClientFactory {
      * Initialize a new factory.  This factory is intended to be a singleton and should be
      * created once during application startup.
      */
-    public JaxRsClientFactory(JaxRsClientConfiguration config) {
+    public JaxRsClientFactory(JaxRsClientConfig config) {
         this.config = config;
     }
 
@@ -145,7 +145,7 @@ public class JaxRsClientFactory {
     public synchronized ClientBuilder newBuilder(String clientName, Collection<JaxRsFeatureGroup> featureGroupsIn) {
         started = true;
 
-        final JaxRsClientConfiguration jaxRsConfig = configForClient(clientName);
+        final JaxRsClientConfig jaxRsConfig = configForClient(clientName);
 
         final List<JaxRsFeatureGroup> featureGroups = ImmutableList.<JaxRsFeatureGroup>builder()
                 .add(PrivateFeatureGroup.WILDCARD)
@@ -170,7 +170,7 @@ public class JaxRsClientFactory {
     }
 
     @VisibleForTesting
-    protected JaxRsClientConfiguration configForClient(String clientName) {
+    protected JaxRsClientConfig configForClient(String clientName) {
         return config; // XXX ignored clientname?
     }
 

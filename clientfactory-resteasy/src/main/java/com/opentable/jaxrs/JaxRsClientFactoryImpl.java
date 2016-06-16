@@ -49,7 +49,7 @@ import org.jboss.resteasy.client.jaxrs.internal.ClientInvocation;
 public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
     @Override
-    public ClientBuilder newBuilder(String clientName, JaxRsClientConfiguration config) {
+    public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config) {
         final ResteasyClientBuilder builder = new ResteasyClientBuilder();
         configureHttpEngine(clientName, builder, config);
         configureAuthenticationIfNeeded(clientName, builder, config);
@@ -57,7 +57,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         return builder;
     }
 
-    private void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfiguration config)
+    private void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
     {
         final HttpClientBuilder builder = HttpClientBuilder.create();
         if (config.isEtcdHacksEnabled()) {
@@ -82,7 +82,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         clientBuilder.httpEngine(engine);
     }
 
-    private static RequestConfig customRequestConfig(JaxRsClientConfiguration config, RequestConfig.Builder base) {
+    private static RequestConfig customRequestConfig(JaxRsClientConfig config, RequestConfig.Builder base) {
         base.setRedirectsEnabled(true);
         if (config != null) {
             base.setConnectionRequestTimeout((int) config.connectionPoolTimeout().toMillis())
@@ -92,7 +92,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         return base.build();
     }
 
-    private void configureAuthenticationIfNeeded(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfiguration config)
+    private void configureAuthenticationIfNeeded(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
     {
         if (!StringUtils.isEmpty(config.basicAuthUserName()) && !StringUtils.isEmpty(config.basicAuthPassword()))
         {
@@ -102,7 +102,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         }
     }
 
-    private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfiguration config) {
+    private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config) {
         ExecutorService executor = new ThreadPoolExecutor(1, 10, 1, TimeUnit.HOURS,
                 new SynchronousQueue<Runnable>(),
                 new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
@@ -111,9 +111,9 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     }
 
     private static class HackedApacheHttpClient4Engine extends ApacheHttpClient4Engine {
-        private final JaxRsClientConfiguration config;
+        private final JaxRsClientConfig config;
 
-        HackedApacheHttpClient4Engine(JaxRsClientConfiguration config, HttpClient client) {
+        HackedApacheHttpClient4Engine(JaxRsClientConfig config, HttpClient client) {
             super(client);
             this.config = config;
         }

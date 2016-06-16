@@ -26,7 +26,7 @@ public class JerseyClientBuilderTest
     @Test
     public void socketTimeoutPropagates() throws NoSuchFieldException, IllegalAccessException
     {
-        final JaxRsClientConfiguration conf = makeConfig();
+        final JaxRsClientConfig conf = makeConfig();
         final Client client = factoryForConfig(conf).newClient("test", StandardFeatureGroup.PUBLIC);
         String result = client.getConfiguration().getProperty("jersey.config.client.readTimeout").toString();
         assertEquals("6600", result);
@@ -35,18 +35,18 @@ public class JerseyClientBuilderTest
     @Test
     public void connectTimeoutPropagates() throws NoSuchFieldException, IllegalAccessException
     {
-        final JaxRsClientConfiguration conf = makeConfig();
+        final JaxRsClientConfig conf = makeConfig();
         final Client client = factoryForConfig(conf).newClient("test", StandardFeatureGroup.PUBLIC);
         final String result = client.getConfiguration().getProperty("jersey.config.client.connectTimeout").toString();
         assertEquals("4400", result);
     }
 
-    private static JaxRsClientFactory factoryForConfig(JaxRsClientConfiguration config) {
+    private static JaxRsClientFactory factoryForConfig(JaxRsClientConfig config) {
         return new JaxRsClientFactory(config);
     }
 
-    private static JaxRsClientConfiguration makeConfig() {
-        return new JaxRsClientConfiguration() {
+    private static JaxRsClientConfig makeConfig() {
+        return new JaxRsClientConfig() {
             @Override
             public Duration socketTimeout() {
                 return Duration.ofMillis(6600);

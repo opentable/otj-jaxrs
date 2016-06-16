@@ -25,7 +25,7 @@ class InternalClientFactoryHolder
 {
     private static final InternalClientFactory FACTORY_IMPL = findFactory();
 
-    static ClientBuilder newBuilder(String clientName, JaxRsClientConfiguration config)
+    static ClientBuilder newBuilder(String clientName, JaxRsClientConfig config)
     {
         return FACTORY_IMPL.newBuilder(clientName, config);
     }

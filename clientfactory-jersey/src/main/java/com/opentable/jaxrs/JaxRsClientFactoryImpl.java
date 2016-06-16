@@ -31,14 +31,14 @@ import org.glassfish.jersey.message.GZipEncoder;
 public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
     @Override
-    public ClientBuilder newBuilder(String clientName, JaxRsClientConfiguration config) {
+    public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config) {
         final JerseyClientBuilder builder = new JerseyClientBuilder();
         builder.withConfig(createClientConfig(config));
         configureAuthenticationIfNeeded(builder, config);
         return builder.register(GZipEncoder.class);
     }
 
-    private ClientConfig createClientConfig(JaxRsClientConfiguration config)
+    private ClientConfig createClientConfig(JaxRsClientConfig config)
     {
         final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(config.httpClientMaxTotalConnections());
@@ -52,7 +52,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         return clientConfig;
     }
 
-    private static void configureAuthenticationIfNeeded(ClientBuilder builder, JaxRsClientConfiguration config)
+    private static void configureAuthenticationIfNeeded(ClientBuilder builder, JaxRsClientConfig config)
     {
         if (!StringUtils.isEmpty(config.basicAuthUserName()) && !StringUtils.isEmpty(config.basicAuthPassword()))
         {

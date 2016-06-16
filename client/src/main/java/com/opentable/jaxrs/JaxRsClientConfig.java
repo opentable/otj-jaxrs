@@ -18,9 +18,9 @@ import java.time.Duration;
 /**
  * JAX-RS Client tunables.
  */
-public interface JaxRsClientConfiguration
+public interface JaxRsClientConfig
 {
-    JaxRsClientConfiguration DEFAULT = new JaxRsClientConfiguration() {};
+    JaxRsClientConfig DEFAULT = new JaxRsClientConfig() {};
 
     /**
      * Timeout to check out a connection from the connection pool.

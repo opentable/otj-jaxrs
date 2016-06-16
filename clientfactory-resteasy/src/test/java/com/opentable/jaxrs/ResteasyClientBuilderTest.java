@@ -32,7 +32,7 @@ import org.junit.Test;
 @SuppressWarnings("restriction")
 public class ResteasyClientBuilderTest {
     private static final String BAD_URI = "http://example.invalid";
-    private final JaxRsClientConfiguration config = new JaxRsClientConfiguration() {};
+    private final JaxRsClientConfig config = new JaxRsClientConfig() {};
 
     @Test
     public void testNoRedirect() throws Exception {
