@@ -41,6 +41,12 @@
 
     <dependency>
       <groupId>com.opentable.components</groupId>
+      <artifactId>otj-spring</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.opentable.components</groupId>
       <artifactId>otj-jaxrs-shared</artifactId>
     </dependency>
 

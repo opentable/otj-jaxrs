@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.annotation.concurrent.GuardedBy;
 import javax.inject.Singleton;
@@ -62,7 +63,7 @@ public class JaxRsClientFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(JaxRsClientFactory.class);
 
-    private final JaxRsClientConfig config;
+    private final Function<String, JaxRsClientConfig> config;
 
     @GuardedBy("this")
     private final Multimap<JaxRsFeatureGroup, Feature> featureMap = HashMultimap.create();
@@ -76,7 +77,7 @@ public class JaxRsClientFactory {
      * Initialize a new factory.  This factory is intended to be a singleton and should be
      * created once during application startup.
      */
-    public JaxRsClientFactory(JaxRsClientConfig config) {
+    public JaxRsClientFactory(Function<String, JaxRsClientConfig> config) {
         this.config = config;
     }
 
@@ -171,7 +172,7 @@ public class JaxRsClientFactory {
 
     @VisibleForTesting
     protected JaxRsClientConfig configForClient(String clientName) {
-        return config; // XXX ignored clientname?
+        return config.apply(clientName);
     }
 
     /**

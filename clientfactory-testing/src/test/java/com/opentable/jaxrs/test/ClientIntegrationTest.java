@@ -50,7 +50,7 @@ public class ClientIntegrationTest {
 
     @Before
     public void setup() throws IOException {
-        factory = new JaxRsClientFactory(new JaxRsClientConfig() {
+        factory = new JaxRsClientFactory(t -> new JaxRsClientConfig() {
             @Override
             public int httpClientDefaultMaxPerRoute() {
                 return 10;

@@ -42,7 +42,7 @@ public class JerseyClientBuilderTest
     }
 
     private static JaxRsClientFactory factoryForConfig(JaxRsClientConfig config) {
-        return new JaxRsClientFactory(config);
+        return new JaxRsClientFactory(t -> config);
     }
 
     private static JaxRsClientConfig makeConfig() {
