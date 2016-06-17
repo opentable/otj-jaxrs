@@ -48,11 +48,11 @@ public class JerseyClientBuilderTest
     private static JaxRsClientConfig makeConfig() {
         return new JaxRsClientConfig() {
             @Override
-            public Duration socketTimeout() {
+            public Duration getSocketTimeout() {
                 return Duration.ofMillis(6600);
             }
             @Override
-            public Duration connectTimeout() {
+            public Duration getConnectTimeout() {
                 return Duration.ofMillis(4400);
             }
         };

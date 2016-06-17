@@ -41,23 +41,23 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     private ClientConfig createClientConfig(JaxRsClientConfig config)
     {
         final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(config.httpClientMaxTotalConnections());
-        connectionManager.setDefaultMaxPerRoute(config.httpClientDefaultMaxPerRoute());
+        connectionManager.setMaxTotal(config.getHttpClientMaxTotalConnections());
+        connectionManager.setDefaultMaxPerRoute(config.getHttpClientDefaultMaxPerRoute());
 
         final ClientConfig clientConfig = new ClientConfig();
         clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
         clientConfig.connectorProvider(new ApacheConnectorProvider());
-        clientConfig.property(ClientProperties.CONNECT_TIMEOUT, (int) config.connectTimeout().toMillis());
-        clientConfig.property(ClientProperties.READ_TIMEOUT, (int) config.socketTimeout().toMillis());
+        clientConfig.property(ClientProperties.CONNECT_TIMEOUT, (int) config.getConnectTimeout().toMillis());
+        clientConfig.property(ClientProperties.READ_TIMEOUT, (int) config.getSocketTimeout().toMillis());
         return clientConfig;
     }
 
     private static void configureAuthenticationIfNeeded(ClientBuilder builder, JaxRsClientConfig config)
     {
-        if (!StringUtils.isEmpty(config.basicAuthUserName()) && !StringUtils.isEmpty(config.basicAuthPassword()))
+        if (!StringUtils.isEmpty(config.getBasicAuthUserName()) && !StringUtils.isEmpty(config.getBasicAuthPassword()))
         {
             HttpAuthenticationFeature auth = HttpAuthenticationFeature.basic(
-                    config.basicAuthUserName(), config.basicAuthPassword());
+                    config.getBasicAuthUserName(), config.getBasicAuthPassword());
             builder.register(auth);
         }
     }

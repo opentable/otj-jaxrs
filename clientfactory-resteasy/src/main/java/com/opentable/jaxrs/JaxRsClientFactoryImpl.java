@@ -67,13 +67,13 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         }
         final MonitoredPoolingHttpClientConnectionManager connectionManager = new MonitoredPoolingHttpClientConnectionManager(clientName);
 
-        connectionManager.setCheckoutWarnTime(Duration.ofMillis(config.connectionPoolWarnTime().toMillis()));
-        connectionManager.setMaxTotal(config.connectionPoolSize());
-        connectionManager.setDefaultMaxPerRoute(config.httpClientDefaultMaxPerRoute());
+        connectionManager.setCheckoutWarnTime(Duration.ofMillis(config.getConnectionPoolWarnTime().toMillis()));
+        connectionManager.setMaxTotal(config.getConnectionPoolSize());
+        connectionManager.setDefaultMaxPerRoute(config.getHttpClientDefaultMaxPerRoute());
 
         final HttpClient client = builder
                 .setDefaultSocketConfig(SocketConfig.custom()
-                        .setSoTimeout((int) config.socketTimeout().toMillis())
+                        .setSoTimeout((int) config.getSocketTimeout().toMillis())
                         .build())
                 .setDefaultRequestConfig(customRequestConfig(config, RequestConfig.custom()))
                 .setConnectionManager(connectionManager)
@@ -85,19 +85,19 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     private static RequestConfig customRequestConfig(JaxRsClientConfig config, RequestConfig.Builder base) {
         base.setRedirectsEnabled(true);
         if (config != null) {
-            base.setConnectionRequestTimeout((int) config.connectionPoolTimeout().toMillis())
-                .setConnectTimeout((int) config.connectTimeout().toMillis())
-                .setSocketTimeout((int) config.socketTimeout().toMillis());
+            base.setConnectionRequestTimeout((int) config.getConnectionPoolTimeout().toMillis())
+                .setConnectTimeout((int) config.getConnectTimeout().toMillis())
+                .setSocketTimeout((int) config.getSocketTimeout().toMillis());
         }
         return base.build();
     }
 
     private void configureAuthenticationIfNeeded(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
     {
-        if (!StringUtils.isEmpty(config.basicAuthUserName()) && !StringUtils.isEmpty(config.basicAuthPassword()))
+        if (!StringUtils.isEmpty(config.getBasicAuthUserName()) && !StringUtils.isEmpty(config.getBasicAuthPassword()))
         {
             final BasicAuthentication auth = new BasicAuthentication(
-                    config.basicAuthUserName(), config.basicAuthPassword());
+                    config.getBasicAuthUserName(), config.getBasicAuthPassword());
             clientBuilder.register(auth);
         }
     }
