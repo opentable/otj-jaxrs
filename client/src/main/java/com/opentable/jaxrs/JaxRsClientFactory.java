@@ -99,7 +99,13 @@ public class JaxRsClientFactory {
 
     @Inject
     void injectBindings(Collection<JaxRsFeatureBinding> bindings) {
-        bindings.forEach(b -> addFeatureToGroup(b.getGroup(), b.getFeature()));
+        bindings.forEach(b -> {
+            if (b.getGroup() != null) {
+                addFeatureToGroup(b.getGroup(), b.getFeature());
+            } else {
+                addFeatureToAllClients(b.getFeature());
+            }
+        });
     }
 
     /**

@@ -18,4 +18,9 @@ public class JaxRsClientConfiguration {
     JaxRsClientFactory jaxrsClientFactory(SpecializedConfigFactory<JaxRsClientConfig> config) {
         return new JaxRsClientFactory(config);
     }
+
+    @Bean
+    JaxRsFeatureBinding dataUriHandler() {
+        return JaxRsFeatureBinding.bindToAllGroups(new DataUriFeature());
+    }
 }
