@@ -1,5 +1,7 @@
 package com.opentable.jaxrs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.PropertyResolver;
@@ -22,5 +24,10 @@ public class JaxRsClientConfiguration {
     @Bean
     JaxRsFeatureBinding dataUriHandler() {
         return JaxRsFeatureBinding.bindToAllGroups(new DataUriFeature());
+    }
+
+    @Bean
+    JaxRsFeatureBinding jsonFeature(ObjectMapper mapper) {
+        return JaxRsFeatureBinding.bindToAllGroups(JsonClientFeature.forMapper(mapper));
     }
 }
