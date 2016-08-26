@@ -13,9 +13,12 @@
  */
 package com.opentable.jaxrs;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.ws.rs.client.ClientBuilder;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.impl.client.IdleConnectionEvictor;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
@@ -40,9 +43,12 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
 
     private ClientConfig createClientConfig(JaxRsClientConfig config)
     {
-        final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        final EvictablePoolingHttpClientConnectionManager connectionManager = new EvictablePoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(config.getHttpClientMaxTotalConnections());
         connectionManager.setDefaultMaxPerRoute(config.getHttpClientDefaultMaxPerRoute());
+
+        connectionManager.ice = new IdleConnectionEvictor(connectionManager, config.getIdleTimeout().toMillis(), TimeUnit.MILLISECONDS);
+        connectionManager.ice.start();
 
         final ClientConfig clientConfig = new ClientConfig();
         clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
@@ -59,6 +65,16 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
             HttpAuthenticationFeature auth = HttpAuthenticationFeature.basic(
                     config.getBasicAuthUserName(), config.getBasicAuthPassword());
             builder.register(auth);
+        }
+    }
+
+    private static class EvictablePoolingHttpClientConnectionManager extends PoolingHttpClientConnectionManager {
+        private volatile IdleConnectionEvictor ice;
+
+        @Override
+        public void shutdown() {
+            ice.shutdown();
+            super.shutdown();
         }
     }
 }

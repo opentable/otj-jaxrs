@@ -68,6 +68,13 @@ public interface JaxRsClientConfig
     }
 
     /**
+     * HTTP connection pool idle timeout.
+     */
+    default Duration getIdleTimeout() {
+        return Duration.ofSeconds(20);
+    }
+
+    /**
      * Basic auth username.
      */
     //@Config({"jaxrs.client.${clientName}.auth.basic.username", "jaxrs.client.default.auth.basic.username"})
