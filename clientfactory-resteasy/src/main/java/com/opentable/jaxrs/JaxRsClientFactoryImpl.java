@@ -77,6 +77,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                         .build())
                 .setDefaultRequestConfig(customRequestConfig(config, RequestConfig.custom()))
                 .setConnectionManager(connectionManager)
+                .evictIdleConnections(config.getIdleTimeout().toMillis(), TimeUnit.MILLISECONDS)
                 .build();
         final ApacheHttpClient4Engine engine = new HackedApacheHttpClient4Engine(config, client);
         clientBuilder.httpEngine(engine);
