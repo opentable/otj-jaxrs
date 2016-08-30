@@ -133,6 +133,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
             if (Boolean.FALSE.equals(request.getMutableProperties().get(JaxRsClientProperties.FOLLOW_REDIRECTS))) {
                 httpMethod.setConfig(RequestConfig.copy(httpMethod.getConfig()).setRedirectsEnabled(false).build());
             }
+            request.property(JaxRsClientProperties.ACTUAL_REQUEST, httpMethod);
         }
     }
 

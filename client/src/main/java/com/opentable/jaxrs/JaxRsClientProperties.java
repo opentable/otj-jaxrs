@@ -18,6 +18,7 @@ package com.opentable.jaxrs;
  * are known to work well in both Jersey and RESTEasy.
  */
 public final class JaxRsClientProperties {
+    public static final String ACTUAL_REQUEST = "ot.actual-request";
     public static final String FOLLOW_REDIRECTS = "jersey.config.client.followRedirects";
 
     private JaxRsClientProperties() { }
