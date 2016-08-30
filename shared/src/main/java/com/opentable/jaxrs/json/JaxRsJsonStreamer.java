@@ -162,7 +162,7 @@ public class JaxRsJsonStreamer<T>
             final AtomicLong count = new AtomicLong();
             boolean success = false;
 
-            try (final JsonGenerator jg = mapper.getFactory().createGenerator(output)) {
+            try (JsonGenerator jg = mapper.getFactory().createGenerator(output)) {
 
                 header.call(jg);
 

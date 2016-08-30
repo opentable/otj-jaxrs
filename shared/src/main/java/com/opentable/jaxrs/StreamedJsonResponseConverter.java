@@ -64,7 +64,7 @@ public class StreamedJsonResponseConverter
                 LOG.debug("Return code is {}, finishing.", response.getStatus());
                 return;
             case 200:
-                try (final JsonParser jp = mapper.getFactory().createParser(response.readEntity(InputStream.class))) {
+                try (JsonParser jp = mapper.getFactory().createParser(response.readEntity(InputStream.class))) {
                     doRead(callback, type, jp);
                 }
                 return;
