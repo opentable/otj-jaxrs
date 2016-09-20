@@ -97,9 +97,13 @@ public interface JaxRsClientConfig
 
     /**
      * Maximum connections per-route.
+     *
+     * E.g., if you want to have lots of connections open to another microservice, and it's hosted on a number
+     * of hosts ("routes") smaller than the number of connections you want to maintain.  By default, is
+     * {@link #getConnectionPoolSize()}, since you can't have more connections than this.
      */
     default int getHttpClientDefaultMaxPerRoute() {
-        return 20;
+        return getConnectionPoolSize();
     }
 
     /**
