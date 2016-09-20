@@ -93,15 +93,6 @@ public interface JaxRsClientConfig
     }
 
     /**
-     * Maximum total connections allowed.
-     */
-    //@Config({"jaxrs.client.${clientName}.max-connections", "jaxrs.client.default.max-connections"})
-    //@Default("100")
-    default int getHttpClientMaxTotalConnections() {
-        return 100;
-    }
-
-    /**
      * Maximum connections per-route.
      */
     //@Config({"jaxrs.client.${clientName}.max-route-connections", "jaxrs.client.default.max-route-connections"})
