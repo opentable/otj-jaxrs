@@ -44,7 +44,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     private ClientConfig createClientConfig(JaxRsClientConfig config)
     {
         final EvictablePoolingHttpClientConnectionManager connectionManager = new EvictablePoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(config.getHttpClientMaxTotalConnections());
+        connectionManager.setMaxTotal(config.getConnectionPoolSize());
         connectionManager.setDefaultMaxPerRoute(config.getHttpClientDefaultMaxPerRoute());
 
         connectionManager.ice = new IdleConnectionEvictor(connectionManager, config.getIdleTimeout().toMillis(), TimeUnit.MILLISECONDS);
