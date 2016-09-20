@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.annotation.concurrent.GuardedBy;
 import javax.inject.Inject;
@@ -169,14 +170,12 @@ public class JaxRsClientFactory {
         builder.property(CLIENT_NAME_PROPERTY, clientName);
         builder.property(FEATURE_GROUP_PROPERTY, featureGroups);
 
-        LOG.debug("Building client '{}' with feature groups {} and config '{}'", clientName, featureGroups, jaxRsConfig);
+        final List<Feature> features = featureGroups.stream()
+            .flatMap(g -> featureMap.get(g).stream())
+            .collect(Collectors.toList());
 
-        for (JaxRsFeatureGroup group : featureGroups) {
-            for (Feature f : featureMap.get(group)) {
-                LOG.trace("Client '{}' enabling feature {}", clientName, f);
-                builder.register(f);
-            }
-        }
+        LOG.debug("Building client '{}' with feature groups {}, features {}, and config '{}'", clientName, featureGroups, features, jaxRsConfig);
+        features.forEach(builder::register);
 
         return builder;
     }
