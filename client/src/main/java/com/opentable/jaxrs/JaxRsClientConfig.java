@@ -15,8 +15,15 @@ package com.opentable.jaxrs;
 
 import java.time.Duration;
 
+import javax.ws.rs.client.Invocation;
+
 /**
  * JAX-RS Client tunables.
+ *
+ * In your properties file, the config options are prefixed with &ldquo;{@code jaxrs.client.${clientName}}&rdquo;.
+ * Currently, the config values themselves are the same as the actual method names(!).
+ * So, for example, you might include the following in your config file:
+ * {@code jaxrs.client.foo.getConnectionPoolSize=10}
  */
 public interface JaxRsClientConfig
 {
@@ -24,18 +31,20 @@ public interface JaxRsClientConfig
 
     /**
      * Timeout to check out a connection from the connection pool.
+     *
+     * This connection pool checkout won't occur until you call {@link Invocation#invoke()}.  If the time to get a
+     * connection surpasses this value, a runtime exception will be thrown.
      */
-    //@Config({"jaxrs.client.${clientName}.pool.timeout", "jaxrs.client.default.pool.timeout"})
-    //@Default("5s")
     default Duration getConnectionPoolTimeout() {
         return Duration.ofSeconds(5);
     }
 
     /**
      * Monitor connection pool for failure to acquire leases.
+     *
+     * This connection pool checkout won't occur until you call {@link Invocation#invoke()}.  If the time to get a
+     * connection surpasses this value, a warning will be logged.
      */
-    //@Config({"jaxrs.client.${clientName}.pool.warn-time", "jaxrs.client.default.pool.warn-time"})
-    //@Default("1s")
     default Duration getConnectionPoolWarnTime() {
         return Duration.ofSeconds(1);
     }
@@ -43,8 +52,6 @@ public interface JaxRsClientConfig
     /**
      * Connection pool size.
      */
-    //@Config({"jaxrs.client.${clientName}.pool.size", "jaxrs.client.default.pool.size"})
-    //@Default("40")
     default int getConnectionPoolSize() {
         return 40;
     }
@@ -52,23 +59,23 @@ public interface JaxRsClientConfig
     /**
      * Timeout to establish initial connection.
      */
-    //@Config({"jaxrs.client.${clientName}.connect-timeout", "jaxrs.client.default.connect-timeout"})
-    //@Default("10s")
     default Duration getConnectTimeout() {
         return Duration.ofSeconds(10);
     }
 
     /**
      * Socket timeout.
+     *
+     * @see java.net.SocketOptions#SO_TIMEOUT
      */
-    //@Config({"jaxrs.client.${clientName}.socket-timeout", "jaxrs.client.default.socket-timeout"})
-    //@Default("30s")
     default Duration getSocketTimeout() {
         return Duration.ofSeconds(30);
     }
 
     /**
-     * HTTP connection pool idle timeout.
+     * HTTP connection pool idle connection eviction threshold.
+     *
+     * @see org.apache.http.impl.client.HttpClientBuilder#evictIdleConnections
      */
     default Duration getIdleTimeout() {
         return Duration.ofSeconds(20);
@@ -77,8 +84,6 @@ public interface JaxRsClientConfig
     /**
      * Basic auth username.
      */
-    //@Config({"jaxrs.client.${clientName}.auth.basic.username", "jaxrs.client.default.auth.basic.username"})
-    //@DefaultNull
     default String getBasicAuthUserName() {
         return null;
     }
@@ -86,8 +91,6 @@ public interface JaxRsClientConfig
     /**
      * Basic auth password.
      */
-    //@Config({"jaxrs.client.${clientName}.auth.basic.password", "jaxrs.client.default.auth.basic.password"})
-    //@DefaultNull
     default String getBasicAuthPassword() {
         return null;
     }
@@ -95,8 +98,6 @@ public interface JaxRsClientConfig
     /**
      * Maximum connections per-route.
      */
-    //@Config({"jaxrs.client.${clientName}.max-route-connections", "jaxrs.client.default.max-route-connections"})
-    //@Default("20")
     default int getHttpClientDefaultMaxPerRoute() {
         return 20;
     }
@@ -104,8 +105,6 @@ public interface JaxRsClientConfig
     /**
      * Special hacks for etcd, especially allowing PUTs to 307 redirect.
      */
-    //@Config({"jaxrs.client.${clientName}.enable-etcd-hacks", "jaxrs.client.default.enable-etcd-hacks"})
-    //@Default("true")
     default boolean isEtcdHacksEnabled() {
         return true;
     }
