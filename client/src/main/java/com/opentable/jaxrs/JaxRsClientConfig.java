@@ -112,4 +112,13 @@ public interface JaxRsClientConfig
     default boolean isEtcdHacksEnabled() {
         return true;
     }
+
+    /**
+     * Whether cookies should be handled.
+     *
+     * NB: Currently unsupported for Jersey clients.
+     */
+    default boolean isCookieHandlingEnabled() {
+        return false;
+    }
 }
