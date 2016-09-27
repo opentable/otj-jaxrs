@@ -24,11 +24,7 @@ import javax.ws.rs.client.Invocation;
  * In your properties file, the config options are prefixed with &ldquo;{@code jaxrs.client.${clientName}.}&rdquo;.
  * Currently, the config parameter names themselves are the {@link java.beans.PropertyDescriptor}-style names.
  * So, for example, you might include the following in your config file:
- * {@code jaxrs.client.foo.connectionPoolSize=10}
- *
- * <p>
- * Confusingly, when printed out, the config parameter names will be the <em>method</em> names,
- * such as {@code getConnectionPoolSize}.
+ * {@code jaxrs.client.foo.connectionPoolSize=10}.
  */
 public interface JaxRsClientConfig
 {
