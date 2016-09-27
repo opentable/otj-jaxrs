@@ -65,6 +65,9 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 .setRedirectStrategy(new ExtraLaxRedirectStrategy())
                 .addInterceptorFirst(new SwallowHeaderInterceptor(HttpHeaders.CONTENT_LENGTH));
         }
+        if (!config.isCookieHandlingEnabled()) {
+            builder.disableCookieManagement();
+        }
         final MonitoredPoolingHttpClientConnectionManager connectionManager = new MonitoredPoolingHttpClientConnectionManager(clientName);
 
         connectionManager.setCheckoutWarnTime(Duration.ofMillis(config.getConnectionPoolWarnTime().toMillis()));

@@ -20,10 +20,15 @@ import javax.ws.rs.client.Invocation;
 /**
  * JAX-RS Client tunables.
  *
- * In your properties file, the config options are prefixed with &ldquo;{@code jaxrs.client.${clientName}}&rdquo;.
- * Currently, the config values themselves are the same as the actual method names(!).
+ * <p>
+ * In your properties file, the config options are prefixed with &ldquo;{@code jaxrs.client.${clientName}.}&rdquo;.
+ * Currently, the config parameter names themselves are the {@link java.beans.PropertyDescriptor}-style names.
  * So, for example, you might include the following in your config file:
- * {@code jaxrs.client.foo.getConnectionPoolSize=10}
+ * {@code jaxrs.client.foo.connectionPoolSize=10}
+ *
+ * <p>
+ * Confusingly, when printed out, the config parameter names will be the <em>method</em> names,
+ * such as {@code getConnectionPoolSize}.
  */
 public interface JaxRsClientConfig
 {
@@ -111,5 +116,14 @@ public interface JaxRsClientConfig
      */
     default boolean isEtcdHacksEnabled() {
         return true;
+    }
+
+    /**
+     * Whether cookies should be handled.
+     *
+     * NB: Currently unsupported for Jersey clients.
+     */
+    default boolean isCookieHandlingEnabled() {
+        return false;
     }
 }
