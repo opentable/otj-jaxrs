@@ -26,7 +26,6 @@
   <properties>
     <!-- need this for testing, and runtime if not using otj-jackson -->
     <ot.build.allow-resteasy-jackson2-provider>true</ot.build.allow-resteasy-jackson2-provider>
-    <ot.build.allow-guice>true</ot.build.allow-guice>
   </properties>
 
   <dependencies>
