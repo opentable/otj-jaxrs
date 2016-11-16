@@ -6,14 +6,10 @@ OpenTable JAX-RS Component
 Component Charter
 -----------------
 
-* Provides bindings from a JAX-RS provider into the Guice, configuration, and `otj-httpserver` ecosystem.
+* Provides bindings from a JAX-RS Client provider into the Spring, configuration, and `otj-server` ecosystem.
+  - Can swap out Jersey for RESTEasy
+  - Register Features with Spring DI environment
 * Brings in `otj-jackson` support for directly reading and writing JSON.
-
-JAX-RS
-------
-
-This module stores bindings between various bits of the server infrastructure.
-It glues more foundational components into the JAX-RS ecosystem.
 
 Component Level
 ---------------
