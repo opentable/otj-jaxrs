@@ -41,7 +41,6 @@
     <module>shared</module>
     <module>client</module>
     <module>exception</module>
-    <module>testing</module>
   </modules>
 
   <dependencyManagement>
