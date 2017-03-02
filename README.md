@@ -19,27 +19,25 @@ Configuration
 The JAX-RS client configuration is managed through your application properties. 
 
 
-Options are configured using the provided client name and the corresponding jaxrs configuration:
-
-For the client name "availability" the corresponding connection pool configuration option will be:
-
-"jaxrs.client.availability.connectionPool=50"
+Options are configured using the provided client name and the corresponding jaxrs configuration:  
+jaxrs.client.${clientName}.option=value
 
 
-For configuration options that take time, use the ISO 8601 Durations format (https://en.wikipedia.org/wiki/ISO_8601).
+For the client name "availability" the corresponding connection pool configuration option will be:  
+jaxrs.client.availability.connectionPool=50
 
-Example: Configure the connection timeout to 5s
 
+For configuration options that take time, use the ISO 8601 Durations format (https://en.wikipedia.org/wiki/ISO_8601).  
+
+Example: Configure the connection timeout to 5s  
 "jaxrs.client.availability.connectTimeout=PT5s"
 
 
-For values smaller than seconds you may use decimals per the ISO 8601 format: 
-
+For values smaller than seconds you may use decimals per the ISO 8601 format:  
 >"The smallest value used may also have a decimal fraction, as in "P0.5Y" to indicate half a year. This decimal fraction may be specified with either a comma or a full stop, as in "P0,5Y" or "P0.5Y"."
 
 
-To configure a connection timeout of 150ms:
-
+To configure a connection timeout of 150ms:  
 "jaxrs.client.availability.connectTimeout=PT0.150s" 
 
 
