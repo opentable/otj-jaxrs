@@ -20,7 +20,9 @@ The JAX-RS client configuration is managed through your application properties.
 
 
 Options are configured using the provided client name and the corresponding jaxrs configuration:
-EX: client name: "availability"
+
+For the client name "availability" the corresponding connection pool configuration option will be:
+
 "jaxrs.client.availability.connectionPool=50"
 
 
