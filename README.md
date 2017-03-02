@@ -35,7 +35,7 @@ Example: Configure the connection timeout to 5s
 
 For values smaller than seconds you may use decimals per the ISO 8601 format: 
 
-"The smallest value used may also have a decimal fraction, as in "P0.5Y" to indicate half a year. This decimal fraction may be specified with either a comma or a full stop, as in "P0,5Y" or "P0.5Y"."
+>"The smallest value used may also have a decimal fraction, as in "P0.5Y" to indicate half a year. This decimal fraction may be specified with either a comma or a full stop, as in "P0,5Y" or "P0.5Y"."
 
 
 To configure a connection timeout of 150ms:
@@ -44,5 +44,6 @@ To configure a connection timeout of 150ms:
 
 
 For a list of configurable options see client/src/main/java/com/opentable/jaxrs/JaxRsClientConfig.java
+
 ----
 Copyright (C) 2014 OpenTable, Inc.
