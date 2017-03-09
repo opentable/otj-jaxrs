@@ -20,17 +20,20 @@ The JAX-RS client configuration is managed through your application properties.
 
 
 Options are configured using the provided client name and the corresponding jaxrs configuration:  
-`jaxrs.client.${clientName}.option=value`
+
+    jaxrs.client.${clientName}.option=value
 
 
 For the client name "availability" the corresponding connection pool configuration option will be:  
-`jaxrs.client.availability.connectionPool=50`
+
+    jaxrs.client.availability.connectionPool=50
 
 
 For configuration options that take time, use the ISO 8601 Durations format (https://en.wikipedia.org/wiki/ISO_8601).  
 
 Example: Configure the connection timeout to 5s  
-`jaxrs.client.availability.connectTimeout=PT5s`
+
+    jaxrs.client.availability.connectTimeout=PT5s
 
 
 For values smaller than seconds you may use decimals per the ISO 8601 format:  
@@ -38,10 +41,11 @@ For values smaller than seconds you may use decimals per the ISO 8601 format:
 
 
 To configure a connection timeout of 150ms:  
-`jaxrs.client.availability.connectTimeout=PT0.150s`
+
+    jaxrs.client.availability.connectTimeout=PT0.150s
 
 
-For a list of configurable options see client/src/main/java/com/opentable/jaxrs/JaxRsClientConfig.java
+For a list of configurable options see [client/src/main/java/com/opentable/jaxrs/JaxRsClientConfig.java](client/src/main/java/com/opentable/jaxrs/JaxRsClientConfig.java)
 
 ----
 Copyright (C) 2014 OpenTable, Inc.
