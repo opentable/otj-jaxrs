@@ -13,6 +13,8 @@
  */
 package com.opentable.jaxrs;
 
+import static com.opentable.jaxrs.InternalClientFactoryHolder.factory;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -165,7 +167,7 @@ public class JaxRsClientFactory {
                 .addAll(featureGroupsIn)
                 .build();
 
-        final ClientBuilder builder = InternalClientFactoryHolder.newBuilder(clientName, jaxRsConfig);
+        final ClientBuilder builder = factory().newBuilder(clientName, jaxRsConfig);
 
         builder.property(CLIENT_NAME_PROPERTY, clientName);
         builder.property(FEATURE_GROUP_PROPERTY, featureGroups);
