@@ -13,8 +13,6 @@
  */
 package com.opentable.jaxrs;
 
-import javax.ws.rs.client.ClientBuilder;
-
 /**
  * Hides gory details of reflection from main API.
  *
@@ -25,9 +23,8 @@ class InternalClientFactoryHolder
 {
     private static final InternalClientFactory FACTORY_IMPL = findFactory();
 
-    static ClientBuilder newBuilder(String clientName, JaxRsClientConfig config)
-    {
-        return FACTORY_IMPL.newBuilder(clientName, config);
+    static InternalClientFactory factory() {
+        return FACTORY_IMPL;
     }
 
     private static InternalClientFactory findFactory() {
