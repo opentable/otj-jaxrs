@@ -21,6 +21,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -38,6 +39,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.MonitoredPoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.jboss.resteasy.client.jaxrs.BasicAuthentication;
+import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.jboss.resteasy.client.jaxrs.internal.ClientInvocation;
@@ -55,6 +57,11 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         configureAuthenticationIfNeeded(clientName, builder, config);
         configureThreadPool(clientName, builder, config);
         return builder;
+    }
+
+    @Override
+    public <T> T createClientProxy(Class<T> proxyType, WebTarget baseTarget) {
+        return ProxyBuilder.builder(proxyType, baseTarget).build();
     }
 
     private void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
