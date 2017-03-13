@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Feature;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -212,5 +213,18 @@ public class JaxRsClientFactory {
      */
     public Client newClient(String clientName, Collection<JaxRsFeatureGroup> featureGroups) {
         return newBuilder(clientName, featureGroups).build();
+    }
+
+    /**
+     * Create a Client proxy for the given interface type.
+     * Note that different JAX-RS providers behave slightly
+     * differently for this feature.
+     *
+     * @param proxyClass the class to implement
+     * @param baseTarget the API root
+     * @return a proxy implementation that executes requests
+     */
+    public <T> T createClientProxy(Class<T> proxyClass, WebTarget baseTarget) {
+        return factory().createClientProxy(proxyClass, baseTarget);
     }
 }

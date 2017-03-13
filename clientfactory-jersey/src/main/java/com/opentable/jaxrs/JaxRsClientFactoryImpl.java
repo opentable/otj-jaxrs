@@ -16,6 +16,7 @@ package com.opentable.jaxrs;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.IdleConnectionEvictor;
@@ -39,6 +40,11 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         builder.withConfig(createClientConfig(config));
         configureAuthenticationIfNeeded(builder, config);
         return builder.register(GZipEncoder.class);
+    }
+
+    @Override
+    public <T> T createClientProxy(Class<T> proxyType, WebTarget baseTarget) {
+        throw new UnsupportedOperationException("Jersey support for this feature is TODO");
     }
 
     private ClientConfig createClientConfig(JaxRsClientConfig config)
