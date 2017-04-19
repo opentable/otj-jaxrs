@@ -133,10 +133,7 @@ public class JaxRsClientFactory {
     public synchronized JaxRsClientFactory addFeatureToGroup(JaxRsFeatureGroup group, Feature... features) {
         Preconditions.checkState(!started, "Already started building clients");
         featureMap.putAll(group, Arrays.asList(features));
-
-        for (Feature f : features) {
-            LOG.trace("Group {} registers feature {}", group, f);
-        }
+        LOG.trace("Group {} registers features {}", group, features);
         return this;
     }
 
@@ -155,8 +152,7 @@ public class JaxRsClientFactory {
     public final synchronized JaxRsClientFactory addFeatureToGroup(JaxRsFeatureGroup group, Class<? extends Feature>... features) {
         Preconditions.checkState(!started, "Already started building clients");
         classFeatureMap.putAll(group, Arrays.asList(features));
-
-        LOG.trace("Group {} registers feature {}", group, features);
+        LOG.trace("Group {} registers features {}", group, features);
         return this;
     }
 
@@ -183,8 +179,13 @@ public class JaxRsClientFactory {
             .flatMap(g -> featureMap.get(g).stream())
             .collect(Collectors.toList());
 
-        LOG.debug("Building client '{}' with feature groups {}, features {}, and config '{}'", clientName, featureGroups, features, jaxRsConfig);
+        final List<Class<? extends Feature>> classFeatures = featureGroups.stream()
+            .flatMap(g -> classFeatureMap.get(g).stream())
+            .collect(Collectors.toList());
+
+        LOG.debug("Building client '{}' with feature groups {}, features {} {}, and config '{}'", clientName, featureGroups, features, classFeatures, jaxRsConfig);
         features.forEach(builder::register);
+        classFeatures.forEach(builder::register);
 
         return builder;
     }
