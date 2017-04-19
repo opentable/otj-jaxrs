@@ -73,7 +73,7 @@ public class JaxRsClientFactory {
     @GuardedBy("this")
     private final Multimap<JaxRsFeatureGroup, Feature> featureMap = HashMultimap.create();
     @GuardedBy("this")
-    private final Multimap<JaxRsFeatureGroup, Class<Feature>> classFeatureMap = HashMultimap.create();
+    private final Multimap<JaxRsFeatureGroup, Class<? extends Feature>> classFeatureMap = HashMultimap.create();
 
     @GuardedBy("this")
     private boolean started;
@@ -144,7 +144,7 @@ public class JaxRsClientFactory {
      * Register a list of features for all created clients.
      */
     @SafeVarargs
-    public final synchronized JaxRsClientFactory addFeatureToAllClients(Class<Feature>... features) {
+    public final synchronized JaxRsClientFactory addFeatureToAllClients(Class<? extends Feature>... features) {
         return addFeatureToGroup(PrivateFeatureGroup.WILDCARD, features);
     }
 
@@ -152,13 +152,11 @@ public class JaxRsClientFactory {
      * Register a list of features to all clients marked with the given group.
      */
     @SafeVarargs
-    public final synchronized JaxRsClientFactory addFeatureToGroup(JaxRsFeatureGroup group, Class<Feature>... features) {
+    public final synchronized JaxRsClientFactory addFeatureToGroup(JaxRsFeatureGroup group, Class<? extends Feature>... features) {
         Preconditions.checkState(!started, "Already started building clients");
         classFeatureMap.putAll(group, Arrays.asList(features));
 
-        for (Class<Feature> f : features) {
-            LOG.trace("Group {} registers feature {}", group, f);
-        }
+        LOG.trace("Group {} registers feature {}", group, features);
         return this;
     }
 
