@@ -2,7 +2,7 @@ package com.opentable.jaxrs;
 
 import javax.ws.rs.core.Feature;
 
-public class JaxRsFeatureBinding {
+public final class JaxRsFeatureBinding {
     private final JaxRsFeatureGroup group;
     private final Feature feature;
 

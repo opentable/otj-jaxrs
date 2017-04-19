@@ -42,8 +42,6 @@ public class JaxRsJsonStreamer<T>
     private static final Logger LOG = LoggerFactory.getLogger(JaxRsJsonStreamer.class);
 
     private final ObjectMapper mapper;
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "unused" })
-    private final TypeReference<T> type;
     private final Callback<JsonGenerator> header;
     private final Callback<JsonGenerator> footer;
     private final JsonEmitter<T> emitter;
@@ -129,11 +127,11 @@ public class JaxRsJsonStreamer<T>
         return builder(type).withHeader(StandardStreamCallbacks.ARRAY_HEADER).withFooter(StandardStreamCallbacks.ARRAY_FOOTER);
     }
 
-    private JaxRsJsonStreamer(ObjectMapper mapper, TypeReference<T> type, JsonEmitter<T> emitter, Callback<JsonGenerator> header, Callback<JsonGenerator> footer)
+    JaxRsJsonStreamer(ObjectMapper mapper, TypeReference<T> type, JsonEmitter<T> emitter, Callback<JsonGenerator> header, Callback<JsonGenerator> footer)
     {
         this.emitter = checkNotNull(emitter, "null emitter");
         this.mapper = checkNotNull(mapper, "null mapper");
-        this.type = checkNotNull(type, "null type");
+        checkNotNull(type, "null type");
         this.header = checkNotNull(header, "no header writer set");
         this.footer = checkNotNull(footer, "no footer writer set");
     }
@@ -177,10 +175,9 @@ public class JaxRsJsonStreamer<T>
                 footer.call(jg);
 
                 success = true;
-            } catch (final Throwable t) {
-                Throwables.propagateIfInstanceOf(t, WebApplicationException.class);
-                Throwables.propagateIfInstanceOf(t, IOException.class);
-                throw Throwables.propagate(t);
+            } catch (final Exception t) {
+                Throwables.propagateIfPossible(t, WebApplicationException.class, IOException.class);
+                throw new RuntimeException(t);
             } finally {
                 if (success) {
                     LOG.trace("Succeeded streaming {} results in {}ms for {}", count.get(), sw.getTime(), JaxRsJsonStreamer.this);

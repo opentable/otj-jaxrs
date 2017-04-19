@@ -19,9 +19,11 @@ package com.opentable.jaxrs;
  * Finds and remembers the Class for InternalClientFactory, uses it
  * to create new instances.
  */
-class InternalClientFactoryHolder
+final class InternalClientFactoryHolder
 {
     private static final InternalClientFactory FACTORY_IMPL = findFactory();
+
+    private InternalClientFactoryHolder() { }
 
     static InternalClientFactory factory() {
         return FACTORY_IMPL;

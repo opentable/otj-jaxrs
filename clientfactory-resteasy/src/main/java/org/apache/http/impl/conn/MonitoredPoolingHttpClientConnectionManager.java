@@ -24,15 +24,15 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import org.apache.http.HttpClientConnection;
 import org.apache.http.conn.ConnectionPoolTimeoutException;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.pool.PoolStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Sets;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * A pooling connection manager that overrides
@@ -43,7 +43,7 @@ public class MonitoredPoolingHttpClientConnectionManager extends PoolingHttpClie
     private static final Logger LOG = LoggerFactory.getLogger(MonitoredPoolingHttpClientConnectionManager.class);
     private static final long WARN_INTERVAL_SECONDS = 5;
 
-    private String clientName;
+    private final String clientName;
     /** Time that we last noticed a blocked connection. */
     private volatile Instant lastBlockedAt = Instant.now();
     private volatile long warnTimeMs = -1;

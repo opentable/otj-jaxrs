@@ -7,8 +7,8 @@ import org.apache.http.impl.io.ChunkedInputStream;
 import org.jboss.resteasy.client.jaxrs.internal.ClientResponse;
 import org.jboss.resteasy.specimpl.BuiltResponse;
 
-public class ResteasyUtil {
-    { BuiltResponse.class.cast(null); } // fool dependency analyzer
+public final class ResteasyUtil {
+    private ResteasyUtil() { BuiltResponse.class.cast(null); } // fool dependency analyzer
     /**
      * Given a {@code Response} object, find the associated http request and abort it.
      * Mostly useful to cleanly close never ending streaming responses -- if you call
