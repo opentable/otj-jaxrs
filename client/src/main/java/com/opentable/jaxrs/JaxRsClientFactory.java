@@ -82,6 +82,14 @@ public class JaxRsClientFactory {
      * Initialize a new factory.  This factory is intended to be a singleton and should be
      * created once during application startup.
      */
+    public JaxRsClientFactory() {
+        this(name -> JaxRsClientConfig.DEFAULT);
+    }
+
+    /**
+     * Initialize a new factory.  This factory is intended to be a singleton and should be
+     * created once during application startup.
+     */
     public JaxRsClientFactory(Function<String, JaxRsClientConfig> config) {
         this.config = config;
     }
