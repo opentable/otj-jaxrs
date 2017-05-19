@@ -15,6 +15,8 @@ package com.opentable.jaxrs;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -114,11 +116,15 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     }
 
     private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config) {
-        ExecutorService executor = new ThreadPoolExecutor(1, 10, 1, TimeUnit.HOURS,
-                new SynchronousQueue<Runnable>(),
+        final ExecutorService executor = new ThreadPoolExecutor(1, 10, 1, TimeUnit.HOURS,
+                requestQueue(config.getAsyncQueueLimit()),
                 new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
                 new ThreadPoolExecutor.AbortPolicy());
         clientBuilder.asyncExecutor(executor, true);
+    }
+
+    private BlockingQueue<Runnable> requestQueue(int size) {
+        return size == 0 ? new SynchronousQueue<>() : new ArrayBlockingQueue<>(size);
     }
 
     private static class HackedApacheHttpClient4Engine extends ApacheHttpClient4Engine {

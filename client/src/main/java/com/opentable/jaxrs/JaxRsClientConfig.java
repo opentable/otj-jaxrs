@@ -58,6 +58,15 @@ public interface JaxRsClientConfig
     }
 
     /**
+     * Maximum number of simultaneous asynchronous requests
+     * in-flight awaiting resource (e.g. connection) availability
+     * before we reject additional requests.
+     */
+    default int getAsyncQueueLimit() {
+        return 1000;
+    }
+
+    /**
      * Timeout to establish initial connection.
      */
     default Duration getConnectTimeout() {
