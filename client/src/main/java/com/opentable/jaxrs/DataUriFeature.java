@@ -24,7 +24,7 @@ public class DataUriFeature implements Feature {
         public void filter(ClientRequestContext requestContext) throws IOException {
             final URI uri = requestContext.getUri();
             final String scheme = uri.getScheme();
-            if (scheme.startsWith("data")) {
+            if (scheme != null && scheme.startsWith("data")) {
                 int code = 200;
                 final int plusIdx = scheme.indexOf('+');
                 if (plusIdx > 0) {
