@@ -66,7 +66,14 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         return ProxyBuilder.builder(proxyType, baseTarget).build();
     }
 
-    private void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
+    public static void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
+    {
+        final HttpClient client = prepareHttpClientBuilder(clientName, config).build();
+        final ApacheHttpClient4Engine engine = new HackedApacheHttpClient4Engine(config, client);
+        clientBuilder.httpEngine(engine);
+    }
+
+    public static HttpClientBuilder prepareHttpClientBuilder(String clientName, JaxRsClientConfig config)
     {
         final HttpClientBuilder builder = HttpClientBuilder.create();
         if (config.isEtcdHacksEnabled()) {
@@ -83,16 +90,13 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         connectionManager.setMaxTotal(config.getConnectionPoolSize());
         connectionManager.setDefaultMaxPerRoute(config.getHttpClientDefaultMaxPerRoute());
 
-        final HttpClient client = builder
+        return builder
                 .setDefaultSocketConfig(SocketConfig.custom()
                         .setSoTimeout((int) config.getSocketTimeout().toMillis())
                         .build())
                 .setDefaultRequestConfig(customRequestConfig(config, RequestConfig.custom()))
                 .setConnectionManager(connectionManager)
-                .evictIdleConnections(config.getIdleTimeout().toMillis(), TimeUnit.MILLISECONDS)
-                .build();
-        final ApacheHttpClient4Engine engine = new HackedApacheHttpClient4Engine(config, client);
-        clientBuilder.httpEngine(engine);
+                .evictIdleConnections(config.getIdleTimeout().toMillis(), TimeUnit.MILLISECONDS);
     }
 
     private static RequestConfig customRequestConfig(JaxRsClientConfig config, RequestConfig.Builder base) {
