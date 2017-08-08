@@ -15,8 +15,10 @@ package org.apache.http.impl.conn;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -51,6 +53,8 @@ public class MonitoredPoolingHttpClientConnectionManager extends PoolingHttpClie
     private final ScheduledThreadPoolExecutor scheduler;
 
     private final Set<HttpRoute> knownRoutes = Sets.newConcurrentHashSet();
+    /** Store the stack trace of connection allocation. */
+    private final Map<HttpClientConnection, Throwable> allocationSites = new ConcurrentHashMap<>();
 
     public MonitoredPoolingHttpClientConnectionManager(String clientName) {
         this.clientName = clientName;
@@ -86,17 +90,24 @@ public class MonitoredPoolingHttpClientConnectionManager extends PoolingHttpClie
 
         warnFuture.ifPresent(f -> f.cancel(false));
 
-        if (time.toMillis() > warnTimeMs) {
-            // Log stack trace only if TRACE enabled
-            Throwable t = null;
-            if (LOG.isTraceEnabled()) {
-                t = new Throwable();
-                t.fillInStackTrace();
-            }
+        Throwable t = null;
+        // Log stack trace only if TRACE enabled
+        if (LOG.isTraceEnabled()) {
+            t = new Throwable();
+            t.fillInStackTrace();
+            allocationSites.put(result, t);
+        }
+        if (warnTimeMs > 0 && time.toMillis() > warnTimeMs) {
             LOG.warn("Checkout from pool \"{}\" took {}", clientName, time, t);
         }
 
         return result;
+    }
+
+    @Override
+    public void releaseConnection(HttpClientConnection managedConn, Object state, long keepalive, TimeUnit tunit) {
+        allocationSites.remove(managedConn);
+        super.releaseConnection(managedConn, state, keepalive, tunit);
     }
 
     private void warnIfStalling() {
@@ -105,6 +116,7 @@ public class MonitoredPoolingHttpClientConnectionManager extends PoolingHttpClie
             LOG.warn("Pool \"{}\" is stalling!  {} threads currently awaiting checkout.  Pool stats {}", clientName, nBlockedThreads, getTotalStats());
             knownRoutes.forEach(r ->
                 LOG.warn("Pool \"{}\" route \"{}\" stats {}", clientName, r, getStats(r)));
+            allocationSites.forEach((c, t) -> LOG.warn("Connection {} allocation site", c, t));
         }
         knownRoutes.removeIf(r -> {
             PoolStats stats = getStats(r);
@@ -116,6 +128,8 @@ public class MonitoredPoolingHttpClientConnectionManager extends PoolingHttpClie
     public void shutdown() {
         scheduler.shutdown();
         super.shutdown();
+        knownRoutes.clear();
+        allocationSites.clear();
     }
 
     public void setCheckoutWarnTime(Duration warnTime) {
