@@ -1,6 +1,11 @@
 otj-jaxrs changelog
 ===================
 
+2.4.2
+-----
+
+* findbugs-annotations change
+
 2.4.1
 -----
 
