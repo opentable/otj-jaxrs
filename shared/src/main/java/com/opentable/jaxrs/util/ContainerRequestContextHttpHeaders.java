@@ -14,7 +14,7 @@ import javax.ws.rs.core.MultivaluedMap;
 /**
  * Implementation of {@link HttpHeaders} based on {@link ContainerRequestContext}.
  */
-public class ContainerRequestContextHttpHeaders implements HttpHeaders {
+class ContainerRequestContextHttpHeaders implements HttpHeaders {
     private final ContainerRequestContext ctx;
 
     ContainerRequestContextHttpHeaders(final ContainerRequestContext ctx) {
