@@ -1,6 +1,11 @@
 otj-jaxrs changelog
 ===================
 
+2.5.0
+-----
+
+* added HttpHeadersUtils
+
 2.4.2
 -----
 
