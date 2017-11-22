@@ -117,13 +117,6 @@ public interface JaxRsClientConfig
     }
 
     /**
-     * Special hacks for etcd, especially allowing PUTs to 307 redirect.
-     */
-    default boolean isEtcdHacksEnabled() {
-        return true;
-    }
-
-    /**
      * Whether cookies should be handled.
      *
      * NB: Currently unsupported for Jersey clients.

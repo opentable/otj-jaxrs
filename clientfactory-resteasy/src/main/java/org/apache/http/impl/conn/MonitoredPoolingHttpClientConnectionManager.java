@@ -29,10 +29,6 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-import org.apache.http.HttpClientConnection;
-import org.apache.http.conn.ConnectionPoolTimeoutException;
-import org.apache.http.conn.routing.HttpRoute;
-import org.apache.http.pool.PoolStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

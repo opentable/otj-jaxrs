@@ -13,7 +13,6 @@
  */
 package com.opentable.jaxrs;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -28,23 +27,11 @@ import javax.ws.rs.client.WebTarget;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpException;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.config.RequestConfig.Builder;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.config.SocketConfig;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.MonitoredPoolingHttpClientConnectionManager;
-import org.apache.http.protocol.HttpContext;
+import org.eclipse.jetty.client.HttpClient;
 import org.jboss.resteasy.client.jaxrs.BasicAuthentication;
 import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
-import org.jboss.resteasy.client.jaxrs.internal.ClientInvocation;
 
 /**
  * The RESTEasy implementation of ClientFactory. Hides RESTEasy specific stuff
@@ -68,19 +55,15 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
 
     public static void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
     {
-        final HttpClient client = prepareHttpClientBuilder(clientName, config).build();
-        final ApacheHttpClient4Engine engine = new HackedApacheHttpClient4Engine(config, client);
+        final HttpClient client = new HttpClient();
+        final JettyHttpEngine engine = new JettyHttpEngine(client);
         clientBuilder.httpEngine(engine);
     }
 
     public static HttpClientBuilder prepareHttpClientBuilder(String clientName, JaxRsClientConfig config)
     {
         final HttpClientBuilder builder = HttpClientBuilder.create();
-        if (config.isEtcdHacksEnabled()) {
-            builder
-                .setRedirectStrategy(new ExtraLaxRedirectStrategy())
-                .addInterceptorFirst(new SwallowHeaderInterceptor(HttpHeaders.CONTENT_LENGTH));
-        }
+
         if (!config.isCookieHandlingEnabled()) {
             builder.disableCookieManagement();
         }
@@ -129,46 +112,5 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
 
     private BlockingQueue<Runnable> requestQueue(int size) {
         return size == 0 ? new SynchronousQueue<>() : new ArrayBlockingQueue<>(size);
-    }
-
-    private static class HackedApacheHttpClient4Engine extends ApacheHttpClient4Engine {
-        private final JaxRsClientConfig config;
-
-        HackedApacheHttpClient4Engine(JaxRsClientConfig config, HttpClient client) {
-            super(client);
-            this.config = config;
-        }
-
-        @Override
-        protected HttpRequestBase createHttpMethod(String url, String restVerb) {
-            final HttpRequestBase result = super.createHttpMethod(url, restVerb);
-            final Builder base = result.getConfig() == null ? RequestConfig.custom() : RequestConfig.copy(result.getConfig());
-            result.setConfig(customRequestConfig(config, base));
-            return result;
-        }
-
-        @Override
-        protected void loadHttpMethod(ClientInvocation request, HttpRequestBase httpMethod) throws Exception {
-            super.loadHttpMethod(request, httpMethod);
-            if (Boolean.FALSE.equals(request.getMutableProperties().get(JaxRsClientProperties.FOLLOW_REDIRECTS))) {
-                httpMethod.setConfig(RequestConfig.copy(httpMethod.getConfig()).setRedirectsEnabled(false).build());
-            }
-            request.property(JaxRsClientProperties.ACTUAL_REQUEST, httpMethod);
-        }
-    }
-
-    private static class SwallowHeaderInterceptor implements HttpRequestInterceptor {
-        private final String[] headers;
-
-        SwallowHeaderInterceptor(String... headers) {
-            this.headers = headers;
-        }
-
-        @Override
-        public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
-            for (String header : headers) {
-                request.removeHeaders(header);
-            }
-        }
     }
 }
