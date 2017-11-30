@@ -24,6 +24,13 @@
 
   <dependencies>
     <dependency>
+      <groupId>co.paralleluniverse</groupId>
+      <artifactId>quasar-core</artifactId>
+      <version>0.7.7</version>
+      <classifier>jdk8</classifier>
+    </dependency>
+
+    <dependency>
       <groupId>com.opentable.components</groupId>
       <artifactId>otj-jaxrs-client</artifactId>
     </dependency>
@@ -74,9 +81,11 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- XXX -->
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>1.10.1</version>
       <scope>test</scope>
     </dependency>
 

@@ -1,7 +1,7 @@
 package com.opentable.jaxrs;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
@@ -23,7 +23,7 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.client.api.Result;
-import org.eclipse.jetty.client.util.DeferredContentProvider;
+import org.eclipse.jetty.client.util.BytesContentProvider;
 import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.io.ByteBufferPool;
 import org.eclipse.jetty.util.Callback;
@@ -32,6 +32,11 @@ import org.jboss.resteasy.client.jaxrs.internal.ClientInvocation;
 import org.jboss.resteasy.client.jaxrs.internal.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import co.paralleluniverse.fibers.Fiber;
+import co.paralleluniverse.fibers.FiberExecutorScheduler;
+import co.paralleluniverse.fibers.SuspendExecution;
+import co.paralleluniverse.fibers.Suspendable;
 
 class JettyHttpEngine implements AsyncClientHttpEngine {
     private static final Logger LOG = LoggerFactory.getLogger(JettyHttpEngine.class);
@@ -48,11 +53,13 @@ class JettyHttpEngine implements AsyncClientHttpEngine {
     private final HttpClient client;
     private final ByteBufferPool bufs;
     private final JaxRsClientConfig config;
+    private final FiberExecutorScheduler fibers;
 
     public JettyHttpEngine(HttpClient client, JaxRsClientConfig config) {
         this.client = client;
         this.config = config;
         bufs = client.getByteBufferPool();
+        fibers = new FiberExecutorScheduler("jetty-jaxrs", client.getExecutor());
     }
 
     @Override
@@ -96,12 +103,16 @@ class JettyHttpEngine implements AsyncClientHttpEngine {
         request.method(invocation.getMethod());
         invocation.getHeaders().asMap().forEach((h, vs) -> vs.forEach(v -> request.header(h, v)));
 
-        final DeferredContentProvider content;
         if (invocation.getEntity() != null) {
-            content = new DeferredContentProvider();
-            request.content(content);
-        } else {
-            content = null;
+            // todo: don't buffer?
+            LOG.debug("writeRequestBody {}", request);
+            try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
+                invocation.writeRequestBody(stream);
+                LOG.debug("done writeRequestBody {}", request);
+                request.content(new BytesContentProvider(stream.toByteArray()));
+            } catch (IOException e) {
+                throw new ProcessingException(e);
+            }
         }
 
         LOG.debug("send {} as {}", invocation, request);
@@ -119,9 +130,14 @@ class JettyHttpEngine implements AsyncClientHttpEngine {
             }
 
             @Override
+            @Suspendable
             public void onContent(Response response, ByteBuffer content, Callback callback) {
                 LOG.debug("content {} {}", request, content.remaining());
-                stream.offer(content, callback);
+                try {
+                    stream.offer(content, callback);
+                } catch (SuspendExecution e) {
+                    throw new AssertionError(e);
+                }
             }
 
             @Override
@@ -155,29 +171,15 @@ class JettyHttpEngine implements AsyncClientHttpEngine {
                 cr.setProperties(invocation.getMutableProperties());
                 cr.setStatus(response.getStatus());
                 cr.setHeaders(extract(response.getHeaders()));
-                client.getExecutor().execute(() -> {
+                new Fiber<>(fibers, () -> {
                     LOG.debug("{} begin extractResult", request);
-                    // XXX: blocks a thread during deserialization, how do we async decode?
                     final T t = extractor.extractResult(cr);
                     LOG.debug("{} end extractResult", request);
                     future.complete(t);
                     callback.completed(t);
-                });
+                }).start();
             }
         });
-        if (content != null) {
-            try {
-                LOG.debug("writeRequestBody {}", request);
-                try (OutputStream stream = new JettyContentStream(bufs, content)) {
-                    invocation.writeRequestBody(stream);
-                }
-                LOG.debug("done writeRequestBody {}", request);
-            } catch (IOException e) {
-                throw new ProcessingException(e);
-            } finally {
-                content.close();
-            }
-        }
         return future;
     }
 
