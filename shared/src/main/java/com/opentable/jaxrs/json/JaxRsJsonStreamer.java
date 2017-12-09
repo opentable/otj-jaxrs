@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.ws.rs.WebApplicationException;
@@ -110,6 +111,15 @@ public class JaxRsJsonStreamer<T>
     public static <T> Builder<T> wrappedResultsArrayOf(TypeReference<T> type)
     {
         return builder(type).withHeader(StandardStreamCallbacks.RESULTS_HEADER).withFooter(StandardStreamCallbacks.RESULTS_FOOTER);
+    }
+
+    public static <T> Builder<T> wrappedResultsArrayOf(Class<T> type) {
+        return wrappedResultsArrayOf(new TypeReference<T>() {
+            @Override
+            public Type getType() {
+                return type;
+            }
+        });
     }
 
     /**

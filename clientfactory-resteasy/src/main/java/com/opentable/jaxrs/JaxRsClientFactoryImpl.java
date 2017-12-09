@@ -13,7 +13,6 @@
  */
 package com.opentable.jaxrs;
 
-import java.time.Duration;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -27,7 +26,6 @@ import javax.ws.rs.client.WebTarget;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.impl.conn.MonitoredPoolingHttpClientConnectionManager;
 import org.eclipse.jetty.client.HttpClient;
 import org.jboss.resteasy.client.jaxrs.BasicAuthentication;
 import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
@@ -56,40 +54,13 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     public static void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
     {
         final HttpClient client = new HttpClient();
-        final JettyHttpEngine engine = new JettyHttpEngine(client);
+        try {
+            client.start();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        final JettyHttpEngine engine = new JettyHttpEngine(client, config);
         clientBuilder.httpEngine(engine);
-    }
-
-    public static HttpClientBuilder prepareHttpClientBuilder(String clientName, JaxRsClientConfig config)
-    {
-        final HttpClientBuilder builder = HttpClientBuilder.create();
-
-        if (!config.isCookieHandlingEnabled()) {
-            builder.disableCookieManagement();
-        }
-        final MonitoredPoolingHttpClientConnectionManager connectionManager = new MonitoredPoolingHttpClientConnectionManager(clientName);
-
-        connectionManager.setCheckoutWarnTime(Duration.ofMillis(config.getConnectionPoolWarnTime().toMillis()));
-        connectionManager.setMaxTotal(config.getConnectionPoolSize());
-        connectionManager.setDefaultMaxPerRoute(config.getHttpClientDefaultMaxPerRoute());
-
-        return builder
-                .setDefaultSocketConfig(SocketConfig.custom()
-                        .setSoTimeout((int) config.getSocketTimeout().toMillis())
-                        .build())
-                .setDefaultRequestConfig(customRequestConfig(config, RequestConfig.custom()))
-                .setConnectionManager(connectionManager)
-                .evictIdleConnections(config.getIdleTimeout().toMillis(), TimeUnit.MILLISECONDS);
-    }
-
-    private static RequestConfig customRequestConfig(JaxRsClientConfig config, RequestConfig.Builder base) {
-        base.setRedirectsEnabled(true);
-        if (config != null) {
-            base.setConnectionRequestTimeout((int) config.getConnectionPoolTimeout().toMillis())
-                .setConnectTimeout((int) config.getConnectTimeout().toMillis())
-                .setSocketTimeout((int) config.getSocketTimeout().toMillis());
-        }
-        return base.build();
     }
 
     private void configureAuthenticationIfNeeded(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
@@ -107,7 +78,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 requestQueue(config.getAsyncQueueLimit()),
                 new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
                 new ThreadPoolExecutor.AbortPolicy());
-        clientBuilder.asyncExecutor(executor, true);
+        clientBuilder.executorService(executor);
     }
 
     private BlockingQueue<Runnable> requestQueue(int size) {
