@@ -41,6 +41,10 @@
 
     <dependency>
       <groupId>com.opentable.components</groupId>
+      <artifactId>otj-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.opentable.components</groupId>
       <artifactId>otj-spring</artifactId>
       <optional>true</optional>
     </dependency>
