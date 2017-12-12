@@ -25,7 +25,6 @@ import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.client.api.Result;
 import org.eclipse.jetty.client.util.BytesContentProvider;
 import org.eclipse.jetty.http.HttpFields;
-import org.eclipse.jetty.io.ByteBufferPool;
 import org.eclipse.jetty.util.Callback;
 import org.jboss.resteasy.client.jaxrs.AsyncClientHttpEngine;
 import org.jboss.resteasy.client.jaxrs.internal.ClientInvocation;
@@ -51,14 +50,19 @@ class JettyHttpEngine implements AsyncClientHttpEngine {
     };
 
     private final HttpClient client;
-    private final ByteBufferPool bufs;
-    private final JaxRsClientConfig config;
+//    private final ByteBufferPool bufs;
+//    private final JaxRsClientConfig config;
     private final FiberExecutorScheduler fibers;
 
-    public JettyHttpEngine(HttpClient client, JaxRsClientConfig config) {
-        this.client = client;
-        this.config = config;
-        bufs = client.getByteBufferPool();
+    JettyHttpEngine(JaxRsClientConfig config) {
+        client = new HttpClient();
+        client.setIdleTimeout(config.getIdleTimeout().toMillis());
+        try {
+            client.start();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+//        this.config = config;
         fibers = new FiberExecutorScheduler("jetty-jaxrs", client.getExecutor());
     }
 
@@ -81,7 +85,7 @@ class JettyHttpEngine implements AsyncClientHttpEngine {
             future.cancel(true);
             throw clientException(e, null);
         } catch (ExecutionException | TimeoutException e) {
-            throw clientException(e.getCause(), null);
+            throw clientException(e.getCause(), null); // NOPMD
         }
     }
 
@@ -201,7 +205,7 @@ class JettyHttpEngine implements AsyncClientHttpEngine {
     private static RuntimeException clientException(Throwable ex, javax.ws.rs.core.Response clientResponse) {
         RuntimeException ret;
         if (ex == null) {
-            ret = new ProcessingException(new NullPointerException());
+            ret = new ProcessingException(new NullPointerException()); // NOPMD
         }
         else if (ex instanceof WebApplicationException) {
             ret = (WebApplicationException) ex;

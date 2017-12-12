@@ -14,7 +14,6 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -44,9 +43,7 @@ public class JettyHttpEngineTest {
             server.start();
         }
         if (client == null) {
-            HttpClient hc = new HttpClient();
-            hc.start();
-            builder.httpEngine(new JettyHttpEngine(hc, config));
+            builder.httpEngine(new JettyHttpEngine(config));
             client = builder.build();
             builder = null;
         }

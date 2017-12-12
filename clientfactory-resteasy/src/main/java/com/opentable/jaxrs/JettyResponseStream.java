@@ -74,7 +74,7 @@ class JettyResponseStream extends InputStream {
             return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new InterruptedIOException(e.getMessage());
+            throw new InterruptedIOException(e.getMessage()); // NOPMD
         } catch (SuspendExecution e) {
             throw new AssertionError(e);
         }

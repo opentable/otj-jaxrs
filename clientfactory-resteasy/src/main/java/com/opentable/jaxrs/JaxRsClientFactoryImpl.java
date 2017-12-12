@@ -26,7 +26,6 @@ import javax.ws.rs.client.WebTarget;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.client.HttpClient;
 import org.jboss.resteasy.client.jaxrs.BasicAuthentication;
 import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -53,13 +52,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
 
     public static void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
     {
-        final HttpClient client = new HttpClient();
-        try {
-            client.start();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        final JettyHttpEngine engine = new JettyHttpEngine(client, config);
+        final JettyHttpEngine engine = new JettyHttpEngine(config);
         clientBuilder.httpEngine(engine);
     }
 
