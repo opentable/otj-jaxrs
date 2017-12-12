@@ -1,6 +1,11 @@
 otj-jaxrs changelog
 ===================
 
+2.6.0
+-----
+
+* added automatic referrer-related header setting for clients
+
 2.5.0
 -----
 
