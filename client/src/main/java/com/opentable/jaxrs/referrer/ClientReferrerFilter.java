@@ -2,6 +2,7 @@ package com.opentable.jaxrs.referrer;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -26,18 +27,31 @@ public class ClientReferrerFilter implements ClientRequestFilter {
     private final Map<String, List<Object>> referrerHeaders;
 
     @Inject
-    public ClientReferrerFilter(final AppInfo appInfo, final ServiceInfo serviceInfo) {
-        this(appInfo.getTaskHost(), serviceInfo.getName());
+    public ClientReferrerFilter(final Optional<AppInfo> appInfo, final Optional<ServiceInfo> serviceInfo) {
+        this(
+                appInfo.map(AppInfo::getTaskHost).orElse(null),
+                serviceInfo.map(ServiceInfo::getName).orElse(null)
+        );
     }
 
-    public ClientReferrerFilter(@Nullable final String host, final String serviceName) {
+    public ClientReferrerFilter(@Nullable final String host, @Nullable final String serviceName) {
         final ImmutableMap.Builder<String, List<Object>> builder = ImmutableMap.builder();
         if (host != null) {
             builder.put(OTHeaders.REFERRING_HOST, ImmutableList.of(host));
         }
-        builder.put(OTHeaders.REFERRING_SERVICE, ImmutableList.of(serviceName));
+        if (serviceName != null) {
+            builder.put(OTHeaders.REFERRING_SERVICE, ImmutableList.of(serviceName));
+        }
         referrerHeaders = builder.build();
-        LOG.info("on outgoing jax-rs requests, will set headers: {}", referrerHeaders);
+        if (isActive()) {
+            LOG.info("on outgoing jax-rs requests, will set headers: {}", referrerHeaders);
+        } else {
+            LOG.warn("no headers found for outgoing jax-rs requests");
+        }
+    }
+
+    final boolean isActive() {
+        return !referrerHeaders.isEmpty();
     }
 
     @Override

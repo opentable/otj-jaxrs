@@ -17,7 +17,10 @@ public class ClientReferrerFeature implements Feature {
 
     @Override
     public boolean configure(final FeatureContext context) {
-        context.register(filter);
-        return true;
+        final boolean active = filter.isActive();
+        if (active) {
+            context.register(filter);
+        }
+        return active;
     }
 }
