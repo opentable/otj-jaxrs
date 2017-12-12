@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.opentable.httpheaders.OTHeaders;
 import com.opentable.service.AppInfo;
 import com.opentable.service.ServiceInfo;
 
@@ -32,9 +33,9 @@ public class ClientReferrerFilter implements ClientRequestFilter {
     public ClientReferrerFilter(@Nullable final String host, final String serviceName) {
         final ImmutableMap.Builder<String, List<Object>> builder = ImmutableMap.builder();
         if (host != null) {
-            builder.put(ClientReferrerConfiguration.HOST_HEADER_NAME, ImmutableList.of(host));
+            builder.put(OTHeaders.REFERRING_HOST, ImmutableList.of(host));
         }
-        builder.put(ClientReferrerConfiguration.SERVICE_HEADER_NAME, ImmutableList.of(serviceName));
+        builder.put(OTHeaders.REFERRING_SERVICE, ImmutableList.of(serviceName));
         referrerHeaders = builder.build();
         LOG.info("on outgoing jax-rs requests, will set headers: {}", referrerHeaders);
     }

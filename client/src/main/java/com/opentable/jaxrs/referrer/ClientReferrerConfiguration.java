@@ -18,9 +18,6 @@ import com.opentable.jaxrs.StandardFeatureGroup;
 @Configuration
 @Import(ClientReferrerFeature.class)
 public class ClientReferrerConfiguration {
-    static final String SERVICE_HEADER_NAME = "OT-Referring-Service";
-    static final String HOST_HEADER_NAME = "OT-Referring-Host";
-
     @Bean
     public JaxRsFeatureBinding getClientReferrerFeatureBinding(final ClientReferrerFeature feature) {
         return JaxRsFeatureBinding.bind(StandardFeatureGroup.PLATFORM_INTERNAL, feature);
