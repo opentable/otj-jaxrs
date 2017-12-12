@@ -1,6 +1,11 @@
 otj-jaxrs changelog
 ===================
 
+2.7.0
+-----
+
+* made referrer logic more robust to different spring configurations
+
 2.6.0
 -----
 
