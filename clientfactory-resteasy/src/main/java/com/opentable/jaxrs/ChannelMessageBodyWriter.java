@@ -34,7 +34,7 @@ public class ChannelMessageBodyWriter implements MessageBodyWriter<Channel<?>> {
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return type == Channel.class;
+        return Channel.class.isAssignableFrom(type);
     }
 
     @Override
@@ -47,16 +47,16 @@ public class ChannelMessageBodyWriter implements MessageBodyWriter<Channel<?>> {
             MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
     throws IOException, WebApplicationException
     {
-        LOG.debug("Begin streaming channel: {}", t);
+        LOG.trace("Begin streaming channel: {}", t);
         JaxRsJsonStreamer.wrappedResultsArrayOf(Object.class).build(mapper).execute(c -> {
             while (!t.isClosed()) {
                 final Object resp = t.receive(30, TimeUnit.SECONDS);
-                LOG.trace("channel {} stream {}", t, resp);
+                LOG.trace("channel {} received {}", t, resp);
                 if (resp != null || !t.isClosed()) {
                     c.call(resp);
                 }
             }
-            LOG.debug("End streaming channel: {}", t);
-        });
+            LOG.trace("End streaming channel: {}", t);
+        }).write(entityStream);
     }
 }
