@@ -13,50 +13,47 @@
  */
 package com.opentable.jaxrs;
 
-import java.io.IOException;
-import java.time.Duration;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpException;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.config.RequestConfig.Builder;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.config.SocketConfig;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.MonitoredPoolingHttpClientConnectionManager;
-import org.apache.http.protocol.HttpContext;
-import org.jboss.resteasy.client.jaxrs.BasicAuthentication;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.util.HttpCookieStore;
 import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
-import org.jboss.resteasy.client.jaxrs.internal.ClientInvocation;
+import org.jboss.resteasy.client.jaxrs.engines.JettyClientEngine;
+import org.springframework.context.ApplicationContext;
+import org.springframework.util.ClassUtils;
 
 /**
  * The RESTEasy implementation of ClientFactory. Hides RESTEasy specific stuff
- * behind a common facade.
+ * behind a common facade.  Uses Jetty-Client.
  */
 public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
+    private final BiConsumer<ResteasyClientBuilder, HttpClient> customizer;
+
+    public JaxRsClientFactoryImpl(ApplicationContext ctx) {
+        if (ctx != null && ClassUtils.isPresent("org.eclipse.jetty.server.Server", null)) {
+            customizer = JettyServerGuts.extract(ctx);
+        } else {
+            customizer = (rcb, hc) -> {};
+        }
+    }
+
     @Override
     public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config) {
         final ResteasyClientBuilder builder = new ResteasyClientBuilder();
         configureHttpEngine(clientName, builder, config);
-        configureAuthenticationIfNeeded(clientName, builder, config);
         configureThreadPool(clientName, builder, config);
         return builder;
     }
@@ -66,57 +63,19 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         return ProxyBuilder.builder(proxyType, baseTarget).build();
     }
 
-    public static void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
+    public void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
     {
-        final HttpClient client = prepareHttpClientBuilder(clientName, config).build();
-        final ApacheHttpClient4Engine engine = new HackedApacheHttpClient4Engine(config, client);
-        clientBuilder.httpEngine(engine);
-    }
-
-    public static HttpClientBuilder prepareHttpClientBuilder(String clientName, JaxRsClientConfig config)
-    {
-        final HttpClientBuilder builder = HttpClientBuilder.create();
-        if (config.isEtcdHacksEnabled()) {
-            builder
-                .setRedirectStrategy(new ExtraLaxRedirectStrategy())
-                .addInterceptorFirst(new SwallowHeaderInterceptor(HttpHeaders.CONTENT_LENGTH));
+        final HttpClient client = new HttpClient();
+        client.setIdleTimeout(config.getIdleTimeout().toMillis());
+        client.setAddressResolutionTimeout(config.getConnectTimeout().toMillis());
+        client.setConnectTimeout(config.getConnectTimeout().toMillis());
+        client.setMaxConnectionsPerDestination(config.getHttpClientDefaultMaxPerRoute());
+        client.setRemoveIdleDestinations(true);
+        if (config.isCookieHandlingEnabled()) {
+            client.setCookieStore(new HttpCookieStore());
         }
-        if (!config.isCookieHandlingEnabled()) {
-            builder.disableCookieManagement();
-        }
-        final MonitoredPoolingHttpClientConnectionManager connectionManager = new MonitoredPoolingHttpClientConnectionManager(clientName);
-
-        connectionManager.setCheckoutWarnTime(Duration.ofMillis(config.getConnectionPoolWarnTime().toMillis()));
-        connectionManager.setMaxTotal(config.getConnectionPoolSize());
-        connectionManager.setDefaultMaxPerRoute(config.getHttpClientDefaultMaxPerRoute());
-
-        return builder
-                .setDefaultSocketConfig(SocketConfig.custom()
-                        .setSoTimeout((int) config.getSocketTimeout().toMillis())
-                        .build())
-                .setDefaultRequestConfig(customRequestConfig(config, RequestConfig.custom()))
-                .setConnectionManager(connectionManager)
-                .evictIdleConnections(config.getIdleTimeout().toMillis(), TimeUnit.MILLISECONDS);
-    }
-
-    private static RequestConfig customRequestConfig(JaxRsClientConfig config, RequestConfig.Builder base) {
-        base.setRedirectsEnabled(true);
-        if (config != null) {
-            base.setConnectionRequestTimeout((int) config.getConnectionPoolTimeout().toMillis())
-                .setConnectTimeout((int) config.getConnectTimeout().toMillis())
-                .setSocketTimeout((int) config.getSocketTimeout().toMillis());
-        }
-        return base.build();
-    }
-
-    private void configureAuthenticationIfNeeded(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
-    {
-        if (!StringUtils.isEmpty(config.getBasicAuthUserName()) && !StringUtils.isEmpty(config.getBasicAuthPassword()))
-        {
-            final BasicAuthentication auth = new BasicAuthentication(
-                    config.getBasicAuthUserName(), config.getBasicAuthPassword());
-            clientBuilder.register(auth);
-        }
+        clientBuilder.httpEngine(new JettyClientEngine(client));
+        customizer.accept(clientBuilder, client);
     }
 
     private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config) {
@@ -124,51 +83,10 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 requestQueue(config.getAsyncQueueLimit()),
                 new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
                 new ThreadPoolExecutor.AbortPolicy());
-        clientBuilder.asyncExecutor(executor, true);
+        clientBuilder.executorService(executor);
     }
 
     private BlockingQueue<Runnable> requestQueue(int size) {
         return size == 0 ? new SynchronousQueue<>() : new ArrayBlockingQueue<>(size);
-    }
-
-    private static class HackedApacheHttpClient4Engine extends ApacheHttpClient4Engine {
-        private final JaxRsClientConfig config;
-
-        HackedApacheHttpClient4Engine(JaxRsClientConfig config, HttpClient client) {
-            super(client);
-            this.config = config;
-        }
-
-        @Override
-        protected HttpRequestBase createHttpMethod(String url, String restVerb) {
-            final HttpRequestBase result = super.createHttpMethod(url, restVerb);
-            final Builder base = result.getConfig() == null ? RequestConfig.custom() : RequestConfig.copy(result.getConfig());
-            result.setConfig(customRequestConfig(config, base));
-            return result;
-        }
-
-        @Override
-        protected void loadHttpMethod(ClientInvocation request, HttpRequestBase httpMethod) throws Exception {
-            super.loadHttpMethod(request, httpMethod);
-            if (Boolean.FALSE.equals(request.getMutableProperties().get(JaxRsClientProperties.FOLLOW_REDIRECTS))) {
-                httpMethod.setConfig(RequestConfig.copy(httpMethod.getConfig()).setRedirectsEnabled(false).build());
-            }
-            request.property(JaxRsClientProperties.ACTUAL_REQUEST, httpMethod);
-        }
-    }
-
-    private static class SwallowHeaderInterceptor implements HttpRequestInterceptor {
-        private final String[] headers;
-
-        SwallowHeaderInterceptor(String... headers) {
-            this.headers = headers;
-        }
-
-        @Override
-        public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
-            for (String header : headers) {
-                request.removeHeaders(header);
-            }
-        }
     }
 }

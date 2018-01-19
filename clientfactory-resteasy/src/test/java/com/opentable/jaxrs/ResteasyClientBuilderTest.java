@@ -42,7 +42,7 @@ public class ResteasyClientBuilderTest {
             server.start();
 
             final InetSocketAddress addr = server.getAddress();
-            Client client = new JaxRsClientFactoryImpl().newBuilder("test", config).build();
+            Client client = new JaxRsClientFactoryImpl(null).newBuilder("test", config).build();
             try {
                 Response r = client.target("http://" + addr.getHostString() + ":" + addr.getPort()).request()
                         .property(JaxRsClientProperties.FOLLOW_REDIRECTS, false)

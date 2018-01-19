@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.IdleConnectionEvictor;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
@@ -26,19 +25,21 @@ import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
-import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.message.GZipEncoder;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Jersey implementation of InternalClientFactory
  */
 public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
+    public JaxRsClientFactoryImpl(ApplicationContext ctx) {
+    }
+
     @Override
     public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config) {
         final JerseyClientBuilder builder = new JerseyClientBuilder();
         builder.withConfig(createClientConfig(config));
-        configureAuthenticationIfNeeded(builder, config);
         return builder.register(GZipEncoder.class);
     }
 
@@ -62,16 +63,6 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         clientConfig.property(ClientProperties.CONNECT_TIMEOUT, (int) config.getConnectTimeout().toMillis());
         clientConfig.property(ClientProperties.READ_TIMEOUT, (int) config.getSocketTimeout().toMillis());
         return clientConfig;
-    }
-
-    private static void configureAuthenticationIfNeeded(ClientBuilder builder, JaxRsClientConfig config)
-    {
-        if (!StringUtils.isEmpty(config.getBasicAuthUserName()) && !StringUtils.isEmpty(config.getBasicAuthPassword()))
-        {
-            HttpAuthenticationFeature auth = HttpAuthenticationFeature.basic(
-                    config.getBasicAuthUserName(), config.getBasicAuthPassword());
-            builder.register(auth);
-        }
     }
 
     private static class EvictablePoolingHttpClientConnectionManager extends PoolingHttpClientConnectionManager {

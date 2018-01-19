@@ -41,6 +41,7 @@ import com.google.common.collect.SetMultimap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Central registry for creating JAX-RS Clients.
@@ -77,6 +78,13 @@ public class JaxRsClientFactory {
 
     @GuardedBy("this")
     private boolean started;
+
+    private ApplicationContext ctx;
+
+    @Inject
+    public void setApplicationContext(ApplicationContext ctx) {
+        this.ctx = ctx;
+    }
 
     /**
      * Initialize a new factory.  This factory is intended to be a singleton and should be
@@ -170,7 +178,7 @@ public class JaxRsClientFactory {
                 .addAll(featureGroupsIn)
                 .build();
 
-        final ClientBuilder builder = factory().newBuilder(clientName, jaxRsConfig);
+        final ClientBuilder builder = factory(ctx).newBuilder(clientName, jaxRsConfig);
 
         builder.property(CLIENT_NAME_PROPERTY, clientName);
         builder.property(FEATURE_GROUP_PROPERTY, featureGroups);
@@ -232,6 +240,6 @@ public class JaxRsClientFactory {
      * @return a proxy implementation that executes requests
      */
     public <T> T createClientProxy(Class<T> proxyClass, WebTarget baseTarget) {
-        return factory().createClientProxy(proxyClass, baseTarget);
+        return factory(ctx).createClientProxy(proxyClass, baseTarget);
     }
 }

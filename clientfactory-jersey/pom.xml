@@ -16,7 +16,7 @@
   <parent>
     <artifactId>otj-jaxrs-parent</artifactId>
     <groupId>com.opentable.components</groupId>
-    <version>2.7.1-SNAPSHOT</version>
+    <version>2.8.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -100,13 +100,13 @@
 
     <!-- Apache -->
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
     </dependency>
 
     <!-- test -->

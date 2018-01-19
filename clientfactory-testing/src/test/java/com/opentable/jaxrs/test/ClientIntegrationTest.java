@@ -73,19 +73,6 @@ public class ClientIntegrationTest {
         httpServer.stop(0);
     }
 
-    @Test(expected=Exception.class)
-    public void exhaustConnectionPoolWithoutClose() throws InterruptedException {
-        final Client client = factory.newClient("test", StandardFeatureGroup.PUBLIC);
-        final URI uri = UriBuilder.fromUri("http://"+address.getHostName()).port(SERVER_PORT).build();
-
-        for (int i = 0; i < 100; i++) {
-            LOG.trace("trying connection number {} for {}", i, uri);
-            final Response response = client.target(uri).request().get();
-
-            assertEquals("status should be 200", 200, response.getStatus());
-        }
-    }
-
     @Test
     public void closedConnectionPoolNotExhaused() throws InterruptedException {
         final Client client = factory.newClient("test", StandardFeatureGroup.PUBLIC);

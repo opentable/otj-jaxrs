@@ -74,7 +74,7 @@ public interface JaxRsClientConfig
     }
 
     /**
-     * Socket timeout.
+     * Socket timeout.  Not used for asynchronous capable engines.
      *
      * @see java.net.SocketOptions#SO_TIMEOUT
      */
@@ -83,26 +83,10 @@ public interface JaxRsClientConfig
     }
 
     /**
-     * HTTP connection pool idle connection eviction threshold.
-     *
-     * @see org.apache.http.impl.client.HttpClientBuilder#evictIdleConnections
+     * HTTP connection idle timeout.
      */
     default Duration getIdleTimeout() {
-        return Duration.ofSeconds(20);
-    }
-
-    /**
-     * Basic auth username.
-     */
-    default String getBasicAuthUserName() {
-        return null;
-    }
-
-    /**
-     * Basic auth password.
-     */
-    default String getBasicAuthPassword() {
-        return null;
+        return Duration.ofSeconds(30);
     }
 
     /**
@@ -114,13 +98,6 @@ public interface JaxRsClientConfig
      */
     default int getHttpClientDefaultMaxPerRoute() {
         return getConnectionPoolSize();
-    }
-
-    /**
-     * Special hacks for etcd, especially allowing PUTs to 307 redirect.
-     */
-    default boolean isEtcdHacksEnabled() {
-        return true;
     }
 
     /**

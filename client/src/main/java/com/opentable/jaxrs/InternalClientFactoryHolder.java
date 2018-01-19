@@ -13,32 +13,40 @@
  */
 package com.opentable.jaxrs;
 
+import java.util.WeakHashMap;
+
+import org.springframework.context.ApplicationContext;
+
 /**
  * Hides gory details of reflection from main API.
  *
  * Finds and remembers the Class for InternalClientFactory, uses it
  * to create new instances.
  */
-final class InternalClientFactoryHolder
-{
-    private static final InternalClientFactory FACTORY_IMPL = findFactory();
+final class InternalClientFactoryHolder {
+    private static final InternalClientFactory FACTORY_IMPL = findFactory(null);
+    private static final WeakHashMap<ApplicationContext, InternalClientFactory> factories = new WeakHashMap<>();
 
     private InternalClientFactoryHolder() { }
 
-    static InternalClientFactory factory() {
-        return FACTORY_IMPL;
+    static synchronized InternalClientFactory factory(ApplicationContext ctx) {
+        if (ctx == null) {
+            return FACTORY_IMPL;
+        } else {
+            return factories.computeIfAbsent(ctx, InternalClientFactoryHolder::findFactory);
+        }
     }
 
-    private static InternalClientFactory findFactory() {
+    private static InternalClientFactory findFactory(ApplicationContext ctx) {
         try {
             final ClassLoader classLoader = InternalClientFactoryHolder.class.getClassLoader();
             final String implClass = "com.opentable.jaxrs.JaxRsClientFactoryImpl";
             return InternalClientFactory.class.cast(
-                    Class.forName(implClass, true, classLoader).newInstance());
+                    Class.forName(implClass, true, classLoader).getConstructor(ApplicationContext.class).newInstance(ctx));
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Can't find com.opentable.jaxrs.JaxRsClientBuilderImpl. " +
                     "did you include a jaxrs-clientbuilder-* jar on your classpath?", e);
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (ReflectiveOperationException e) {
             throw new RuntimeException("Error instantiating factory class", e);
         }
     }
