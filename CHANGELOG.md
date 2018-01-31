@@ -1,6 +1,11 @@
 otj-jaxrs changelog
 ===================
 
+2.8.0
+-----
+
+* use Jetty client HttpEngine for real async support
+
 2.7.0
 -----
 
