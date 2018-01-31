@@ -1,6 +1,11 @@
 otj-jaxrs changelog
 ===================
 
+2.8.1
+-----
+
+* fix Jetty HttpEngine SSL support, client builder properties
+
 2.8.0
 -----
 
