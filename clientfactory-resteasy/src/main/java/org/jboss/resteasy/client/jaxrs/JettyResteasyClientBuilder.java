@@ -2,7 +2,6 @@ package org.jboss.resteasy.client.jaxrs;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
 
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.util.HttpCookieStore;
@@ -16,12 +15,10 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
 
     private final String clientName;
     private final JaxRsClientConfig config;
-    private final BiConsumer<ResteasyClientBuilder, HttpClient> customizer;
 
-    public JettyResteasyClientBuilder(String clientName, JaxRsClientConfig config, BiConsumer<ResteasyClientBuilder, HttpClient> customizer) {
+    public JettyResteasyClientBuilder(String clientName, JaxRsClientConfig config) {
         this.clientName = clientName;
         this.config = config;
-        this.customizer = customizer;
     }
 
     @Override
@@ -35,7 +32,6 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         if (config.isCookieHandlingEnabled()) {
             client.setCookieStore(new HttpCookieStore());
         }
-        customizer.accept(this, client);
 
         final ClientConfiguration cc = new ClientConfiguration(getProviderFactory());
         properties.forEach(cc::property);

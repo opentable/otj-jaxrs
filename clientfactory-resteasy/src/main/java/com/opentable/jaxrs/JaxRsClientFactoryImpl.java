@@ -19,19 +19,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-import org.eclipse.jetty.client.HttpClient;
 import org.jboss.resteasy.client.jaxrs.JettyResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.springframework.context.ApplicationContext;
-import org.springframework.util.ClassUtils;
 
 /**
  * The RESTEasy implementation of ClientFactory. Hides RESTEasy specific stuff
@@ -39,22 +36,16 @@ import org.springframework.util.ClassUtils;
  */
 public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
-    private final BiConsumer<ResteasyClientBuilder, HttpClient> customizer;
-    private final boolean provideThreadPool;
 
     public JaxRsClientFactoryImpl(ApplicationContext ctx) {
-        if (ctx != null && ClassUtils.isPresent("org.eclipse.jetty.server.Server", null)) {
-            customizer = JettyServerGuts.extract(ctx);
-            provideThreadPool = false;
-        } else {
-            customizer = (rcb, hc) -> {};
-            provideThreadPool = true;
-        }
+//        if (ctx != null && ClassUtils.isPresent("org.eclipse.jetty.server.Server", null)) {
+            // TODO: figure out how to wire up thread pool
+//        }
     }
 
     @Override
     public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config) {
-        final ResteasyClientBuilder builder = new JettyResteasyClientBuilder(clientName, config, customizer);
+        final ResteasyClientBuilder builder = new JettyResteasyClientBuilder(clientName, config);
         configureThreadPool(clientName, builder, config);
         return builder;
     }
@@ -65,13 +56,11 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     }
 
     private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config) {
-        if (provideThreadPool) {
-            final ExecutorService executor = new ThreadPoolExecutor(8, 8, 1, TimeUnit.HOURS,
-                    requestQueue(config.getAsyncQueueLimit()),
-                    new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
-                    new ThreadPoolExecutor.AbortPolicy());
-            clientBuilder.executorService(executor);
-        }
+        final ExecutorService executor = new ThreadPoolExecutor(8, 8, 1, TimeUnit.HOURS,
+                requestQueue(config.getAsyncQueueLimit()),
+                new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
+                new ThreadPoolExecutor.AbortPolicy());
+        clientBuilder.executorService(executor);
     }
 
     private BlockingQueue<Runnable> requestQueue(int size) {
