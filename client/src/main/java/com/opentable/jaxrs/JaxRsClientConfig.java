@@ -15,8 +15,6 @@ package com.opentable.jaxrs;
 
 import java.time.Duration;
 
-import javax.ws.rs.client.Invocation;
-
 /**
  * JAX-RS Client tunables.
  *
@@ -33,8 +31,8 @@ public interface JaxRsClientConfig
     /**
      * Timeout to check out a connection from the connection pool.
      *
-     * This connection pool checkout won't occur until you call {@link Invocation#invoke()}.  If the time to get a
-     * connection surpasses this value, a runtime exception will be thrown.
+     * This connection pool checkout won't occur until you call {@link javax.ws.rs.client.InvocationInvocation#invoke()}.
+     * If the time to get a connection surpasses this value, a runtime exception will be thrown.
      */
     default Duration getConnectionPoolTimeout() {
         return Duration.ofSeconds(5);
@@ -43,8 +41,8 @@ public interface JaxRsClientConfig
     /**
      * Monitor connection pool for failure to acquire leases.
      *
-     * This connection pool checkout won't occur until you call {@link Invocation#invoke()}.  If the time to get a
-     * connection surpasses this value, a warning will be logged.
+     * This connection pool checkout won't occur until you call {@link javax.ws.rs.client.InvocationInvocation#invoke()}.
+     * If the time to get a connection surpasses this value, a warning will be logged.
      */
     default Duration getConnectionPoolWarnTime() {
         return Duration.ofSeconds(1);
@@ -78,6 +76,7 @@ public interface JaxRsClientConfig
      *
      * @see java.net.SocketOptions#SO_TIMEOUT
      */
+    @Deprecated
     default Duration getSocketTimeout() {
         return Duration.ofSeconds(30);
     }
