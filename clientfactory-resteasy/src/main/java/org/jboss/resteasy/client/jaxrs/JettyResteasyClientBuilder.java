@@ -1,6 +1,5 @@
 package org.jboss.resteasy.client.jaxrs;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
@@ -39,10 +38,7 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         customizer.accept(this, client);
 
         final ClientConfiguration cc = new ClientConfiguration(getProviderFactory());
-        for (Map.Entry<String, Object> entry : properties.entrySet())
-        {
-           cc.property(entry.getKey(), entry.getValue());
-        }
+        properties.forEach(cc::property);
 
         return new ResteasyClient(new JettyClientEngine(client), asyncExecutor, cleanupExecutor, scheduledExecutorService, cc);
     }
