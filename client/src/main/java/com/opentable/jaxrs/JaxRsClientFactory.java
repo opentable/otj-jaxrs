@@ -242,4 +242,9 @@ public class JaxRsClientFactory {
     public <T> T createClientProxy(Class<T> proxyClass, WebTarget baseTarget) {
         return factory(ctx).createClientProxy(proxyClass, baseTarget);
     }
+
+    /** Convenience method for making a builder with the name "test", for use in... tests! */
+    public static ClientBuilder testBuilder() {
+        return new JaxRsClientFactory().newBuilder("test", StandardFeatureGroup.PLATFORM_INTERNAL);
+    }
 }
