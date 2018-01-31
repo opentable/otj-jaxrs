@@ -34,7 +34,7 @@ public class ResteasyClientBuilderTest {
     private static final String BAD_URI = "http://example.invalid";
     private final JaxRsClientConfig config = new JaxRsClientConfig() {};
 
-    @Test
+    @Test(timeout=10_000)
     public void testNoRedirect() throws Exception {
         final HttpServer server = HttpServer.create(new InetSocketAddress(InetAddress.getLocalHost(), 0), 1);
         try {
