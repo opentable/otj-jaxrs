@@ -14,10 +14,12 @@
 package com.opentable.jaxrs;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.HttpHeaders;
@@ -27,6 +29,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.junit.Test;
 
 @SuppressWarnings("restriction")
@@ -43,6 +46,7 @@ public class ResteasyClientBuilderTest {
 
             final InetSocketAddress addr = server.getAddress();
             Client client = new JaxRsClientFactoryImpl(null).newBuilder("test", config).build();
+            final ExecutorService executor = ((ResteasyClient) client).asyncInvocationExecutor();
             try {
                 Response r = client.target("http://" + addr.getHostString() + ":" + addr.getPort()).request()
                         .property(JaxRsClientProperties.FOLLOW_REDIRECTS, false)
@@ -52,6 +56,7 @@ public class ResteasyClientBuilderTest {
             } finally {
                 client.close();
             }
+            assertTrue(executor.isShutdown());
         } finally {
             server.stop(0);
         }

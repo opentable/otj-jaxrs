@@ -36,7 +36,7 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         final ClientConfiguration cc = new ClientConfiguration(getProviderFactory());
         properties.forEach(cc::property);
 
-        return new ResteasyClient(new JettyClientEngine(client), asyncExecutor, cleanupExecutor, scheduledExecutorService, cc);
+        return new ResteasyClient(new JettyClientEngine(client), asyncExecutor, true, scheduledExecutorService, cc);
     }
 
     private SslContextFactory createSslFactory() {
