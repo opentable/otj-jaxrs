@@ -1,6 +1,11 @@
 otj-jaxrs changelog
 ===================
 
+2.8.3
+-----
+
+* fix leaking Client thread pools
+
 2.8.2
 -----
 * Spring Boot 2/5.0.4
