@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.util.HttpCookieStore;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.jboss.resteasy.client.jaxrs.engines.JettyClientEngine;
+import org.jboss.resteasy.client.jaxrs.engines.jetty.JettyClientEngine;
 import org.jboss.resteasy.client.jaxrs.internal.ClientConfiguration;
 
 import com.opentable.jaxrs.JaxRsClientConfig;
