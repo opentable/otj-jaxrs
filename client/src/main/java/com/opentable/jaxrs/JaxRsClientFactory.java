@@ -178,7 +178,7 @@ public class JaxRsClientFactory {
                 .addAll(featureGroupsIn)
                 .build();
 
-        final ClientBuilder builder = factory(ctx).newBuilder(clientName, jaxRsConfig);
+        final ClientBuilder builder = factory(ctx).newBuilder(clientName, jaxRsConfig, featureGroups);
 
         builder.property(CLIENT_NAME_PROPERTY, clientName);
         builder.property(FEATURE_GROUP_PROPERTY, featureGroups);

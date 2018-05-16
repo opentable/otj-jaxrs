@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.client.Client;
@@ -45,7 +46,7 @@ public class ResteasyClientBuilderTest {
             server.start();
 
             final InetSocketAddress addr = server.getAddress();
-            Client client = new JaxRsClientFactoryImpl(null).newBuilder("test", config).build();
+            Client client = new JaxRsClientFactoryImpl(null).newBuilder("test", config, Collections.emptyList()).build();
             final ExecutorService executor = ((ResteasyClient) client).asyncInvocationExecutor();
             try {
                 Response r = client.target("http://" + addr.getHostString() + ":" + addr.getPort()).request()

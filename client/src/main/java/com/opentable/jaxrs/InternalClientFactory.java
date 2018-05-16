@@ -13,6 +13,8 @@
  */
 package com.opentable.jaxrs;
 
+import java.util.Collection;
+
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 
@@ -20,6 +22,6 @@ import javax.ws.rs.client.WebTarget;
  * SPI for creating {@link ClientBuilder} instances.
  */
 interface InternalClientFactory {
-    ClientBuilder newBuilder(String clientName, JaxRsClientConfig config);
+    ClientBuilder newBuilder(String clientName, JaxRsClientConfig config, Collection<JaxRsFeatureGroup> featureGroups);
     <T> T createClientProxy(Class<T> proxyType, WebTarget baseTarget);
 }

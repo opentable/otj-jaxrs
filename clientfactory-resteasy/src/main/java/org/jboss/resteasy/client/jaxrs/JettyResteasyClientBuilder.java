@@ -8,17 +8,23 @@ import org.eclipse.jetty.util.HttpCookieStore;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.client.jaxrs.engines.jetty.JettyClientEngine;
 import org.jboss.resteasy.client.jaxrs.internal.ClientConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.opentable.jaxrs.JaxRsClientConfig;
+import com.opentable.jaxrs.TlsProvider;
 
 public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
+    private static final Logger LOG = LoggerFactory.getLogger(JettyResteasyClientBuilder.class);
 
     private final String clientName;
     private final JaxRsClientConfig config;
+    private final TlsProvider provider;
 
-    public JettyResteasyClientBuilder(String clientName, JaxRsClientConfig config) {
+    public JettyResteasyClientBuilder(String clientName, JaxRsClientConfig config, TlsProvider provider) {
         this.clientName = clientName;
         this.config = config;
+        this.provider = provider;
     }
 
     @Override
@@ -48,6 +54,23 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         });
         Optional.ofNullable(truststore).ifPresent(factory::setTrustStore);
         Optional.ofNullable(sslContext).ifPresent(factory::setSslContext);
+        if (provider != null) {
+            provider.init((ts, ks) -> {
+                try {
+                    factory.reload(f -> {
+                        f.setValidateCerts(true);
+                        f.setValidatePeerCerts(true);
+                        f.setKeyStorePassword("");
+                        f.setKeyStore(ks);
+                        f.setTrustStorePassword("");
+                        f.setTrustStore(ts);
+                    });
+                    LOG.debug("Rotated client {} TLS keys to {}", factory, ks);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
         return factory;
     }
 

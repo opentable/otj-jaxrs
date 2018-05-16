@@ -13,6 +13,7 @@
  */
 package com.opentable.jaxrs;
 
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.ClientBuilder;
@@ -37,7 +38,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     }
 
     @Override
-    public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config) {
+    public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config, Collection<JaxRsFeatureGroup> featureGroups) {
         final JerseyClientBuilder builder = new JerseyClientBuilder();
         builder.withConfig(createClientConfig(config));
         return builder.register(GZipEncoder.class);
