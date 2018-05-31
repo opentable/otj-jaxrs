@@ -1,6 +1,11 @@
 otj-jaxrs changelog
 ===================
 
+2.9.0
+-----
+
+* first pass at jetty tls integration
+
 2.8.3
 -----
 
