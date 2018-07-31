@@ -32,7 +32,7 @@ class StandardStreamCallbacks
         }
     };
 
-    static Callback<JsonGenerator> RESULTS_HEADER = new Callback<JsonGenerator>() {
+    static final Callback<JsonGenerator> RESULTS_HEADER = new Callback<JsonGenerator>() {
         @Override
         public void call(JsonGenerator jg) throws Exception
         {
@@ -41,7 +41,7 @@ class StandardStreamCallbacks
         }
     };
 
-    static Callback<JsonGenerator> RESULTS_FOOTER = new Callback<JsonGenerator>() {
+    static final Callback<JsonGenerator> RESULTS_FOOTER = new Callback<JsonGenerator>() {
         @Override
         public void call(JsonGenerator jg) throws Exception
         {
@@ -51,7 +51,7 @@ class StandardStreamCallbacks
         }
     };
 
-    static Callback<JsonGenerator> ARRAY_HEADER = new Callback<JsonGenerator>() {
+    static final Callback<JsonGenerator> ARRAY_HEADER = new Callback<JsonGenerator>() {
         @Override
         public void call(JsonGenerator jg) throws Exception
         {
@@ -59,7 +59,7 @@ class StandardStreamCallbacks
         }
     };
 
-    static Callback<JsonGenerator> ARRAY_FOOTER = new Callback<JsonGenerator>() {
+    static final Callback<JsonGenerator> ARRAY_FOOTER = new Callback<JsonGenerator>() {
         @Override
         public void call(JsonGenerator jg) throws Exception
         {
