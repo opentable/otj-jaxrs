@@ -19,12 +19,12 @@
   <parent>
     <groupId>com.opentable</groupId>
     <artifactId>otj-parent-spring</artifactId>
-    <version>163</version>
+    <version>164</version>
   </parent>
 
   <properties>
     <!-- Remove once parent updated -->
-    <dep.resteasy.version>4.0.0-OT-4</dep.resteasy.version>
+    <dep.resteasy.version>4.0.0.Beta4</dep.resteasy.version>
   </properties>
 
   <scm>
