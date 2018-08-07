@@ -39,7 +39,7 @@ final class InternalClientFactoryHolder {
 
     private static InternalClientFactory findFactory(ApplicationContext ctx) {
         try {
-            final ClassLoader classLoader = InternalClientFactoryHolder.class.getClassLoader();
+            final ClassLoader classLoader = InternalClientFactoryHolder.class.getClassLoader(); //NOPMD
             final String implClass = "com.opentable.jaxrs.JaxRsClientFactoryImpl";
             return InternalClientFactory.class.cast(
                     Class.forName(implClass, true, classLoader).getConstructor(ApplicationContext.class).newInstance(ctx));

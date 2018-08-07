@@ -19,8 +19,13 @@
   <parent>
     <groupId>com.opentable</groupId>
     <artifactId>otj-parent-spring</artifactId>
-    <version>150</version>
+    <version>164</version>
   </parent>
+
+  <properties>
+    <!-- Remove once parent updated  -->
+    <dep.resteasy.version>4.0.0.Beta5</dep.resteasy.version>
+  </properties>
 
   <scm>
     <connection>scm:git:git://github.com/opentable/otj-jaxrs.git</connection>
