@@ -39,12 +39,12 @@
     <connection>scm:git:git://github.com/opentable/otj-jaxrs.git</connection>
     <developerConnection>scm:git:git@github.com:opentable/otj-jaxrs.git</developerConnection>
     <url>http://github.com/opentable/otj-jaxrs</url>
-    <tag>HEAD</tag>
+    <tag>otj-jaxrs-parent-2.9.2</tag>
   </scm>
 
   <groupId>com.opentable.components</groupId>
   <artifactId>otj-jaxrs-parent</artifactId>
-  <version>2.9.2-SNAPSHOT</version>
+  <version>2.9.2</version>
   <packaging>pom</packaging>
 
   <modules>
