@@ -1,6 +1,10 @@
 otj-jaxrs changelog
 ===================
 
+2.9.2
+-----
+* Update to Jetty 9.4.12.0830
+
 2.9.1
 -----
 * Update to Resteasy Beta 5 (from OT-3 which was a melange of beta3++)
