@@ -71,11 +71,22 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     }
 
     private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config) {
-        final ExecutorService executor = new ThreadPoolExecutor(8, 8, 1, TimeUnit.HOURS,
+        final int threads = calculateThreads(config.getExecutorThreads());
+        final ExecutorService executor = new ThreadPoolExecutor(threads, threads, 1, TimeUnit.HOURS,
                 requestQueue(config.getAsyncQueueLimit()),
                 new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
                 new ThreadPoolExecutor.AbortPolicy());
         clientBuilder.executorService(executor);
+    }
+
+    private int calculateThreads(final int executorThreads) {
+        if (executorThreads > 0) {
+            return  executorThreads;
+        }
+        // For current standard 8 core machines this is 10 regardless.
+        // On Java 10, you might get less than 8 core reported, but it will still size as if it's 8
+        // Beyond 8 core you MIGHT undersize if running on Docker, but otherwise should be fine.
+        return Math.max(10, (Runtime.getRuntime().availableProcessors() + 2 ));
     }
 
     private BlockingQueue<Runnable> requestQueue(int size) {

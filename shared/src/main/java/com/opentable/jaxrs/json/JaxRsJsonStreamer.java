@@ -53,7 +53,8 @@ public class JaxRsJsonStreamer<T>
 
     public static class Builder<T>
     {
-        private Callback<JsonGenerator> header, footer;
+        private Callback<JsonGenerator> header;
+        private Callback<JsonGenerator> footer;
 
         @SuppressWarnings("unchecked")
         private JsonEmitter<T> emitter = (JsonEmitter<T>) StandardStreamCallbacks.DEFAULT_EMITTER;
