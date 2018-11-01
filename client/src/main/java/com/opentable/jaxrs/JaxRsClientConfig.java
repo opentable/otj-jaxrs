@@ -107,4 +107,10 @@ public interface JaxRsClientConfig
     default boolean isCookieHandlingEnabled() {
         return false;
     }
+
+    /**
+     * Number of Executor Threads. Defaults to 10.
+     * If set to -1, will try to autosize for cores. Not implemented for Jersey.
+     */
+    default int getExecutorThreads() { return 10; };
 }

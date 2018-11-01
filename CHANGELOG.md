@@ -1,6 +1,13 @@
 otj-jaxrs changelog
 ===================
 
+2.9.3
+-----
+A deadlock condition is possible in JaxRS Client. It should only occur on machines > 8 cores.
+
+We added getExecutorThreads() to the config to deal with it. Setting to -1 should
+autocalculate a good value
+
 2.9.2
 -----
 * Update to Jetty 9.4.12.0830
