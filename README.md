@@ -3,6 +3,10 @@ OpenTable JAX-RS Component
 
 [![Build Status](https://travis-ci.org/opentable/otj-jaxrs.svg)](https://travis-ci.org/opentable/otj-jaxrs)
 
+Notes
+-----
+* otj-jaxrs-exception is considered *deprecated*. Please do not use it in newer projects (although we will continue to support it indefinitely)
+
 Component Charter
 -----------------
 
