@@ -113,4 +113,21 @@ public interface JaxRsClientConfig
      * If set to -1, will try to autosize for cores. Not implemented for Jersey.
      */
     default int getExecutorThreads() { return 10; };
+
+    /**
+     * Get the HTTP proxy host to proxy this client's requests through
+     * @return the proxy host, or an empty string if the client should not use a proxy
+     */
+    default String getProxyHost(){
+        return "";
+    }
+
+    /**
+     * Get the HTTP port of the proxy server to proxy this client's requests through
+     * @return the HTTP port, or 0 if the client should not use a proxy
+     */
+    default int getProxyPort() {
+        return 0;
+    }
+
 }
