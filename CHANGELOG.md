@@ -1,6 +1,12 @@
 otj-jaxrs changelog
 ===================
 
+2.9.4
+-----
+* We now support a simple HTTP proxy with the JAXRS Jetty Client
+
+(See ProxyHost, ProxyPort in JAXRSClientConfig)
+
 2.9.3
 -----
 A deadlock condition is possible in JaxRS Client. It should only occur on machines > 8 cores.
