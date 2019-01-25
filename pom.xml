@@ -19,7 +19,7 @@
   <parent>
     <groupId>com.opentable</groupId>
     <artifactId>otj-parent-spring</artifactId>
-    <version>183-SNAPSHOT</version>
+    <version>184</version>
   </parent>
 
   <properties>
@@ -28,8 +28,8 @@
     <basepom.check.fail-javadoc>false</basepom.check.fail-javadoc>
 
     <!-- Remove -->
-    <dep.otj-core.version>1.6.1-SNAPSHOT</dep.otj-core.version>
-    <dep.otj-spring.version>1.3.3-SNAPSHOT</dep.otj-spring.version>
+    <dep.otj-core.version>1.6.1</dep.otj-core.version>
+    <dep.otj-spring.version>1.3.3</dep.otj-spring.version>
   </properties>
 
 
