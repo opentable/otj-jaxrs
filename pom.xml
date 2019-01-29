@@ -45,6 +45,7 @@
   <modules>
     <module>clientfactory-jersey</module>
     <module>clientfactory-resteasy</module>
+    <module>clientfactory-resteasy-apache</module>
     <module>clientfactory-testing</module>
     <module>shared</module>
     <module>client</module>
