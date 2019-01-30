@@ -43,6 +43,7 @@ import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient43Engine;
 import org.jboss.resteasy.client.jaxrs.internal.ClientInvocation;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -58,10 +59,11 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     }
 
     public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config) {
-        final ResteasyClientBuilder builder = (ResteasyClientBuilder) ClientBuilder.newBuilder();
+        final ExecutorService executorService = configureThreadPool(clientName, config);
+        final ResteasyClientBuilderImpl builder = new ResteasyClientBuilderImpl();
+        builder.asyncExecutor(executorService, true);
         configureHttpEngine(clientName, builder, config);
         configureAuthenticationIfNeeded(clientName, builder, config);
-        configureThreadPool(clientName, builder, config);
         return builder;
     }
 
@@ -133,12 +135,13 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         */
     }
 
-    private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config) {
+    private ExecutorService configureThreadPool(String clientName, JaxRsClientConfig config) {
         final ExecutorService executor = new ThreadPoolExecutor(1, calculateThreads(config.getExecutorThreads()), 1, TimeUnit.HOURS,
                 requestQueue(config.getAsyncQueueLimit()),
                 new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
                 new ThreadPoolExecutor.AbortPolicy());
-        clientBuilder.asyncExecutor(executor, true);
+        return executor;
+       // clientBuilder.asyncExecutor(executor, true);
     }
 
     private int calculateThreads(final int executorThreads) {
