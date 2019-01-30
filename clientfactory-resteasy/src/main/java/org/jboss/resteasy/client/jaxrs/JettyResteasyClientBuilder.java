@@ -10,13 +10,15 @@ import org.eclipse.jetty.util.HttpCookieStore;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.client.jaxrs.engines.jetty.JettyClientEngine;
 import org.jboss.resteasy.client.jaxrs.internal.ClientConfiguration;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opentable.jaxrs.JaxRsClientConfig;
 import com.opentable.jaxrs.TlsProvider;
 
-public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
+public class JettyResteasyClientBuilder extends ResteasyClientBuilderImpl {
     private static final Logger LOG = LoggerFactory.getLogger(JettyResteasyClientBuilder.class);
 
     private final String clientName;
@@ -48,7 +50,7 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         final ClientConfiguration cc = new ClientConfiguration(getProviderFactory());
         properties.forEach(cc::property);
 
-        return new ResteasyClient(new JettyClientEngine(client), asyncExecutor, true, scheduledExecutorService, cc);
+        return new ResteasyClientImpl(new JettyClientEngine(client), asyncExecutor, true, scheduledExecutorService, cc);
     }
 
     private SslContextFactory createSslFactory() {

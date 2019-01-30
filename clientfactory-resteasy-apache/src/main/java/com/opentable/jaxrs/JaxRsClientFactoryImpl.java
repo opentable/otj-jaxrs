@@ -41,7 +41,7 @@ import org.apache.http.impl.conn.MonitoredPoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient43Engine;
 import org.jboss.resteasy.client.jaxrs.internal.ClientInvocation;
 import org.springframework.context.ApplicationContext;
 
@@ -58,7 +58,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     }
 
     public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config) {
-        final ResteasyClientBuilder builder = new ResteasyClientBuilder();
+        final ResteasyClientBuilder builder = (ResteasyClientBuilder) ClientBuilder.newBuilder();
         configureHttpEngine(clientName, builder, config);
         configureAuthenticationIfNeeded(clientName, builder, config);
         configureThreadPool(clientName, builder, config);
@@ -78,7 +78,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     public static void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
     {
         final HttpClient client = prepareHttpClientBuilder(clientName, config).build();
-        final ApacheHttpClient4Engine engine = new HackedApacheHttpClient4Engine(config, client);
+        final ApacheHttpClient43Engine engine = new HackedApacheHttpClient4Engine(config, client);
         clientBuilder.httpEngine(engine);
     }
 
@@ -155,7 +155,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         return size == 0 ? new SynchronousQueue<>() : new ArrayBlockingQueue<>(size);
     }
 
-    private static class HackedApacheHttpClient4Engine extends ApacheHttpClient4Engine {
+    private static class HackedApacheHttpClient4Engine extends ApacheHttpClient43Engine {
         private final JaxRsClientConfig config;
 
         HackedApacheHttpClient4Engine(JaxRsClientConfig config, HttpClient client) {
