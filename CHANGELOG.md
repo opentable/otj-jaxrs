@@ -1,6 +1,14 @@
 otj-jaxrs changelog
 ===================
 
+2.9.6
+-----
+* Clarify supported engines in JAXRSClientConfig
+* Add otj-resteasy-apache for folks that might need it (please see us if you do)
+
+2.9.5
+-----
+* Rebuild DAG for SBT 2.1.1
 2.9.4
 -----
 * We now support a simple HTTP proxy with the JAXRS Jetty Client

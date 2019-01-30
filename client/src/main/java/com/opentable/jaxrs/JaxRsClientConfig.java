@@ -23,6 +23,11 @@ import java.time.Duration;
  * Currently, the config parameter names themselves are the {@link java.beans.PropertyDescriptor}-style names.
  * So, for example, you might include the following in your config file:
  * {@code jaxrs.client.foo.connectionPoolSize=10}.
+ *
+ * Many settings are supported only for specific engines
+ * resteasy - resteasy implementation backed by jetty. This is the default
+ * resteasy-apache - old resteasy implementation using apache http client.
+ * jersey - jersey implementation, also backed by apache http client.
  */
 public interface JaxRsClientConfig
 {
@@ -33,6 +38,9 @@ public interface JaxRsClientConfig
      *
      * This connection pool checkout won't occur until you call {@link javax.ws.rs.client.InvocationInvocation#invoke()}.
      * If the time to get a connection surpasses this value, a runtime exception will be thrown.
+     *
+     * Supported: resteasy-apache
+     * Unsupported: resteasy, jersey
      */
     default Duration getConnectionPoolTimeout() {
         return Duration.ofSeconds(5);
@@ -43,6 +51,9 @@ public interface JaxRsClientConfig
      *
      * This connection pool checkout won't occur until you call {@link javax.ws.rs.client.InvocationInvocation#invoke()}.
      * If the time to get a connection surpasses this value, a warning will be logged.
+     *
+     * Supported: resteasy-apache
+     * Unsupported: resteasy, jersey
      */
     default Duration getConnectionPoolWarnTime() {
         return Duration.ofSeconds(1);
@@ -50,6 +61,9 @@ public interface JaxRsClientConfig
 
     /**
      * Connection pool size.
+     *
+     * Supported: resteasy-apache, jersey
+     * Unsupported: resteasy
      */
     default int getConnectionPoolSize() {
         return 40;
@@ -59,6 +73,9 @@ public interface JaxRsClientConfig
      * Maximum number of simultaneous asynchronous requests
      * in-flight awaiting resource (e.g. connection) availability
      * before we reject additional requests.
+     *
+     * Supported: resteasy-apache, resteasy
+     * Unsupported: jersey
      */
     default int getAsyncQueueLimit() {
         return 1000;
@@ -66,6 +83,9 @@ public interface JaxRsClientConfig
 
     /**
      * Timeout to establish initial connection.
+     *
+     * Supported: resteasy-apache, resteasy
+     * Unsupported: jersey
      */
     default Duration getConnectTimeout() {
         return Duration.ofSeconds(10);
@@ -73,6 +93,9 @@ public interface JaxRsClientConfig
 
     /**
      * Socket timeout.  Not used for asynchronous capable engines.
+     *
+     * Supported: resteasy-apache, jersey
+     * Unsupported: resteasy
      *
      * @see java.net.SocketOptions#SO_TIMEOUT
      */
@@ -83,6 +106,8 @@ public interface JaxRsClientConfig
 
     /**
      * HTTP connection idle timeout.
+     *
+     * Supported: all
      */
     default Duration getIdleTimeout() {
         return Duration.ofSeconds(30);
@@ -94,6 +119,8 @@ public interface JaxRsClientConfig
      * E.g., if you want to have lots of connections open to another microservice, and it's hosted on a number
      * of hosts ("routes") smaller than the number of connections you want to maintain.  By default, is
      * {@link #getConnectionPoolSize()}, since you can't have more connections than this.
+     *
+     * Supported: all
      */
     default int getHttpClientDefaultMaxPerRoute() {
         return getConnectionPoolSize();
@@ -102,7 +129,8 @@ public interface JaxRsClientConfig
     /**
      * Whether cookies should be handled.
      *
-     * NB: Currently unsupported for Jersey clients.
+     * Supported: resteasy, resteasy-apache
+     * Unsupported: jersey
      */
     default boolean isCookieHandlingEnabled() {
         return false;
@@ -111,12 +139,18 @@ public interface JaxRsClientConfig
     /**
      * Number of Executor Threads. Defaults to 10.
      * If set to -1, will try to autosize for cores. Not implemented for Jersey.
+     *
+     * Supported: resteasy, resteasy-apache
+     * Unsupported: jersey
      */
     default int getExecutorThreads() { return 10; };
 
     /**
      * Get the HTTP proxy host to proxy this client's requests through
      * @return the proxy host, or an empty string if the client should not use a proxy
+     *
+     * Supported: resteasy
+     * Unsupported: resteasy-apache, jersey
      */
     default String getProxyHost(){
         return "";
@@ -125,6 +159,9 @@ public interface JaxRsClientConfig
     /**
      * Get the HTTP port of the proxy server to proxy this client's requests through
      * @return the HTTP port, or 0 if the client should not use a proxy
+     *
+     * Supported: resteasy
+     * Unsupported: resteasy-apache, jersey
      */
     default int getProxyPort() {
         return 0;

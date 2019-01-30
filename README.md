@@ -18,9 +18,26 @@ Component Charter
 Component Level
 ---------------
 
+Installation
+------------
+* Add the otj-jaxrs-client and otj-jaxrs-shared maven dependencies
+* Choose an engine (otj-jaxrs-clientfactory-resteasy, otj-jaxrs-clientfactory-jersey, otj-jaxrs-clientfactory-resteasy-apache).
+
+Normally otj-jaxrs-clientfactory-resteasy (which is RestEasy + Jetty client) is used in otj-server.
+This is still the recommended choice.
+
+otj-clientfactory-jersey is considered legacy and not regularly tested. We don't recommend it. Let us
+know if you need it.
+
+otj-clientfactory-resteasy-apache - Is RestEasy + Apache Http Engine. We don't recommend this currently, but
+we are keeping this around, as Apache has a few options Jetty doesn't support.
+
 Configuration
 --------------
 The JAX-RS client configuration is managed through your application properties. 
+
+See JaxRSClientConfig for the list of options. Note many options are only supported
+by specific engines. It's a bit of a mess, frankly, which eventually we'll clean up.
 
 
 Options are configured using the provided client name and the corresponding jaxrs configuration:  
