@@ -27,6 +27,7 @@ import javax.ws.rs.client.WebTarget;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.jboss.resteasy.client.jaxrs.JettyResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -72,6 +73,10 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
 
     private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config) {
         final int threads = CalculateThreads.calculateThreads(config.getExecutorThreads());
+        // We used a fixed thread pool here instead of a QueuedThreadPool (which would lead to lower memory)
+        // Primarily because resteasy wants an ExecutorService not an Executor
+        // Reexamine in future
+        // See https://docs.google.com/spreadsheets/d/179upsXNJv_xMWYHZLY2e0456bxoBYbOHW7ORV3m-CxE/edit#gid=0
         final ExecutorService executor = new ThreadPoolExecutor(threads, threads, 1, TimeUnit.HOURS,
                 requestQueue(config.getAsyncQueueLimit()),
                 new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),

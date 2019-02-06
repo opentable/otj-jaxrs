@@ -3,7 +3,7 @@ otj-jaxrs changelog
 
 2.9.7
 -----
-* Auto tuning is on by default.
+* Auto tuning is on by default in response to the incident with 16 cores.
 
 2.9.6
 -----
