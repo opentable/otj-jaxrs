@@ -1,5 +1,8 @@
 otj-jaxrs changelog
 ===================
+2.9.8
+-----
+* Small bug in CalculateThreads
 
 2.9.7
 -----

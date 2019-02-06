@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 public final class CalculateThreads {
     private static final Logger LOG = LoggerFactory.getLogger(CalculateThreads.class);
     private static final int BASE_OPTIMAL_THREADS = 10;
-    private static final int THREAD_OVERHEAD = 10;
+    private static final int THREAD_OVERHEAD = 2;
 
     private CalculateThreads() {
         /* utility class */
