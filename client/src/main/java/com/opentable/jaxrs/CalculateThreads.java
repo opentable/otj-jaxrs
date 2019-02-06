@@ -2,7 +2,8 @@ package com.opentable.jaxrs;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+// A bit of copy/paste between otj-jaxrs/otj-rest-template - not sure where we could put otherwise other than otj-spring
+// which is a bit.... weird.
 public final class CalculateThreads {
     private static final Logger LOG = LoggerFactory.getLogger(CalculateThreads.class);
     private static final int BASE_OPTIMAL_THREADS = 10;
@@ -11,7 +12,7 @@ public final class CalculateThreads {
     private CalculateThreads() {
         /* utility class */
     }
-    public static int calculateThreads(final int executorThreads) {
+    public static int calculateThreads(final int executorThreads, final String name) {
         // For current standard 8 core machines this is 10 regardless.
         // On Java 10, you might get less than 8 core reported, but it will still size as if it's 8
         // Beyond 8 core you MIGHT undersize if running on Docker, but otherwise should be fine.
@@ -28,7 +29,7 @@ public final class CalculateThreads {
             }
         }
 
-        LOG.debug("Optimal Threads {}, Configured Threads {}", optimalThreads, threadsChosen);
+        LOG.debug("For factory {}, Optimal Threads {}, Configured Threads {}", name, optimalThreads, threadsChosen);
         return threadsChosen;
     }
 }

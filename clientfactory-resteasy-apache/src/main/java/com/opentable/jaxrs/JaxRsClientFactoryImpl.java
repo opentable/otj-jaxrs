@@ -134,7 +134,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     }
 
     private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config) {
-        final ExecutorService executor = new ThreadPoolExecutor(1, CalculateThreads.calculateThreads(config.getExecutorThreads()), 1, TimeUnit.HOURS,
+        final ExecutorService executor = new ThreadPoolExecutor(1, CalculateThreads.calculateThreads(config.getExecutorThreads(), clientName), 1, TimeUnit.HOURS,
                 requestQueue(config.getAsyncQueueLimit()),
                 new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
                 new ThreadPoolExecutor.AbortPolicy());

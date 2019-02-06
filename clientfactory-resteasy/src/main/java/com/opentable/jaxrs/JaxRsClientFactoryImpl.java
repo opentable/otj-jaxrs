@@ -71,7 +71,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     }
 
     private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config) {
-        final int threads = CalculateThreads.calculateThreads(config.getExecutorThreads());
+        final int threads = CalculateThreads.calculateThreads(config.getExecutorThreads(), clientName);
         // We used a fixed thread pool here instead of a QueuedThreadPool (which would lead to lower memory)
         // Primarily because resteasy wants an ExecutorService not an Executor
         // Reexamine in future
