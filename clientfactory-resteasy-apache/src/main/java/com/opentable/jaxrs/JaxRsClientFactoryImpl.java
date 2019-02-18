@@ -64,6 +64,8 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         builder.asyncExecutor(executorService, true);
         configureHttpEngine(clientName, builder, config);
         configureAuthenticationIfNeeded(clientName, builder, config);
+        final ExecutorService executor = configureThreadPool(clientName, config);
+        builder.asyncExecutor(executor, true);
         return builder;
     }
 
@@ -136,22 +138,12 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     }
 
     private ExecutorService configureThreadPool(String clientName, JaxRsClientConfig config) {
-        final ExecutorService executor = new ThreadPoolExecutor(1, calculateThreads(config.getExecutorThreads()), 1, TimeUnit.HOURS,
+        final ExecutorService executor = new ThreadPoolExecutor(1, CalculateThreads.calculateThreads(config.getExecutorThreads(), clientName), 1, TimeUnit.HOURS,
                 requestQueue(config.getAsyncQueueLimit()),
                 new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
                 new ThreadPoolExecutor.AbortPolicy());
         return executor;
        // clientBuilder.asyncExecutor(executor, true);
-    }
-
-    private int calculateThreads(final int executorThreads) {
-        if (executorThreads > 0) {
-            return  executorThreads;
-        }
-        // For current standard 8 core machines this is 10 regardless.
-        // On Java 10, you might get less than 8 core reported, but it will still size as if it's 8
-        // Beyond 8 core you MIGHT undersize if running on Docker, but otherwise should be fine.
-        return Math.max(10, (Runtime.getRuntime().availableProcessors() + 2 ));
     }
 
     private BlockingQueue<Runnable> requestQueue(int size) {

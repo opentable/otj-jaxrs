@@ -137,13 +137,13 @@ public interface JaxRsClientConfig
     }
 
     /**
-     * Number of Executor Threads. Defaults to 10.
+     * Number of Executor Threads. Defaults to -1.
      * If set to -1, will try to autosize for cores. Not implemented for Jersey.
      *
      * Supported: resteasy, resteasy-apache
      * Unsupported: jersey
      */
-    default int getExecutorThreads() { return 10; };
+    default int getExecutorThreads() { return -1; };
 
     /**
      * Get the HTTP proxy host to proxy this client's requests through
