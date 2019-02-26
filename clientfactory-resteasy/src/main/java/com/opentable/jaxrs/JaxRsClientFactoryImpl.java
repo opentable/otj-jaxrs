@@ -66,8 +66,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                     return null;
                 }
             };
-           disableTLS = Boolean.parseBoolean(ctx.getEnvironment().getProperty(KEY_DISABLE, DEF_VALUE))
-                   && (JavaVersion.VERSION.getMajor() == 11);
+           disableTLS = Boolean.parseBoolean(ctx.getEnvironment().getProperty(KEY_DISABLE, String.valueOf(JavaVersion.VERSION.getMajor() == 11)));
         }
         if (disableTLS) {
             this.factoryCustomizers.add(sslContextFactory ->  {
