@@ -47,7 +47,6 @@ import org.springframework.context.ApplicationContext;
 public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
     private static final String KEY_DISABLE =  "ot.client.jaxrs.disableTLS13";
-    private static final String KEY_STOP_DISABLE =  "ot.client.jaxrs.disableTLS13.minor";
     private static final Logger LOG = LoggerFactory.getLogger(JaxRsClientFactoryImpl.class);
     private static final String DEF_VALUE = "true";
     private Supplier<TlsProvider> provider;
@@ -67,9 +66,8 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                     return null;
                 }
             };
-           int minorVersion = Integer.parseInt(ctx.getEnvironment().getProperty(KEY_STOP_DISABLE, "3"));
            disableTLS = Boolean.parseBoolean(ctx.getEnvironment().getProperty(KEY_DISABLE, DEF_VALUE))
-                   && (JavaVersion.VERSION.getMajor() == 11  && JavaVersion.VERSION.getMinor() < minorVersion);
+                   && (JavaVersion.VERSION.getMajor() == 11);
         }
         if (disableTLS) {
             this.factoryCustomizers.add(sslContextFactory ->  {
