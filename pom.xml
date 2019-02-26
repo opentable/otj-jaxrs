@@ -19,11 +19,10 @@
   <parent>
     <groupId>com.opentable</groupId>
     <artifactId>otj-parent-spring</artifactId>
-    <version>188-SNAPSHOT</version>
+    <version>190</version>
   </parent>
 
   <properties>
-    <project.build.targetJdk>11</project.build.targetJdk>
     <basepom.oss.skip-scala-doc>true</basepom.oss.skip-scala-doc>
     <basepom.check.skip-javadoc>false</basepom.check.skip-javadoc>
     <basepom.check.fail-javadoc>false</basepom.check.fail-javadoc>

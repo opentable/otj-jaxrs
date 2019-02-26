@@ -1,7 +1,10 @@
 package org.jboss.resteasy.client.jaxrs;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.client.HttpClient;
@@ -22,16 +25,18 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
     private final String clientName;
     private final JaxRsClientConfig config;
     private final TlsProvider provider;
+    private final List<Consumer<SslContextFactory>> factoryCustomizers;
 
-    public JettyResteasyClientBuilder(String clientName, JaxRsClientConfig config, TlsProvider provider) {
+    public JettyResteasyClientBuilder(String clientName, JaxRsClientConfig config, TlsProvider provider, List<Consumer<SslContextFactory>> factoryCustomizers) {
         this.clientName = clientName;
         this.config = config;
         this.provider = provider;
+        this.factoryCustomizers = factoryCustomizers == null ? new ArrayList<>() : factoryCustomizers;
     }
 
     @Override
     public ResteasyClient build() {
-        final HttpClient client = createHttpClient();
+        final HttpClient client = createHttpClient(factoryCustomizers);
         client.setIdleTimeout(config.getIdleTimeout().toMillis());
         client.setAddressResolutionTimeout(config.getConnectTimeout().toMillis());
         client.setConnectTimeout(config.getConnectTimeout().toMillis());
@@ -51,13 +56,14 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         return new ResteasyClient(new JettyClientEngine(client), asyncExecutor, true, scheduledExecutorService, cc);
     }
 
-    private SslContextFactory createSslFactory() {
+    private SslContextFactory createSslFactory(List<Consumer<SslContextFactory>> factoryCustomizers) {
         final SslContextFactory factory = new SslContextFactory();
         factory.setTrustAll(disableTrustManager);
         Optional.ofNullable(clientKeyStore).ifPresent(ks-> {
             factory.setKeyStore(ks);
             factory.setKeyStorePassword(clientPrivateKeyPassword);
         });
+        factoryCustomizers.forEach(c -> c.accept(factory));
         Optional.ofNullable(truststore).ifPresent(factory::setTrustStore);
         Optional.ofNullable(sslContext).ifPresent(factory::setSslContext);
         if (provider != null) {
@@ -80,8 +86,8 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         return factory;
     }
 
-    private HttpClient createHttpClient() {
-        final HttpClient hc = new HttpClient(createSslFactory());
+    private HttpClient createHttpClient(List<Consumer<SslContextFactory>> customizers) {
+        final HttpClient hc = new HttpClient(createSslFactory(customizers));
         Optional.ofNullable(asyncExecutor).ifPresent(hc::setExecutor);
         hc.setConnectTimeout(TimeUnit.MILLISECONDS.convert(establishConnectionTimeout, establishConnectionTimeoutUnits));
         if (responseBufferSize > 0) {
