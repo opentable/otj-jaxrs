@@ -45,17 +45,14 @@ import org.springframework.context.ApplicationContext;
  */
 public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
-    private static final String KEY_DISABLE =  "ot.client.jaxrs.disableTLS13";
     private static final Logger LOG = LoggerFactory.getLogger(JaxRsClientFactoryImpl.class);
     private Supplier<TlsProvider> provider;
-    private final List<Consumer<SslContextFactory>> factoryCustomizers = new ArrayList<>();
 
     public JaxRsClientFactoryImpl(ApplicationContext ctx) {
 //        if (ctx != null && ClassUtils.isPresent("org.eclipse.jetty.server.Server", null)) {
             // TODO: figure out how to wire up thread pool
 //        }
         provider = () -> null;
-        boolean disableTLS = false;
         if (ctx != null) {
             provider = () -> {
                 try {
@@ -64,18 +61,19 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                     return null;
                 }
             };
-           disableTLS = Boolean.parseBoolean(ctx.getEnvironment().getProperty(KEY_DISABLE, "false"));
         }
-        if (disableTLS) {
-            this.factoryCustomizers.add(sslContextFactory ->  {
-                LOG.info("Disabling TLS 1.3");
-                sslContextFactory.setExcludeProtocols("TLSv1.3");
-            });
-        }
+
     }
 
     @Override
     public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config, Collection<JaxRsFeatureGroup> featureGroups) {
+        final List<Consumer<SslContextFactory>> factoryCustomizers = new ArrayList<>();
+        if (config.isDisableTLS13()) {
+            factoryCustomizers.add(sslContextFactory ->  {
+                LOG.info("Disabling TLS 1.3");
+                sslContextFactory.setExcludeProtocols("TLSv1.3");
+            });
+        }
         final ResteasyClientBuilder builder = new JettyResteasyClientBuilder(clientName, config,
                 featureGroups.contains(StandardFeatureGroup.PLATFORM_INTERNAL) ? provider.get() : null, factoryCustomizers);
         configureThreadPool(clientName, builder, config);
