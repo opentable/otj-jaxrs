@@ -30,7 +30,6 @@ import javax.ws.rs.client.WebTarget;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-import org.eclipse.jetty.util.JavaVersion;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.client.jaxrs.JettyResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
@@ -48,7 +47,6 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
     private static final String KEY_DISABLE =  "ot.client.jaxrs.disableTLS13";
     private static final Logger LOG = LoggerFactory.getLogger(JaxRsClientFactoryImpl.class);
-    private static final String DEF_VALUE = "true";
     private Supplier<TlsProvider> provider;
     private final List<Consumer<SslContextFactory>> factoryCustomizers = new ArrayList<>();
 
@@ -66,7 +64,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                     return null;
                 }
             };
-           disableTLS = Boolean.parseBoolean(ctx.getEnvironment().getProperty(KEY_DISABLE, String.valueOf(JavaVersion.VERSION.getMajor() == 11)));
+           disableTLS = Boolean.parseBoolean(ctx.getEnvironment().getProperty(KEY_DISABLE, "false"));
         }
         if (disableTLS) {
             this.factoryCustomizers.add(sslContextFactory ->  {
