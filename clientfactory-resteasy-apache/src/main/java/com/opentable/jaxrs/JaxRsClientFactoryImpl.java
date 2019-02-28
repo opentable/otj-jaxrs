@@ -43,6 +43,8 @@ import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.jboss.resteasy.client.jaxrs.internal.ClientInvocation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -51,7 +53,7 @@ import org.springframework.context.ApplicationContext;
  */
 public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
-
+    private static final Logger LOG = LoggerFactory.getLogger(JaxRsClientFactoryImpl.class);
 
     public JaxRsClientFactoryImpl(ApplicationContext ctx) {
        /* unused */
@@ -67,6 +69,9 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
 
     @Override
     public ClientBuilder newBuilder(final String clientName, final JaxRsClientConfig config, final Collection<JaxRsFeatureGroup> featureGroups) {
+        if (config.isDisableTLS13()) {
+            LOG.warn(("This implementation (resteasy-apache) doesn't support disabling TLSv13, and that could cause issues on Java 11!"));
+        }
         return newBuilder(clientName, config);
     }
 

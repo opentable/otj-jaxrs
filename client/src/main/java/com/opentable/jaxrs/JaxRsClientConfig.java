@@ -167,4 +167,12 @@ public interface JaxRsClientConfig
         return 0;
     }
 
+
+    /**
+     * Disable TLS13 - Java 11
+     */
+    default boolean isDisableTLS13() {
+        return false;
+    }
+
 }
