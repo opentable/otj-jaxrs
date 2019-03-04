@@ -175,4 +175,12 @@ public interface JaxRsClientConfig
         return false;
     }
 
+    /**
+     * Get a user agent to append to the
+     * @return
+     */
+    default String getUserAgent() {
+        return null;
+    }
+
 }
