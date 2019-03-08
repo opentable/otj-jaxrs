@@ -112,6 +112,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                         .build())
                 .setDefaultRequestConfig(customRequestConfig(config, RequestConfig.custom()))
                 .setConnectionManager(connectionManager)
+                .setUserAgent(config.getUserAgent())
                 .evictIdleConnections(config.getIdleTimeout().toMillis(), TimeUnit.MILLISECONDS);
     }
 
