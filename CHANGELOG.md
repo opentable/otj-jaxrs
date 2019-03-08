@@ -1,6 +1,9 @@
 otj-jaxrs changelog
 ===================
 
+2.9.10
+------
+* As part of security coverage, we now scrub the user-agent field. You may also now configure the field yourself.
 
 2.9.9
 -----
