@@ -44,6 +44,7 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         client.setConnectTimeout(config.getConnectTimeout().toMillis());
         client.setMaxConnectionsPerDestination(config.getHttpClientDefaultMaxPerRoute());
         client.setRemoveIdleDestinations(true);
+        LOG.info("Setting User-Agent for the {} HTTP client to {}", clientName, config.getUserAgent());
         client.setUserAgentField(new HttpField(HttpHeader.USER_AGENT, config.getUserAgent()));
         if(StringUtils.isNotBlank(config.getProxyHost()) && config.getProxyPort() != 0) {
             HttpProxy proxy = new HttpProxy(config.getProxyHost(), config.getProxyPort());
