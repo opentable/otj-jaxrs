@@ -15,6 +15,8 @@ package com.opentable.jaxrs;
 
 import java.time.Duration;
 
+import org.immutables.value.Value;
+
 /**
  * JAX-RS Client tunables.
  *
@@ -29,6 +31,7 @@ import java.time.Duration;
  * resteasy-apache - old resteasy implementation using apache http client.
  * jersey - jersey implementation, also backed by apache http client.
  */
+@Value.Immutable
 public interface JaxRsClientConfig
 {
     JaxRsClientConfig DEFAULT = new JaxRsClientConfig() {};
@@ -42,6 +45,7 @@ public interface JaxRsClientConfig
      * Supported: resteasy-apache
      * Unsupported: resteasy, jersey
      */
+    @Value.Default
     default Duration getConnectionPoolTimeout() {
         return Duration.ofSeconds(5);
     }
@@ -55,6 +59,7 @@ public interface JaxRsClientConfig
      * Supported: resteasy-apache
      * Unsupported: resteasy, jersey
      */
+    @Value.Default
     default Duration getConnectionPoolWarnTime() {
         return Duration.ofSeconds(1);
     }
@@ -65,6 +70,7 @@ public interface JaxRsClientConfig
      * Supported: resteasy-apache, jersey
      * Unsupported: resteasy
      */
+    @Value.Default
     default int getConnectionPoolSize() {
         return 40;
     }
@@ -77,6 +83,7 @@ public interface JaxRsClientConfig
      * Supported: resteasy-apache, resteasy
      * Unsupported: jersey
      */
+    @Value.Default
     default int getAsyncQueueLimit() {
         return 1000;
     }
@@ -87,6 +94,7 @@ public interface JaxRsClientConfig
      * Supported: resteasy-apache, resteasy
      * Unsupported: jersey
      */
+    @Value.Default
     default Duration getConnectTimeout() {
         return Duration.ofSeconds(10);
     }
@@ -99,6 +107,7 @@ public interface JaxRsClientConfig
      *
      * @see java.net.SocketOptions#SO_TIMEOUT
      */
+    @Value.Default
     @Deprecated
     default Duration getSocketTimeout() {
         return Duration.ofSeconds(30);
@@ -109,6 +118,7 @@ public interface JaxRsClientConfig
      *
      * Supported: all
      */
+    @Value.Default
     default Duration getIdleTimeout() {
         return Duration.ofSeconds(30);
     }
@@ -122,6 +132,7 @@ public interface JaxRsClientConfig
      *
      * Supported: all
      */
+    @Value.Default
     default int getHttpClientDefaultMaxPerRoute() {
         return getConnectionPoolSize();
     }
@@ -132,6 +143,7 @@ public interface JaxRsClientConfig
      * Supported: resteasy, resteasy-apache
      * Unsupported: jersey
      */
+    @Value.Default
     default boolean isCookieHandlingEnabled() {
         return false;
     }
@@ -143,6 +155,7 @@ public interface JaxRsClientConfig
      * Supported: resteasy, resteasy-apache
      * Unsupported: jersey
      */
+    @Value.Default
     default int getExecutorThreads() { return -1; };
 
     /**
@@ -152,6 +165,7 @@ public interface JaxRsClientConfig
      * Supported: resteasy
      * Unsupported: resteasy-apache, jersey
      */
+    @Value.Default
     default String getProxyHost(){
         return "";
     }
@@ -163,6 +177,7 @@ public interface JaxRsClientConfig
      * Supported: resteasy
      * Unsupported: resteasy-apache, jersey
      */
+    @Value.Default
     default int getProxyPort() {
         return 0;
     }
@@ -171,8 +186,22 @@ public interface JaxRsClientConfig
     /**
      * Disable TLS13 - Java 11
      */
+    @Value.Default
     default boolean isDisableTLS13() {
         return false;
+    }
+
+    /**
+     * Get a user agent for the client to use
+     *
+     * Supported: resteasy, resteasy-apache
+     * Unsupported: jersey
+     *
+     * @return the user agent string to use
+     */
+    @Value.Default
+    default String getUserAgent() {
+        return "OT-HTTP-Client"; // Choosing a default that leaks minimal information for security reasons
     }
 
 }

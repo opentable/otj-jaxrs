@@ -19,7 +19,7 @@
   <parent>
     <groupId>com.opentable</groupId>
     <artifactId>otj-parent-spring</artifactId>
-    <version>190</version>
+    <version>191</version>
   </parent>
 
   <properties>
@@ -27,8 +27,6 @@
     <basepom.check.skip-javadoc>false</basepom.check.skip-javadoc>
     <basepom.check.fail-javadoc>false</basepom.check.fail-javadoc>
   </properties>
-
-
 
   <scm>
     <connection>scm:git:git://github.com/opentable/otj-jaxrs.git</connection>

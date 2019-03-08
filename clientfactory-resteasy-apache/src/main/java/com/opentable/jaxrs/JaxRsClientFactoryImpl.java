@@ -106,12 +106,15 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         connectionManager.setMaxTotal(config.getConnectionPoolSize());
         connectionManager.setDefaultMaxPerRoute(config.getHttpClientDefaultMaxPerRoute());
 
+        LOG.info("Setting User-Agent for the {} HTTP client to {}", clientName, config.getUserAgent());
+
         return builder
                 .setDefaultSocketConfig(SocketConfig.custom()
                         .setSoTimeout((int) config.getSocketTimeout().toMillis())
                         .build())
                 .setDefaultRequestConfig(customRequestConfig(config, RequestConfig.custom()))
                 .setConnectionManager(connectionManager)
+                .setUserAgent(config.getUserAgent())
                 .evictIdleConnections(config.getIdleTimeout().toMillis(), TimeUnit.MILLISECONDS);
     }
 

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.env.PropertyResolver;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 import com.opentable.jaxrs.referrer.ClientReferrerConfiguration;
 import com.opentable.spring.SpecializedConfigFactory;
@@ -15,8 +15,8 @@ import com.opentable.spring.SpecializedConfigFactory;
 public class JaxRsClientConfiguration {
 
     @Bean
-    SpecializedConfigFactory<JaxRsClientConfig> jaxRsConfigFactory(PropertyResolver pr) {
-        return SpecializedConfigFactory.create(pr, JaxRsClientConfig.class, "jaxrs.client.${name}");
+    SpecializedConfigFactory<JaxRsClientConfig> jaxRsConfigFactory(ConfigurableEnvironment environment) {
+        return SpecializedConfigFactory.create(environment, JaxRsClientConfig.class, "jaxrs.client.${name}");
     }
 
     @Bean
