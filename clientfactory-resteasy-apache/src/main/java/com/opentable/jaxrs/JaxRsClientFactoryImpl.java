@@ -106,7 +106,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         connectionManager.setMaxTotal(config.getConnectionPoolSize());
         connectionManager.setDefaultMaxPerRoute(config.getHttpClientDefaultMaxPerRoute());
 
-        LOG.info("Setting User-Agent for the {} HTTP client to {}", clientName, config.getUserAgent());
+        LOG.info("Setting User-Agent for the {} HTTP client to {}. Using RestEasy with an Apache engine.", clientName, config.getUserAgent());
 
         return builder
                 .setDefaultSocketConfig(SocketConfig.custom()

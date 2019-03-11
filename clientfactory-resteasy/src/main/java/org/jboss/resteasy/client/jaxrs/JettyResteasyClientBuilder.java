@@ -12,6 +12,7 @@ import org.eclipse.jetty.client.HttpProxy;
 import org.eclipse.jetty.http.HttpField;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.util.HttpCookieStore;
+import org.eclipse.jetty.util.Jetty;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.client.jaxrs.engines.jetty.JettyClientEngine;
 import org.jboss.resteasy.client.jaxrs.internal.ClientConfiguration;
@@ -44,7 +45,7 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         client.setConnectTimeout(config.getConnectTimeout().toMillis());
         client.setMaxConnectionsPerDestination(config.getHttpClientDefaultMaxPerRoute());
         client.setRemoveIdleDestinations(true);
-        LOG.info("Setting User-Agent for the {} HTTP client to {}", clientName, config.getUserAgent());
+        LOG.info("Setting User-Agent for the {} HTTP client to {}. Using RestEasy with a Jetty engine of version {}", clientName, config.getUserAgent(), Jetty.VERSION);
         client.setUserAgentField(new HttpField(HttpHeader.USER_AGENT, config.getUserAgent()));
         if(StringUtils.isNotBlank(config.getProxyHost()) && config.getProxyPort() != 0) {
             HttpProxy proxy = new HttpProxy(config.getProxyHost(), config.getProxyPort());
