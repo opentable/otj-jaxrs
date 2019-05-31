@@ -107,6 +107,9 @@ public class JaxRsJsonStreamer<T>
      *     "success": true
      * }
      * </pre>
+     * @param type the generic type
+     * @param <T> generic type
+     * @return Builder
      */
     public static <T> Builder<T> wrappedResultsArrayOf(TypeReference<T> type)
     {
@@ -122,6 +125,9 @@ public class JaxRsJsonStreamer<T>
      *     ...
      * ]
      * </pre>
+     * @param type the generic type
+     * @param <T> generic type
+     * @return Builder
      */
     public static <T> Builder<T> arrayOf(TypeReference<T> type)
     {

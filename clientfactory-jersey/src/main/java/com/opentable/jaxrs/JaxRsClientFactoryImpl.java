@@ -27,6 +27,8 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.message.GZipEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -34,6 +36,7 @@ import org.springframework.context.ApplicationContext;
  */
 public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
+    private static final Logger LOG = LoggerFactory.getLogger(JaxRsClientFactoryImpl.class);
     public JaxRsClientFactoryImpl(ApplicationContext ctx) {
     }
 
@@ -51,6 +54,9 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
 
     private ClientConfig createClientConfig(JaxRsClientConfig config)
     {
+        if (config.isDisableTLS13()) {
+            LOG.warn(("This implementation (jersey) doesn't support disabling TLSv13, and that could cause issues on Java 11!"));
+        }
         final EvictablePoolingHttpClientConnectionManager connectionManager = new EvictablePoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(config.getConnectionPoolSize());
         connectionManager.setDefaultMaxPerRoute(config.getHttpClientDefaultMaxPerRoute());

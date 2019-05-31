@@ -169,9 +169,16 @@ public class JaxRsClientFactory {
      * You own the returned client and are responsible for managing its cleanup.
      */
     public synchronized ClientBuilder newBuilder(String clientName, Collection<JaxRsFeatureGroup> featureGroupsIn) {
-        started = true;
-
         final JaxRsClientConfig jaxRsConfig = configForClient(clientName);
+        return newBuilder(clientName, jaxRsConfig, featureGroupsIn);
+    }
+
+    /**
+     * Create a new {@link ClientBuilder} instance with the given name and groups.
+     * You own the returned client and are responsible for managing its cleanup.
+     */
+    public synchronized ClientBuilder newBuilder(String clientName, JaxRsClientConfig jaxRsConfig, Collection<JaxRsFeatureGroup> featureGroupsIn) {
+        started = true;
 
         final List<JaxRsFeatureGroup> featureGroups = ImmutableList.<JaxRsFeatureGroup>builder()
                 .add(PrivateFeatureGroup.WILDCARD)
@@ -215,6 +222,17 @@ public class JaxRsClientFactory {
     }
 
     /**
+     * Create a new {@link ClientBuilder} instance with the given name and groups.
+     * You own the returned client and are responsible for managing its cleanup.
+     */
+    public synchronized ClientBuilder newBuilder(String clientName, JaxRsClientConfig config, JaxRsFeatureGroup feature, JaxRsFeatureGroup... moreFeatures) {
+        return newBuilder(clientName, config, ImmutableList.<JaxRsFeatureGroup>builder()
+                .add(feature)
+                .addAll(Arrays.asList(moreFeatures))
+                .build());
+    }
+
+    /**
      * Create a new {@link Client} instance with the given name and groups.
      * You own the returned client and are responsible for managing its cleanup.
      */
@@ -228,6 +246,22 @@ public class JaxRsClientFactory {
      */
     public Client newClient(String clientName, Collection<JaxRsFeatureGroup> featureGroups) {
         return newBuilder(clientName, featureGroups).build();
+    }
+
+    /**
+     * Create a new {@link Client} instance with the given name and groups.
+     * You own the returned client and are responsible for managing its cleanup.
+     */
+    public Client newClient(String clientName, JaxRsClientConfig config, JaxRsFeatureGroup feature, JaxRsFeatureGroup... moreFeatures) {
+        return newBuilder(clientName, config, feature, moreFeatures).build();
+    }
+
+    /**
+     * Create a new {@link Client} instance with the given name and groups.
+     * You own the returned client and are responsible for managing its cleanup.
+     */
+    public Client newClient(String clientName, JaxRsClientConfig config, Collection<JaxRsFeatureGroup> featureGroups) {
+        return newBuilder(clientName, config, featureGroups).build();
     }
 
     /**

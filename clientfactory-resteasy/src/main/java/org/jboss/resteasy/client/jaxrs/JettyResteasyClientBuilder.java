@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -18,6 +19,8 @@ import javax.ws.rs.core.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.HttpProxy;
+import org.eclipse.jetty.http.HttpField;
+import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.util.HttpCookieStore;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.client.jaxrs.engines.jetty.JettyClientEngine;
@@ -25,7 +28,7 @@ import org.jboss.resteasy.client.jaxrs.i18n.Messages;
 import org.jboss.resteasy.client.jaxrs.internal.ClientConfiguration;
 import org.jboss.resteasy.client.jaxrs.internal.LocalResteasyProviderFactory;
 import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientImpl;
-import org.jboss.resteasy.core.ResteasyProviderFactoryImpl;
+import org.jboss.resteasy.core.providerfactory.ResteasyProviderFactoryImpl;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
@@ -50,7 +53,7 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
     protected ScheduledExecutorService scheduledExecutorService;
     protected boolean cleanupExecutor;
     protected SSLContext sslContext;
-    protected Map<String, Object> properties = new HashMap<String, Object>();
+    protected Map<String, Object> properties = new HashMap<>();
     protected ClientHttpEngine httpEngine;
     protected int connectionPoolSize = 50;
     protected int maxPooledPerRoute = 0;
@@ -64,22 +67,28 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
     protected HostnameVerifier verifier = null;
     protected int responseBufferSize;
     protected List<String> sniHostNames = new ArrayList<>();
+    private final List<Consumer<SslContextFactory>> factoryCustomizers;
+    private boolean trustSelfSignedCertificates;
 
 
-    public JettyResteasyClientBuilder(String clientName, JaxRsClientConfig config, TlsProvider provider) {
+    public JettyResteasyClientBuilder(String clientName, JaxRsClientConfig config, TlsProvider provider, List<Consumer<SslContextFactory>> factoryCustomizers) {
         this.clientName = clientName;
         this.config = config;
         this.provider = provider;
+        this.factoryCustomizers = factoryCustomizers == null ? new ArrayList<>() : factoryCustomizers;
+        //this.trustSelfSignedCertificates = trustSelfSignedCertificates; Add to config, otherwise default to false
     }
 
     @Override
     public ResteasyClient build() {
-        final HttpClient client = createHttpClient();
+        final HttpClient client = createHttpClient(factoryCustomizers);
         client.setIdleTimeout(config.getIdleTimeout().toMillis());
         client.setAddressResolutionTimeout(config.getConnectTimeout().toMillis());
         client.setConnectTimeout(config.getConnectTimeout().toMillis());
         client.setMaxConnectionsPerDestination(config.getHttpClientDefaultMaxPerRoute());
         client.setRemoveIdleDestinations(true);
+        LOG.info("Setting User-Agent for the {} HTTP client to {}", clientName, config.getUserAgent());
+        client.setUserAgentField(new HttpField(HttpHeader.USER_AGENT, config.getUserAgent()));
         if(StringUtils.isNotBlank(config.getProxyHost()) && config.getProxyPort() != 0) {
             HttpProxy proxy = new HttpProxy(config.getProxyHost(), config.getProxyPort());
             client.getProxyConfiguration().getProxies().add(proxy);
@@ -101,13 +110,14 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         }
     }
 
-    private SslContextFactory createSslFactory() {
+    private SslContextFactory createSslFactory(List<Consumer<SslContextFactory>> factoryCustomizers) {
         final SslContextFactory factory = new SslContextFactory();
         factory.setTrustAll(disableTrustManager);
         Optional.ofNullable(clientKeyStore).ifPresent(ks-> {
             factory.setKeyStore(ks);
             factory.setKeyStorePassword(clientPrivateKeyPassword);
         });
+        factoryCustomizers.forEach(c -> c.accept(factory));
         Optional.ofNullable(truststore).ifPresent(factory::setTrustStore);
         Optional.ofNullable(sslContext).ifPresent(factory::setSslContext);
         if (provider != null) {
@@ -130,8 +140,8 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         return factory;
     }
 
-    private HttpClient createHttpClient() {
-        final HttpClient hc = new HttpClient(createSslFactory());
+    private HttpClient createHttpClient(List<Consumer<SslContextFactory>> customizers) {
+        final HttpClient hc = new HttpClient(createSslFactory(customizers));
         Optional.ofNullable(asyncExecutor).ifPresent(hc::setExecutor);
         hc.setConnectTimeout(TimeUnit.MILLISECONDS.convert(establishConnectionTimeout, establishConnectionTimeoutUnits));
         if (responseBufferSize > 0) {
@@ -538,6 +548,16 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
     public boolean isTrustManagerDisabled()
     {
         return disableTrustManager;
+    }
+
+    @Override
+    public boolean isTrustSelfSignedCertificates() {
+        return this.trustSelfSignedCertificates;
+    }
+
+    @Override
+    public void setIsTrustSelfSignedCertificates(boolean trustSelfSignedCertificates) {
+        this.trustSelfSignedCertificates = trustSelfSignedCertificates;
     }
 
     @Override

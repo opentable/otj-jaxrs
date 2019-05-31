@@ -1,5 +1,17 @@
 otj-jaxrs changelog
 ===================
+
+2.9.10
+------
+* As part of security coverage, we now scrub the user-agent field. You may also now configure the field yourself.
+
+2.9.9
+-----
+REQUIRED FOR JAVA 11
+* Current version of Java 11 has issues with TLS 1.3 (which is new in Java 11). This introduces
+a switch, that we can toggle TLS 1.3 on/off. It is currently as of publication toggled in
+otpl-common-config and is set to disable.
+
 2.9.8
 -----
 * Small bug in CalculateThreads

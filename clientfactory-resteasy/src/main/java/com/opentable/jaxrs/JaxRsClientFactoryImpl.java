@@ -13,13 +13,16 @@
  */
 package com.opentable.jaxrs;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.ws.rs.client.ClientBuilder;
@@ -27,9 +30,12 @@ import javax.ws.rs.client.WebTarget;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.client.jaxrs.JettyResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 
@@ -39,6 +45,7 @@ import org.springframework.context.ApplicationContext;
  */
 public class JaxRsClientFactoryImpl implements InternalClientFactory
 {
+    private static final Logger LOG = LoggerFactory.getLogger(JaxRsClientFactoryImpl.class);
     private Supplier<TlsProvider> provider;
 
     public JaxRsClientFactoryImpl(ApplicationContext ctx) {
@@ -55,12 +62,20 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 }
             };
         }
+
     }
 
     @Override
     public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config, Collection<JaxRsFeatureGroup> featureGroups) {
+        final List<Consumer<SslContextFactory>> factoryCustomizers = new ArrayList<>();
+        if (config.isDisableTLS13()) {
+            factoryCustomizers.add(sslContextFactory ->  {
+                LOG.info("Disabling TLS 1.3");
+                sslContextFactory.setExcludeProtocols("TLSv1.3");
+            });
+        }
         final ResteasyClientBuilder builder = new JettyResteasyClientBuilder(clientName, config,
-                featureGroups.contains(StandardFeatureGroup.PLATFORM_INTERNAL) ? provider.get() : null);
+                featureGroups.contains(StandardFeatureGroup.PLATFORM_INTERNAL) ? provider.get() : null, factoryCustomizers);
         configureThreadPool(clientName, builder, config);
         return builder;
     }
