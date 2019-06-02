@@ -1,5 +1,14 @@
 otj-jaxrs changelog
 ===================
+3.0.0
+----
+* Resteasy 4.0.0 final (non beta) out at last.
+* This has led to significant maven restructuring, due to splits between
+api and implementation packages, and renaming of several packages. The parent
+will do it's best to arbitrate this, but common changes include
+
+(Note the changes)
+* Jersey updated to 2.27. We do not formally support Jersey (though a couple projects use it).
 
 2.9.10
 ------
