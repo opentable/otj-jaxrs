@@ -54,6 +54,9 @@
   <dependencyManagement>
     <dependencies>
     <!-- Once parent is fixed -->
+     <!-- TODO: exhaustively compare versions -->
+      <!-- TODO: servlet api 4.0 -->
+      <!-- TODO: otj-server and other jaxrs dependencies -->
      <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-client-api</artifactId>

@@ -30,13 +30,14 @@ import javax.ws.rs.client.WebTarget;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.HttpProxy;
 import org.eclipse.jetty.http.HttpField;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.util.HttpCookieStore;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -72,23 +73,13 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config, Collection<JaxRsFeatureGroup> featureGroups) {
         final List<Consumer<SslContextFactory>> sSlFactoryContextCustomizers = getSSlFactoryContextCustomizers(config, featureGroups);
         final List<Consumer<HttpClient>> httpClientCustomizers = getHttpClientCustomizers(clientName, config);
-        final JettyResteasyClientBuilder builder = new JettyResteasyClientBuilder()
-                .sslContextFactoryCustomizers(sSlFactoryContextCustomizers)
-                .httpClientCustomizers(httpClientCustomizers)
-                .connectionCheckoutTimeout(config.getConnectTimeout().toMillis(), TimeUnit.MILLISECONDS)
-                .clientName(clientName)
-                .maxPooledPerRoute(config.getHttpClientDefaultMaxPerRoute())
-                .cleanupExecutor(true)
-                ;
-        builder.setIsTrustSelfSignedCertificates(false);
-
-        configureProxy(builder, config);
-        configureThreadPool(clientName, builder, config);
-        return builder;
+        return new JettyResteasyClientBuilder(true, httpClientCustomizers, sSlFactoryContextCustomizers)
+                .connectTimeout(config.getConnectTimeout().toMillis(), TimeUnit.MILLISECONDS)
+                .executorService(configureThreadPool(clientName, config));
     }
 
     private List<Consumer<HttpClient>> getHttpClientCustomizers(final String clientName, final JaxRsClientConfig config) {
-        List<Consumer<HttpClient>> httpClientCustomizers = new ArrayList<>();
+        final List<Consumer<HttpClient>> httpClientCustomizers = new ArrayList<>();
         if (config.getIdleTimeout() != null) {
             httpClientCustomizers.add(hc -> hc.setIdleTimeout(config.getIdleTimeout().toMillis()));
         }
@@ -102,6 +93,10 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         if (config.isCookieHandlingEnabled()) {
             httpClientCustomizers.add(hc -> hc.setCookieStore(new HttpCookieStore()));
         }
+        if(StringUtils.isNotBlank(config.getProxyHost()) && config.getProxyPort() != 0) {
+            httpClientCustomizers.add(hc -> hc.getProxyConfiguration().getProxies().add(new HttpProxy(config.getProxyHost(), config.getProxyPort())));
+        }
+        httpClientCustomizers.add(hc -> hc.setMaxConnectionsPerDestination(Math.max(64, config.getHttpClientDefaultMaxPerRoute())));
         return httpClientCustomizers;
     }
 
@@ -120,26 +115,21 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         return factoryCustomizers;
     }
 
-    private void configureProxy(final ResteasyClientBuilder builder, final JaxRsClientConfig config) {
-        builder.defaultProxy(config.getProxyHost(), config.getProxyPort());
-    }
-
     @Override
     public <T> T createClientProxy(Class<T> proxyType, WebTarget baseTarget) {
         return ProxyBuilder.builder(proxyType, baseTarget).build();
     }
 
-    private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config) {
+    private ExecutorService configureThreadPool(String clientName, JaxRsClientConfig config) {
         final int threads = CalculateThreads.calculateThreads(config.getExecutorThreads(), clientName);
         // We used a fixed thread pool here instead of a QueuedThreadPool (which would lead to lower memory)
         // Primarily because resteasy wants an ExecutorService not an Executor
         // Reexamine in future
         // See https://docs.google.com/spreadsheets/d/179upsXNJv_xMWYHZLY2e0456bxoBYbOHW7ORV3m-CxE/edit#gid=0
-        final ExecutorService executor = new ThreadPoolExecutor(threads, threads, 1, TimeUnit.HOURS,
+        return new ThreadPoolExecutor(threads, threads, 1, TimeUnit.HOURS,
                 requestQueue(config.getAsyncQueueLimit()),
                 new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
                 new ThreadPoolExecutor.AbortPolicy());
-        clientBuilder.executorService(executor);
     }
 
     private BlockingQueue<Runnable> requestQueue(int size) {
