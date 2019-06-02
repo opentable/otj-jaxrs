@@ -74,10 +74,29 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 sslContextFactory.setExcludeProtocols("TLSv1.3");
             });
         }
-        final ResteasyClientBuilder builder = new JettyResteasyClientBuilder(clientName, config,
-                featureGroups.contains(StandardFeatureGroup.PLATFORM_INTERNAL) ? provider.get() : null, factoryCustomizers);
+        final TlsProvider tlsProvider = featureGroups.contains(StandardFeatureGroup.PLATFORM_INTERNAL) ? provider.get() : null;
+        if (tlsProvider != null) {
+            addProviderCustomizer(tlsProvider, factoryCustomizers);
+        }
+
+        final JettyResteasyClientBuilder builder = new JettyResteasyClientBuilder()
+                .userAgent(config.getUserAgent())
+                .sslCustomizers(factoryCustomizers)
+                .connectionCheckoutTimeout(config.getConnectTimeout().toMillis(), TimeUnit.MILLISECONDS)
+                .clientName(clientName)
+                .idleTimeout(config.getIdleTimeout())
+                .enableCookieHandling(config.isCookieHandlingEnabled())
+                .maxPooledPerRoute(config.getHttpClientDefaultMaxPerRoute())
+                .cleanupExecutor(true)
+                ;
+        builder.setIsTrustSelfSignedCertificates(false);
+        configureProxy(builder, config);
         configureThreadPool(clientName, builder, config);
         return builder;
+    }
+
+    private void configureProxy(final ResteasyClientBuilder builder, final JaxRsClientConfig config) {
+        builder.defaultProxy(config.getProxyHost(), config.getProxyPort());
     }
 
     @Override
@@ -100,5 +119,23 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
 
     private BlockingQueue<Runnable> requestQueue(int size) {
         return size == 0 ? new SynchronousQueue<>() : new ArrayBlockingQueue<>(size);
+    }
+
+    private void addProviderCustomizer(final TlsProvider tlsProvider, final List<Consumer<SslContextFactory>> factoryCustomizers) {
+        factoryCustomizers.add(sslContextFactory -> tlsProvider.init((ts, ks) -> {
+            try {
+                sslContextFactory.reload(f -> {
+                    f.setValidateCerts(true);
+                    f.setValidatePeerCerts(true);
+                    f.setKeyStorePassword("");
+                    f.setKeyStore(ks);
+                    f.setTrustStorePassword("");
+                    f.setTrustStore(ts);
+                });
+                LOG.debug("Rotated client {} TLS keys to {}", sslContextFactory, ks);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }));
     }
 }

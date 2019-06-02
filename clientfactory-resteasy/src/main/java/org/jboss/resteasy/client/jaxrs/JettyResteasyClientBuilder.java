@@ -1,6 +1,7 @@
 package org.jboss.resteasy.client.jaxrs;
 
 import java.security.KeyStore;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -28,79 +30,88 @@ import org.jboss.resteasy.client.jaxrs.i18n.Messages;
 import org.jboss.resteasy.client.jaxrs.internal.ClientConfiguration;
 import org.jboss.resteasy.client.jaxrs.internal.LocalResteasyProviderFactory;
 import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientImpl;
-import org.jboss.resteasy.core.providerfactory.ResteasyProviderFactoryImpl;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.opentable.jaxrs.JaxRsClientConfig;
-import com.opentable.jaxrs.TlsProvider;
-
 public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(JettyResteasyClientBuilder.class);
 
-    private final String clientName;
-    private final JaxRsClientConfig config;
-    private final TlsProvider provider;
+    // These are items added to the standard builder
+    private String clientName = "unknown";
+    private String userAgent;
+    private Duration idleTimeout;
+    private List<Consumer<SslContextFactory>> factoryCustomizers;
+    private boolean enableCookieHandling;
+
+    // The standard implementation tends to force this to false, we have been using true, so we expose in our own builder.
+    protected boolean cleanupExecutor;
+
+    // Supported both via builder and TLSProvider injection concept of Steven's - used in code mostly only via TLSProvider
+    // This would have to be revamped prior to contribution
     protected KeyStore truststore;
     protected KeyStore clientKeyStore;
     protected String clientPrivateKeyPassword;
-    protected boolean disableTrustManager;
+
+    // Supported in builder, but never passed to the JettyClientEngine that Steven contributed to RestEasy
+    // Note that that engine throws exception if you set it, we'd have to submit a PR to RestEasy to support
     protected HostnameVerificationPolicy policy = HostnameVerificationPolicy.WILDCARD;
-    protected ResteasyProviderFactory providerFactory;
-    protected ExecutorService asyncExecutor;
-    protected ScheduledExecutorService scheduledExecutorService;
-    protected boolean cleanupExecutor;
+    protected HostnameVerifier verifier = null;
+
+    // Supported by builder, not used in JaxRSClientFactoryImpl (so default implementation is used)
     protected SSLContext sslContext;
+    protected boolean disableTrustManager;
+    protected ResteasyProviderFactory providerFactory;
+    protected int responseBufferSize;
+    // builder supported, not used in JaxRSClientFactoryImpl. This will cause problems with SSEEvents and such, but it's not very clear
+    // when to expose.
+    protected ScheduledExecutorService scheduledExecutorService;
+
+    // builder supported, and set in JaxRSClientFactoryImpl
+    protected ExecutorService asyncExecutor;
+    private int proxyPort = -1;
+    private String proxyHost = null;
+    private String proxyScheme = null;
+    // mapped to connectTimeout
+    protected long establishConnectionTimeout = 15000L; // match jetty defaults
+    protected TimeUnit establishConnectionTimeoutUnits = TimeUnit.MILLISECONDS;
+    // mapped to defaultMaxConnectionsPerRoute
+    protected int maxPooledPerRoute = 64; // match jetty defaults
+
+    // Used in build() but seemingly unhooked to outside world, (which mirrors the odd implementation in RestEasyClientBuilderImpl!
+    // I think it's meant as an arbitrary property to be passed to clientengine.builder
     protected Map<String, Object> properties = new HashMap<>();
+
+    // Preserved part of the spirit of the builder, but it's still all or nothing. Core HttpCLient43 adds a shim builder, which copies
+    // over other settings. Here, if you override, it's all or nothing - you own the whole shebbang. That could be addressed with
+    // PR to RestEasy to enhance Steven's engine to copy over other settings.
     protected ClientHttpEngine httpEngine;
+
+    // Builder supports, but it's not used - there's no clear Jetty equivalent.
+    // Jetty has an idleTimeout, which is individually supported
     protected int connectionPoolSize = 50;
-    protected int maxPooledPerRoute = 0;
     protected long connectionTTL = -1;
     protected TimeUnit connectionTTLUnit = TimeUnit.MILLISECONDS;
     protected long socketTimeout = -1;
     protected TimeUnit socketTimeoutUnits = TimeUnit.MILLISECONDS;
-    protected long establishConnectionTimeout = -1;
-    protected TimeUnit establishConnectionTimeoutUnits = TimeUnit.MILLISECONDS;
     protected int connectionCheckoutTimeoutMs = -1;
-    protected HostnameVerifier verifier = null;
-    protected int responseBufferSize;
-    protected List<String> sniHostNames = new ArrayList<>();
-    private final List<Consumer<SslContextFactory>> factoryCustomizers;
     private boolean trustSelfSignedCertificates;
 
-
-    public JettyResteasyClientBuilder(String clientName, JaxRsClientConfig config, TlsProvider provider, List<Consumer<SslContextFactory>> factoryCustomizers) {
-        this.clientName = clientName;
-        this.config = config;
-        this.provider = provider;
-        this.factoryCustomizers = factoryCustomizers == null ? new ArrayList<>() : factoryCustomizers;
-        //this.trustSelfSignedCertificates = trustSelfSignedCertificates; Add to config, otherwise default to false
-    }
+    // Not currently supported, could be with some investigation
+    protected List<String> sniHostNames = new ArrayList<>();
 
     @Override
     public ResteasyClient build() {
-        final HttpClient client = createHttpClient(factoryCustomizers);
-        client.setIdleTimeout(config.getIdleTimeout().toMillis());
-        client.setAddressResolutionTimeout(config.getConnectTimeout().toMillis());
-        client.setConnectTimeout(config.getConnectTimeout().toMillis());
-        client.setMaxConnectionsPerDestination(config.getHttpClientDefaultMaxPerRoute());
-        client.setRemoveIdleDestinations(true);
-        LOG.info("Setting User-Agent for the {} HTTP client to {}", clientName, config.getUserAgent());
-        client.setUserAgentField(new HttpField(HttpHeader.USER_AGENT, config.getUserAgent()));
-        if(StringUtils.isNotBlank(config.getProxyHost()) && config.getProxyPort() != 0) {
-            HttpProxy proxy = new HttpProxy(config.getProxyHost(), config.getProxyPort());
-            client.getProxyConfiguration().getProxies().add(proxy);
+        if (asyncExecutor == null) {
+            asyncExecutor = Executors.newCachedThreadPool();
         }
-        if (config.isCookieHandlingEnabled()) {
-            client.setCookieStore(new HttpCookieStore());
-        }
-
+        final HttpClient client = createHttpClient(factoryCustomizers == null ? new ArrayList<>() : factoryCustomizers);
         final ClientConfiguration cc = new ClientConfiguration(getProviderFactory());
         properties.forEach(cc::property);
 
-        return new JettyRestEasyClient(new JettyClientEngine(client), asyncExecutor, true, scheduledExecutorService, cc);
+        final ClientHttpEngine clientHttpEngine = this.httpEngine == null ? new JettyClientEngine(client) : httpEngine;
+        return new JettyRestEasyClient(clientHttpEngine, asyncExecutor, cleanupExecutor, scheduledExecutorService, cc);
     }
 
     public static class JettyRestEasyClient extends ResteasyClientImpl {
@@ -120,40 +131,86 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         factoryCustomizers.forEach(c -> c.accept(factory));
         Optional.ofNullable(truststore).ifPresent(factory::setTrustStore);
         Optional.ofNullable(sslContext).ifPresent(factory::setSslContext);
-        if (provider != null) {
-            provider.init((ts, ks) -> {
-                try {
-                    factory.reload(f -> {
-                        f.setValidateCerts(true);
-                        f.setValidatePeerCerts(true);
-                        f.setKeyStorePassword("");
-                        f.setKeyStore(ks);
-                        f.setTrustStorePassword("");
-                        f.setTrustStore(ts);
-                    });
-                    LOG.debug("Rotated client {} TLS keys to {}", factory, ks);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        }
+
         return factory;
     }
 
     private HttpClient createHttpClient(List<Consumer<SslContextFactory>> customizers) {
         final HttpClient hc = new HttpClient(createSslFactory(customizers));
-        Optional.ofNullable(asyncExecutor).ifPresent(hc::setExecutor);
+        // Don't let get below Jetty's recommended default
+        hc.setMaxConnectionsPerDestination(Math.max(64, this.maxPooledPerRoute));
+        hc.setExecutor(asyncExecutor);
         hc.setConnectTimeout(TimeUnit.MILLISECONDS.convert(establishConnectionTimeout, establishConnectionTimeoutUnits));
+        hc.setAddressResolutionTimeout(TimeUnit.MILLISECONDS.convert(establishConnectionTimeout, establishConnectionTimeoutUnits));
         if (responseBufferSize > 0) {
             hc.setResponseBufferSize(responseBufferSize);
             hc.setRequestBufferSize(responseBufferSize);
         }
+        if (idleTimeout != null) {
+            hc.setIdleTimeout(idleTimeout.toMillis());
+        }
+        hc.setRemoveIdleDestinations(true);
+        if (userAgent != null) {
+            LOG.info("Setting User-Agent for the {} HTTP client to {}", clientName, userAgent);
+            hc.setUserAgentField(new HttpField(HttpHeader.USER_AGENT, userAgent));
+        }
+        if(StringUtils.isNotBlank(proxyHost) && proxyPort != 0) {
+            HttpProxy proxy = new HttpProxy(proxyHost, proxyPort);
+            hc.getProxyConfiguration().getProxies().add(proxy);
+        }
+        if (enableCookieHandling) {
+            hc.setCookieStore(new HttpCookieStore());
+        }
         return hc;
+    }
+    public JettyResteasyClientBuilder enableCookieHandling(boolean enableCookieHandling) {
+        this.enableCookieHandling = enableCookieHandling;
+        return this;
+    }
+
+    public JettyResteasyClientBuilder clientName(String clientName) {
+        this.clientName = clientName;
+        return this;
+    }
+
+    public JettyResteasyClientBuilder userAgent(String userAgent) {
+        this.userAgent = userAgent;
+        return this;
+    }
+
+    public JettyResteasyClientBuilder idleTimeout(Duration idleTimeout) {
+        this.idleTimeout = idleTimeout;
+        return this;
+    }
+
+    public JettyResteasyClientBuilder sslCustomizers(List<Consumer<SslContextFactory>> factoryCustomizers) {
+        this.factoryCustomizers = factoryCustomizers;
+        return this;
+    }
+
+    public JettyResteasyClientBuilder cleanupExecutor(boolean cleanupExecutor) {
+        this.cleanupExecutor = cleanupExecutor;
+        return this;
     }
 
     @Override
     public String toString() {
         return "JettyResteasyClientBuilder[" + clientName + "]";
+    }
+
+    @Override
+    public String getDefaultProxyHostname() {
+        return this.proxyHost;
+    }
+
+    @Override
+    public int getDefaultProxyPort() {
+        return this.proxyPort;
+    }
+
+    @Override
+    public String getDefaultProxyScheme() {
+        return this.proxyScheme;
     }
 
     /*
@@ -173,33 +230,6 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         return this;
     }
 
-    /**
-     * Executor to use to run AsyncInvoker invocations.
-     *
-     * @param asyncExecutor executor service
-     * @return an updated client builder instance
-     * @deprecated use {@link JettyResteasyClientBuilder#executorService(ExecutorService)} instead
-     */
-    @Deprecated
-    public JettyResteasyClientBuilder asyncExecutor(ExecutorService asyncExecutor)
-    {
-        return asyncExecutor(asyncExecutor, false);
-    }
-
-    /**
-     * Executor to use to run AsyncInvoker invocations.
-     *
-     * @param asyncExecutor executor service
-     * @param cleanupExecutor true if the Client should close the executor when it is closed
-     * @return an updated client builder instance
-     */
-    @Deprecated
-    public JettyResteasyClientBuilder asyncExecutor(ExecutorService asyncExecutor, boolean cleanupExecutor)
-    {
-        this.asyncExecutor = asyncExecutor;
-        this.cleanupExecutor = cleanupExecutor;
-        return this;
-    }
 
     /**
      * If there is a connection pool, set the time to live in the pool.
@@ -390,7 +420,10 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
 
     @Override
     public ResteasyClientBuilder defaultProxy(final String hostname, final int port, final String scheme) {
-        return null;
+        this.proxyHost = hostname;
+        this.proxyPort = port;
+        this.proxyScheme = scheme;
+        return this;
     }
 
 
@@ -403,10 +436,6 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
             RegisterBuiltin.register(providerFactory);
         }
         return providerFactory;
-    }
-
-    protected ResteasyClient createResteasyClient(ClientHttpEngine engine,ExecutorService executor, boolean cleanupExecutor, ScheduledExecutorService scheduledExecutorService, ClientConfiguration config ) {
-        return new JettyRestEasyClient(engine, executor, cleanupExecutor, scheduledExecutorService, config);
     }
 
     @Override
@@ -481,8 +510,7 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
     @Override
     public JettyResteasyClientBuilder withConfig(Configuration config)
     {
-        providerFactory = new LocalResteasyProviderFactory(new ResteasyProviderFactoryImpl());
-        providerFactory.setProperties(config.getProperties());
+        getProviderFactory().setProperties(config.getProperties());
         for (Class clazz : config.getClasses())
         {
             Map<Class<?>, Integer> contracts = config.getContracts(clazz);
@@ -504,7 +532,8 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
     @Override
     public ResteasyClientBuilder executorService(ExecutorService executorService)
     {
-        return asyncExecutor(executorService, false);
+        this.asyncExecutor = executorService;
+        return this;
     }
 
     @Override
@@ -574,12 +603,14 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
 
     @Override
     public ResteasyClientBuilder useAsyncHttpEngine() {
+        // Jetty is always async, so this is a no-op
         return this;
     }
 
     @Override
     public boolean isUseAsyncHttpEngine()
     {
+        // Jetty is always async
         return httpEngine != null;
     }
 
@@ -589,23 +620,6 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         return sniHostNames;
     }
 
-    @Override
-    public String getDefaultProxyHostname()
-    {
-        return null;
-    }
-
-    @Override
-    public int getDefaultProxyPort()
-    {
-        return  -1;
-    }
-
-    @Override
-    public String getDefaultProxyScheme()
-    {
-        return null;
-    }
     @Override
     public long getReadTimeout(TimeUnit unit)
     {
