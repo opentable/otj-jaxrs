@@ -23,9 +23,9 @@
   <artifactId>otj-jaxrs-clientfactory-jersey</artifactId>
 
   <properties>
-    <ot.jersey.version>2.10.1</ot.jersey.version>
+    <!-- one older than most recent to avoid jakarta gav fun -->
+    <ot.jersey.version>2.27</ot.jersey.version>
     <ot.build.allow-jersey>true</ot.build.allow-jersey>
-    <ot.apache.httpclient.version>4.3.2</ot.apache.httpclient.version>
   </properties>
 
   <dependencyManagement>
