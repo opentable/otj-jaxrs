@@ -28,11 +28,8 @@ import org.jboss.resteasy.client.jaxrs.internal.LocalResteasyProviderFactory;
 import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientImpl;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
-    private static final Logger LOG = LoggerFactory.getLogger(JettyResteasyClientBuilder.class);
 
     // These are items added to the standard builder
     private String clientName = "unknown";
