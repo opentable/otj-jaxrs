@@ -1,7 +1,6 @@
 package org.jboss.resteasy.client.jaxrs;
 
 import java.security.KeyStore;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,9 +20,6 @@ import javax.ws.rs.core.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.HttpProxy;
-import org.eclipse.jetty.http.HttpField;
-import org.eclipse.jetty.http.HttpHeader;
-import org.eclipse.jetty.util.HttpCookieStore;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.client.jaxrs.engines.jetty.JettyClientEngine;
 import org.jboss.resteasy.client.jaxrs.i18n.Messages;
@@ -40,10 +36,8 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
 
     // These are items added to the standard builder
     private String clientName = "unknown";
-    private String userAgent;
-    private Duration idleTimeout;
-    private List<Consumer<SslContextFactory>> factoryCustomizers;
-    private boolean enableCookieHandling;
+    private List<Consumer<SslContextFactory>> sslContextFactoryCustomizers;
+    private List<Consumer<HttpClient>> httpClientCustomizers;
 
     // The standard implementation tends to force this to false, we have been using true, so we expose in our own builder.
     protected boolean cleanupExecutor;
@@ -106,7 +100,10 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         if (asyncExecutor == null) {
             asyncExecutor = Executors.newCachedThreadPool();
         }
-        final HttpClient client = createHttpClient(factoryCustomizers == null ? new ArrayList<>() : factoryCustomizers);
+        final HttpClient client = createHttpClient(
+                httpClientCustomizers == null ? new ArrayList<>() : httpClientCustomizers,
+                sslContextFactoryCustomizers == null ? new ArrayList<>() : sslContextFactoryCustomizers
+        );
         final ClientConfiguration cc = new ClientConfiguration(getProviderFactory());
         properties.forEach(cc::property);
 
@@ -135,8 +132,8 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         return factory;
     }
 
-    private HttpClient createHttpClient(List<Consumer<SslContextFactory>> customizers) {
-        final HttpClient hc = new HttpClient(createSslFactory(customizers));
+    private HttpClient createHttpClient(List<Consumer<HttpClient>> httpClientCustomizers, List<Consumer<SslContextFactory>> sslContextFactoryCustomizers) {
+        final HttpClient hc = new HttpClient(createSslFactory(sslContextFactoryCustomizers));
         // Don't let get below Jetty's recommended default
         hc.setMaxConnectionsPerDestination(Math.max(64, this.maxPooledPerRoute));
         hc.setExecutor(asyncExecutor);
@@ -146,26 +143,12 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
             hc.setResponseBufferSize(responseBufferSize);
             hc.setRequestBufferSize(responseBufferSize);
         }
-        if (idleTimeout != null) {
-            hc.setIdleTimeout(idleTimeout.toMillis());
-        }
-        hc.setRemoveIdleDestinations(true);
-        if (userAgent != null) {
-            LOG.info("Setting User-Agent for the {} HTTP client to {}", clientName, userAgent);
-            hc.setUserAgentField(new HttpField(HttpHeader.USER_AGENT, userAgent));
-        }
         if(StringUtils.isNotBlank(proxyHost) && proxyPort != 0) {
             HttpProxy proxy = new HttpProxy(proxyHost, proxyPort);
             hc.getProxyConfiguration().getProxies().add(proxy);
         }
-        if (enableCookieHandling) {
-            hc.setCookieStore(new HttpCookieStore());
-        }
+        httpClientCustomizers.forEach(c -> c.accept(hc));
         return hc;
-    }
-    public JettyResteasyClientBuilder enableCookieHandling(boolean enableCookieHandling) {
-        this.enableCookieHandling = enableCookieHandling;
-        return this;
     }
 
     public JettyResteasyClientBuilder clientName(String clientName) {
@@ -173,18 +156,13 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
         return this;
     }
 
-    public JettyResteasyClientBuilder userAgent(String userAgent) {
-        this.userAgent = userAgent;
+    public JettyResteasyClientBuilder httpClientCustomizers(final List<Consumer<HttpClient>> httpClientCustomizers) {
+        this.httpClientCustomizers = httpClientCustomizers;
         return this;
     }
 
-    public JettyResteasyClientBuilder idleTimeout(Duration idleTimeout) {
-        this.idleTimeout = idleTimeout;
-        return this;
-    }
-
-    public JettyResteasyClientBuilder sslCustomizers(List<Consumer<SslContextFactory>> factoryCustomizers) {
-        this.factoryCustomizers = factoryCustomizers;
+    public JettyResteasyClientBuilder sslContextFactoryCustomizers(List<Consumer<SslContextFactory>> factoryCustomizers) {
+        this.sslContextFactoryCustomizers = factoryCustomizers;
         return this;
     }
 

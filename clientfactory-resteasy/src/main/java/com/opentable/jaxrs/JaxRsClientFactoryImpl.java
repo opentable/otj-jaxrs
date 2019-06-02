@@ -30,6 +30,10 @@ import javax.ws.rs.client.WebTarget;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.http.HttpField;
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.util.HttpCookieStore;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.client.jaxrs.JettyResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
@@ -67,6 +71,42 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
 
     @Override
     public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config, Collection<JaxRsFeatureGroup> featureGroups) {
+        final List<Consumer<SslContextFactory>> sSlFactoryContextCustomizers = getSSlFactoryContextCustomizers(config, featureGroups);
+        final List<Consumer<HttpClient>> httpClientCustomizers = getHttpClientCustomizers(clientName, config);
+        final JettyResteasyClientBuilder builder = new JettyResteasyClientBuilder()
+                .sslContextFactoryCustomizers(sSlFactoryContextCustomizers)
+                .httpClientCustomizers(httpClientCustomizers)
+                .connectionCheckoutTimeout(config.getConnectTimeout().toMillis(), TimeUnit.MILLISECONDS)
+                .clientName(clientName)
+                .maxPooledPerRoute(config.getHttpClientDefaultMaxPerRoute())
+                .cleanupExecutor(true)
+                ;
+        builder.setIsTrustSelfSignedCertificates(false);
+
+        configureProxy(builder, config);
+        configureThreadPool(clientName, builder, config);
+        return builder;
+    }
+
+    private List<Consumer<HttpClient>> getHttpClientCustomizers(final String clientName, final JaxRsClientConfig config) {
+        List<Consumer<HttpClient>> httpClientCustomizers = new ArrayList<>();
+        if (config.getIdleTimeout() != null) {
+            httpClientCustomizers.add(hc -> hc.setIdleTimeout(config.getIdleTimeout().toMillis()));
+        }
+        httpClientCustomizers.add(hc -> hc.setRemoveIdleDestinations(true));
+        if (config.getUserAgent() != null) {
+            httpClientCustomizers.add(hc-> {
+                LOG.info("Setting User-Agent for the {} HTTP client to {}", clientName, config.getUserAgent());
+                hc.setUserAgentField(new HttpField(HttpHeader.USER_AGENT, config.getUserAgent()));
+            });
+        }
+        if (config.isCookieHandlingEnabled()) {
+            httpClientCustomizers.add(hc -> hc.setCookieStore(new HttpCookieStore()));
+        }
+        return httpClientCustomizers;
+    }
+
+    private List<Consumer<SslContextFactory>> getSSlFactoryContextCustomizers(final JaxRsClientConfig config, final Collection<JaxRsFeatureGroup> featureGroups) {
         final List<Consumer<SslContextFactory>> factoryCustomizers = new ArrayList<>();
         if (config.isDisableTLS13()) {
             factoryCustomizers.add(sslContextFactory ->  {
@@ -78,21 +118,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         if (tlsProvider != null) {
             addProviderCustomizer(tlsProvider, factoryCustomizers);
         }
-
-        final JettyResteasyClientBuilder builder = new JettyResteasyClientBuilder()
-                .userAgent(config.getUserAgent())
-                .sslCustomizers(factoryCustomizers)
-                .connectionCheckoutTimeout(config.getConnectTimeout().toMillis(), TimeUnit.MILLISECONDS)
-                .clientName(clientName)
-                .idleTimeout(config.getIdleTimeout())
-                .enableCookieHandling(config.isCookieHandlingEnabled())
-                .maxPooledPerRoute(config.getHttpClientDefaultMaxPerRoute())
-                .cleanupExecutor(true)
-                ;
-        builder.setIsTrustSelfSignedCertificates(false);
-        configureProxy(builder, config);
-        configureThreadPool(clientName, builder, config);
-        return builder;
+        return factoryCustomizers;
     }
 
     private void configureProxy(final ResteasyClientBuilder builder, final JaxRsClientConfig config) {
