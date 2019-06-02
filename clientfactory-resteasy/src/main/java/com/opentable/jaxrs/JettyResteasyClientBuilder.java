@@ -119,7 +119,7 @@ public class JettyResteasyClientBuilder extends ResteasyClientBuilder {
     }
 
     private SslContextFactory createSslFactory(List<Consumer<SslContextFactory>> factoryCustomizers) {
-        final SslContextFactory factory = new SslContextFactory();
+        final SslContextFactory factory = new SslContextFactory.Client();
         factory.setTrustAll(disableTrustManager);
         Optional.ofNullable(clientKeyStore).ifPresent(ks-> {
             factory.setKeyStore(ks);
