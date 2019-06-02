@@ -1,4 +1,4 @@
-package org.jboss.resteasy.client.jaxrs;
+package com.opentable.jaxrs;
 
 import java.security.KeyStore;
 import java.util.ArrayList;
@@ -21,6 +21,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.HttpProxy;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.jboss.resteasy.client.jaxrs.ClientHttpEngine;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.engines.jetty.JettyClientEngine;
 import org.jboss.resteasy.client.jaxrs.i18n.Messages;
 import org.jboss.resteasy.client.jaxrs.internal.ClientConfiguration;
