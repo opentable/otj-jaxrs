@@ -71,7 +71,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
 
     @Override
     public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config, Collection<JaxRsFeatureGroup> featureGroups) {
-        final List<Consumer<SslContextFactory>> sSlFactoryContextCustomizers = getSSlFactoryContextCustomizers(config, featureGroups);
+        final List<Consumer<SslContextFactory>> sslFactoryContextCustomizers = getSslFactoryContextCustomizers(config, featureGroups);
         final List<Consumer<HttpClient>> httpClientCustomizers = getHttpClientCustomizers(clientName, config);
         return new JettyResteasyClientBuilder(true, httpClientCustomizers, sSlFactoryContextCustomizers)
                 .connectTimeout(config.getConnectTimeout().toMillis(), TimeUnit.MILLISECONDS)
