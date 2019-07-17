@@ -27,7 +27,8 @@
     <basepom.check.skip-javadoc>false</basepom.check.skip-javadoc>
     <basepom.check.fail-javadoc>false</basepom.check.fail-javadoc>
     <!-- remove once parent updated -->
-    <dep.resteasy.version>4.0.0.Final</dep.resteasy.version>
+    <dep.resteasy.version>4.1.0.Final</dep.resteasy.version>
+    <dep.jackson.version>2.9.9</dep.jackson.version>
   </properties>
 
   <scm>
