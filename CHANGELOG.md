@@ -7,7 +7,9 @@ otj-jaxrs changelog
 api and implementation packages, and renaming of several packages. The parent
 will do it's best to arbitrate this, but common changes include
 
-(Note the changes)
+- validator11 -> validator
+- resteasy-jaxrs split into multiple modules
+
 * Jersey updated to 2.27. We do not formally support Jersey (though a couple projects use it).
 
 2.9.10
