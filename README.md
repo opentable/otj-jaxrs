@@ -69,4 +69,4 @@ To configure a connection timeout of 150ms:
 For a list of configurable options see [client/src/main/java/com/opentable/jaxrs/JaxRsClientConfig.java](client/src/main/java/com/opentable/jaxrs/JaxRsClientConfig.java)
 
 ----
-Copyright (C) 2014 OpenTable, Inc.
+Copyright (C) 2019 OpenTable, Inc.

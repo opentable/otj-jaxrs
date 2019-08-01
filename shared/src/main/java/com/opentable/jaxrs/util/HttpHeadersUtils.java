@@ -9,6 +9,8 @@ public final class HttpHeadersUtils {
 
     /**
      * Implementation of {@link HttpHeaders} based on {@link ContainerRequestContext}.
+     * @param ctx ContainerRequestContext (jaxrs)
+     * @return Httpheaders
      */
     public static HttpHeaders from(final ContainerRequestContext ctx) {
         return new ContainerRequestContextHttpHeaders(ctx);

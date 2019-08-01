@@ -41,10 +41,11 @@ import org.apache.http.impl.conn.MonitoredPoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient43Engine;
 import org.jboss.resteasy.client.jaxrs.internal.ClientInvocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -60,10 +61,13 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     }
 
     public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config) {
-        final ResteasyClientBuilder builder = new ResteasyClientBuilder();
+        final ExecutorService executorService = configureThreadPool(clientName, config);
+        final ResteasyClientBuilderImpl builder = new ResteasyClientBuilderImpl();
+        builder.asyncExecutor(executorService, true);
         configureHttpEngine(clientName, builder, config);
         configureAuthenticationIfNeeded(clientName, builder, config);
-        configureThreadPool(clientName, builder, config);
+        final ExecutorService executor = configureThreadPool(clientName, config);
+        builder.asyncExecutor(executor, true);
         return builder;
     }
 
@@ -83,7 +87,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     public static void configureHttpEngine(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config)
     {
         final HttpClient client = prepareHttpClientBuilder(clientName, config).build();
-        final ApacheHttpClient4Engine engine = new HackedApacheHttpClient4Engine(config, client);
+        final ApacheHttpClient43Engine engine = new HackedApacheHttpClient4Engine(config, client);
         clientBuilder.httpEngine(engine);
     }
 
@@ -141,19 +145,20 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         */
     }
 
-    private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config) {
+    private ExecutorService configureThreadPool(String clientName, JaxRsClientConfig config) {
         final ExecutorService executor = new ThreadPoolExecutor(1, CalculateThreads.calculateThreads(config.getExecutorThreads(), clientName), 1, TimeUnit.HOURS,
                 requestQueue(config.getAsyncQueueLimit()),
                 new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
                 new ThreadPoolExecutor.AbortPolicy());
-        clientBuilder.asyncExecutor(executor, true);
+        return executor;
+       // clientBuilder.asyncExecutor(executor, true);
     }
 
     private BlockingQueue<Runnable> requestQueue(int size) {
         return size == 0 ? new SynchronousQueue<>() : new ArrayBlockingQueue<>(size);
     }
 
-    private static class HackedApacheHttpClient4Engine extends ApacheHttpClient4Engine {
+    private static class HackedApacheHttpClient4Engine extends ApacheHttpClient43Engine {
         private final JaxRsClientConfig config;
 
         HackedApacheHttpClient4Engine(JaxRsClientConfig config, HttpClient client) {

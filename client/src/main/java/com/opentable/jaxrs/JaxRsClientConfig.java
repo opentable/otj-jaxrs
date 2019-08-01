@@ -42,7 +42,7 @@ public interface JaxRsClientConfig
      * This connection pool checkout won't occur until you call {@link javax.ws.rs.client.InvocationInvocation#invoke()}.
      * If the time to get a connection surpasses this value, a runtime exception will be thrown.
      *
-     * Supported: resteasy-apache
+     * Supported: resteasy-apache, resteasy
      * Unsupported: resteasy, jersey
      */
     @Value.Default

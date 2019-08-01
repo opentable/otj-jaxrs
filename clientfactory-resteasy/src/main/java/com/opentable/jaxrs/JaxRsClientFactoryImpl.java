@@ -30,10 +30,14 @@ import javax.ws.rs.client.WebTarget;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.HttpProxy;
+import org.eclipse.jetty.http.HttpField;
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.util.HttpCookieStore;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.jboss.resteasy.client.jaxrs.JettyResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -67,6 +71,36 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
 
     @Override
     public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config, Collection<JaxRsFeatureGroup> featureGroups) {
+        final List<Consumer<SslContextFactory>> sslFactoryContextCustomizers = getSSlFactoryContextCustomizers(config, featureGroups);
+        final List<Consumer<HttpClient>> httpClientCustomizers = getHttpClientCustomizers(clientName, config);
+        return new JettyResteasyClientBuilder(true, httpClientCustomizers, sslFactoryContextCustomizers)
+                .connectTimeout(config.getConnectTimeout().toMillis(), TimeUnit.MILLISECONDS)
+                .executorService(configureThreadPool(clientName, config));
+    }
+
+    private List<Consumer<HttpClient>> getHttpClientCustomizers(final String clientName, final JaxRsClientConfig config) {
+        final List<Consumer<HttpClient>> httpClientCustomizers = new ArrayList<>();
+        if (config.getIdleTimeout() != null) {
+            httpClientCustomizers.add(hc -> hc.setIdleTimeout(config.getIdleTimeout().toMillis()));
+        }
+        httpClientCustomizers.add(hc -> hc.setRemoveIdleDestinations(true));
+        if (config.getUserAgent() != null) {
+            httpClientCustomizers.add(hc-> {
+                LOG.info("Setting User-Agent for the {} HTTP client to {}", clientName, config.getUserAgent());
+                hc.setUserAgentField(new HttpField(HttpHeader.USER_AGENT, config.getUserAgent()));
+            });
+        }
+        if (config.isCookieHandlingEnabled()) {
+            httpClientCustomizers.add(hc -> hc.setCookieStore(new HttpCookieStore()));
+        }
+        if(StringUtils.isNotBlank(config.getProxyHost()) && config.getProxyPort() != 0) {
+            httpClientCustomizers.add(hc -> hc.getProxyConfiguration().getProxies().add(new HttpProxy(config.getProxyHost(), config.getProxyPort())));
+        }
+        httpClientCustomizers.add(hc -> hc.setMaxConnectionsPerDestination(Math.max(64, config.getHttpClientDefaultMaxPerRoute())));
+        return httpClientCustomizers;
+    }
+
+    private List<Consumer<SslContextFactory>> getSSlFactoryContextCustomizers(final JaxRsClientConfig config, final Collection<JaxRsFeatureGroup> featureGroups) {
         final List<Consumer<SslContextFactory>> factoryCustomizers = new ArrayList<>();
         if (config.isDisableTLS13()) {
             factoryCustomizers.add(sslContextFactory ->  {
@@ -74,10 +108,11 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 sslContextFactory.setExcludeProtocols("TLSv1.3");
             });
         }
-        final ResteasyClientBuilder builder = new JettyResteasyClientBuilder(clientName, config,
-                featureGroups.contains(StandardFeatureGroup.PLATFORM_INTERNAL) ? provider.get() : null, factoryCustomizers);
-        configureThreadPool(clientName, builder, config);
-        return builder;
+        final TlsProvider tlsProvider = featureGroups.contains(StandardFeatureGroup.PLATFORM_INTERNAL) ? provider.get() : null;
+        if (tlsProvider != null) {
+            addProviderCustomizer(tlsProvider, factoryCustomizers);
+        }
+        return factoryCustomizers;
     }
 
     @Override
@@ -85,20 +120,37 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         return ProxyBuilder.builder(proxyType, baseTarget).build();
     }
 
-    private void configureThreadPool(String clientName, ResteasyClientBuilder clientBuilder, JaxRsClientConfig config) {
+    private ExecutorService configureThreadPool(String clientName, JaxRsClientConfig config) {
         final int threads = CalculateThreads.calculateThreads(config.getExecutorThreads(), clientName);
         // We used a fixed thread pool here instead of a QueuedThreadPool (which would lead to lower memory)
         // Primarily because resteasy wants an ExecutorService not an Executor
         // Reexamine in future
         // See https://docs.google.com/spreadsheets/d/179upsXNJv_xMWYHZLY2e0456bxoBYbOHW7ORV3m-CxE/edit#gid=0
-        final ExecutorService executor = new ThreadPoolExecutor(threads, threads, 1, TimeUnit.HOURS,
+        return new ThreadPoolExecutor(threads, threads, 1, TimeUnit.HOURS,
                 requestQueue(config.getAsyncQueueLimit()),
                 new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
                 new ThreadPoolExecutor.AbortPolicy());
-        clientBuilder.executorService(executor);
     }
 
     private BlockingQueue<Runnable> requestQueue(int size) {
         return size == 0 ? new SynchronousQueue<>() : new ArrayBlockingQueue<>(size);
+    }
+
+    private void addProviderCustomizer(final TlsProvider tlsProvider, final List<Consumer<SslContextFactory>> factoryCustomizers) {
+        factoryCustomizers.add(sslContextFactory -> tlsProvider.init((ts, ks) -> {
+            try {
+                sslContextFactory.reload(f -> {
+                    f.setValidateCerts(true);
+                    f.setValidatePeerCerts(true);
+                    f.setKeyStorePassword("");
+                    f.setKeyStore(ks);
+                    f.setTrustStorePassword("");
+                    f.setTrustStore(ts);
+                });
+                LOG.debug("Rotated client {} TLS keys to {}", sslContextFactory, ks);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }));
     }
 }

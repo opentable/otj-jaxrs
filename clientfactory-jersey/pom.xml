@@ -16,16 +16,16 @@
   <parent>
     <artifactId>otj-jaxrs-parent</artifactId>
     <groupId>com.opentable.components</groupId>
-    <version>2.9.11-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>otj-jaxrs-clientfactory-jersey</artifactId>
 
   <properties>
-    <ot.jersey.version>2.10.1</ot.jersey.version>
+    <!-- one older than most recent to avoid jakarta gav fun -->
+    <ot.jersey.version>2.27</ot.jersey.version>
     <ot.build.allow-jersey>true</ot.build.allow-jersey>
-    <ot.apache.httpclient.version>4.3.2</ot.apache.httpclient.version>
   </properties>
 
   <dependencyManagement>
