@@ -213,7 +213,7 @@ public interface JaxRsClientConfig
      * Unsupported: resteasy-apache, jersey
      */
     @Value.Default
-    default boolean removeUserAgent() {
+    default boolean isRemoveUserAgent() {
         return false;
     }
 
