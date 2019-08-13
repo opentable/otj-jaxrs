@@ -85,14 +85,16 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         }
         httpClientCustomizers.add(hc -> hc.setRemoveIdleDestinations(true));
         if (config.getUserAgent() != null) {
-            final HttpField finalValue = config.removeUserAgent() ? null : new HttpField(HttpHeader.USER_AGENT, config.getUserAgent());
-            final String message = config.removeUserAgent()
+            final HttpField userAgentFieldValue = config.removeUserAgent()
+                    ? null :
+                    new HttpField(HttpHeader.USER_AGENT, config.getUserAgent());
+            final String userAgentChangedMessage = config.removeUserAgent()
                     ? "Removing User-Agent"
                     : String.format("Setting User-Agent for the HTTP client %s to %s", clientName, config.getUserAgent());
-                 httpClientCustomizers.add(hc -> {
-                    LOG.info(message);
-                    hc.setUserAgentField(finalValue);
-                });
+            httpClientCustomizers.add(hc -> {
+                LOG.info(userAgentChangedMessage);
+                hc.setUserAgentField(userAgentFieldValue);
+            });
         }
         if (config.isCookieHandlingEnabled()) {
             httpClientCustomizers.add(hc -> hc.setCookieStore(new HttpCookieStore()));
