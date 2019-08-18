@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.concurrent.ExecutorService;
@@ -40,7 +39,7 @@ public class ResteasyClientBuilderTest {
 
     @Test(timeout=10_000)
     public void testNoRedirect() throws Exception {
-        final HttpServer server = HttpServer.create(new InetSocketAddress(InetAddress.getLocalHost(), 0), 1);
+        final HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 1);
         try {
             server.createContext("/", new RedirectHandler());
             server.start();
