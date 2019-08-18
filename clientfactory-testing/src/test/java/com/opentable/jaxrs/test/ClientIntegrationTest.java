@@ -56,7 +56,7 @@ public class ClientIntegrationTest {
                 return 10;
             }
         });
-        address = new InetSocketAddress(SERVER_PORT);
+        address = new InetSocketAddress("127.0.0.1", SERVER_PORT);
         LOG.debug("creating server at address {}", address);
         httpServer = HttpServer.create(address, 0);
         final byte[] response = HELLO.getBytes();
