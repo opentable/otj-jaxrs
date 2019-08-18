@@ -17,7 +17,7 @@
   <parent>
     <artifactId>otj-jaxrs-parent</artifactId>
     <groupId>com.opentable.components</groupId>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.0.1</version>
   </parent>
 
   <artifactId>otj-jaxrs-clientfactory-resteasy</artifactId>
