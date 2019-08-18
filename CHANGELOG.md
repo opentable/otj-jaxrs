@@ -1,5 +1,12 @@
 otj-jaxrs changelog
 ===================
+
+3.0.1
+-----
+* add isRemoveUserAgent (default=false). This lets you to clear
+the User Agent field entirely. Motivation? If you are setting it
+on your own, this avoids a double set issue.
+
 3.0.0
 ----
 * Resteasy 4.0.0 final (non beta) out at last.

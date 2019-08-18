@@ -204,4 +204,17 @@ public interface JaxRsClientConfig
         return "OT-HTTP-Client"; // Choosing a default that leaks minimal information for security reasons
     }
 
+    /**
+     * Clear the User Agent. In these cases, the user agent specified above is ignored, and NO user agent is set.
+     * The motivation for this is to avoid double User-Agent headers which can occur if your own code must programmatically
+     * set the User-Agent field. (Jetty unfortunately fails to respect this)
+     * @return if the user agent is supposed to be cleared.
+     * Supported: resteasy
+     * Unsupported: resteasy-apache, jersey
+     */
+    @Value.Default
+    default boolean isRemoveUserAgent() {
+        return false;
+    }
+
 }
