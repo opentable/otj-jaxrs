@@ -104,7 +104,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         if (!config.isCookieHandlingEnabled()) {
             builder.disableCookieManagement();
         }
-        final MonitoredPoolingHttpClientConnectionManager connectionManager = new MonitoredPoolingHttpClientConnectionManager(clientName);
+        final MonitoredPoolingHttpClientConnectionManager connectionManager = new MonitoredPoolingHttpClientConnectionManager(clientName); // NOPMD
 
         connectionManager.setCheckoutWarnTime(Duration.ofMillis(config.getConnectionPoolWarnTime().toMillis()));
         connectionManager.setMaxTotal(config.getConnectionPoolSize());
@@ -146,11 +146,10 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     }
 
     private ExecutorService configureThreadPool(String clientName, JaxRsClientConfig config) {
-        final ExecutorService executor = new ThreadPoolExecutor(1, CalculateThreads.calculateThreads(config.getExecutorThreads(), clientName), 1, TimeUnit.HOURS,
+        return new ThreadPoolExecutor(1, CalculateThreads.calculateThreads(config.getExecutorThreads(), clientName), 1, TimeUnit.HOURS,
                 requestQueue(config.getAsyncQueueLimit()),
                 new ThreadFactoryBuilder().setNameFormat(clientName + "-worker-%s").build(),
                 new ThreadPoolExecutor.AbortPolicy());
-        return executor;
        // clientBuilder.asyncExecutor(executor, true);
     }
 

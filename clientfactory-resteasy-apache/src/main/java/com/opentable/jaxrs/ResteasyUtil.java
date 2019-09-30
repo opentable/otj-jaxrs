@@ -18,7 +18,7 @@ public final class ResteasyUtil {
      * @see http://mail-archives.apache.org/mod_mbox/hc-httpclient-users/201608.mbox/%3CD93DAC13-ABE5-4E3C-9429-82D3C94838C9%40gmail.com%3E
      */
     public static void abortResponse(Response r) {
-        final ClientResponse clientResponse = (ClientResponse)r;
+        final ClientResponse clientResponse = (ClientResponse)r; //NOPMD
         ((HttpRequestBase)(clientResponse.getProperties().get(JaxRsClientProperties.ACTUAL_REQUEST))).abort();
     }
 }

@@ -57,7 +57,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         if (config.isDisableTLS13()) {
             LOG.warn(("This implementation (jersey) doesn't support disabling TLSv13, and that could cause issues on Java 11!"));
         }
-        final EvictablePoolingHttpClientConnectionManager connectionManager = new EvictablePoolingHttpClientConnectionManager();
+        final EvictablePoolingHttpClientConnectionManager connectionManager = new EvictablePoolingHttpClientConnectionManager(); //NOPMD
         connectionManager.setMaxTotal(config.getConnectionPoolSize());
         connectionManager.setDefaultMaxPerRoute(config.getHttpClientDefaultMaxPerRoute());
 
