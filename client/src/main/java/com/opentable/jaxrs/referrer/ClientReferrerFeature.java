@@ -6,7 +6,9 @@ import javax.ws.rs.core.FeatureContext;
 
 import org.springframework.context.annotation.Import;
 
-@Import(ClientReferrerFilter.class)
+import com.opentable.service.ReferringInformation;
+
+@Import({ClientReferrerFilter.class, ReferringInformation.class})
 public class ClientReferrerFeature implements Feature {
     private final ClientReferrerFilter filter;
 

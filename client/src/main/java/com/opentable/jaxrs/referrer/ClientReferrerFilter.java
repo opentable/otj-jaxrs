@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opentable.httpheaders.OTHeaders;
-import com.opentable.service.AppInfo;
+import com.opentable.service.ReferringInformation;
 import com.opentable.service.ServiceInfo;
 
 @Provider
@@ -27,17 +27,20 @@ public class ClientReferrerFilter implements ClientRequestFilter {
     private final Map<String, List<Object>> referrerHeaders;
 
     @Inject
-    public ClientReferrerFilter(final Optional<AppInfo> appInfo, final Optional<ServiceInfo> serviceInfo) {
+    public ClientReferrerFilter(final ReferringInformation referringInformation, final Optional<ServiceInfo> serviceInfo) {
         this(
-                appInfo.map(AppInfo::getTaskHost).orElse(null),
+                referringInformation,
                 serviceInfo.map(ServiceInfo::getName).orElse(null)
         );
     }
 
-    public ClientReferrerFilter(@Nullable final String host, @Nullable final String serviceName) {
+    public ClientReferrerFilter(final ReferringInformation referringInformation, @Nullable final String serviceName) {
         final ImmutableMap.Builder<String, List<Object>> builder = ImmutableMap.builder();
-        if (host != null) {
-            builder.put(OTHeaders.REFERRING_HOST, ImmutableList.of(host));
+        if (referringInformation.getReferrringHost() != null) {
+            builder.put(OTHeaders.REFERRING_HOST, ImmutableList.of(referringInformation.getReferrringHost()));
+        }
+        if (referringInformation.getReferringEnvironment() != null) {
+            builder.put(OTHeaders.REFERRING_ENV, ImmutableList.of(referringInformation.getReferringEnvironment()));
         }
         if (serviceName != null) {
             builder.put(OTHeaders.REFERRING_SERVICE, ImmutableList.of(serviceName));
