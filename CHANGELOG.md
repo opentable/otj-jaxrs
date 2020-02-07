@@ -1,6 +1,10 @@
 otj-jaxrs changelog
 ===================
 
+3.0.2
+-----
+* OT-ReferringEnv
+
 3.0.1
 -----
 * add isRemoveUserAgent (default=false). This lets you to clear
