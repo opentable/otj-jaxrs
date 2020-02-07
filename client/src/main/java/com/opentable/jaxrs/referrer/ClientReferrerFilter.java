@@ -36,8 +36,8 @@ public class ClientReferrerFilter implements ClientRequestFilter {
 
     public ClientReferrerFilter(final ReferringInformation referringInformation, @Nullable final String serviceName) {
         final ImmutableMap.Builder<String, List<Object>> builder = ImmutableMap.builder();
-        if (referringInformation.getReferrringHost() != null) {
-            builder.put(OTHeaders.REFERRING_HOST, ImmutableList.of(referringInformation.getReferrringHost()));
+        if (referringInformation.getReferringHost() != null) {
+            builder.put(OTHeaders.REFERRING_HOST, ImmutableList.of(referringInformation.getReferringHost()));
         }
         if (referringInformation.getReferringEnvironment() != null) {
             builder.put(OTHeaders.REFERRING_ENV, ImmutableList.of(referringInformation.getReferringEnvironment()));
