@@ -19,7 +19,7 @@
   <parent>
     <groupId>com.opentable</groupId>
     <artifactId>otj-parent-spring</artifactId>
-    <version>243</version>
+    <version>9999-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -37,7 +37,7 @@
 
   <groupId>com.opentable.components</groupId>
   <artifactId>otj-jaxrs-parent</artifactId>
-  <version>3.0.3-SNAPSHOT</version>
+  <version>5.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
