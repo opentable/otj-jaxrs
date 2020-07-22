@@ -1,6 +1,10 @@
 otj-jaxrs changelog
 ===================
 
+5.2.0
+-----
+* Spring 5.2 recompile\
+
 3.0.2
 -----
 * OT-ReferringEnv
