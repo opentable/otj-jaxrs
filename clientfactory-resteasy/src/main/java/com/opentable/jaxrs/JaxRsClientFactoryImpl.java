@@ -31,8 +31,11 @@ import javax.ws.rs.client.WebTarget;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.client.ConnectionPool;
 import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.HttpDestination;
 import org.eclipse.jetty.client.HttpProxy;
+import org.eclipse.jetty.client.RoundRobinConnectionPool;
 import org.eclipse.jetty.http.HttpField;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.util.HttpCookieStore;
@@ -102,7 +105,16 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
         if(StringUtils.isNotBlank(config.getProxyHost()) && config.getProxyPort() != 0) {
             httpClientCustomizers.add(hc -> hc.getProxyConfiguration().getProxies().add(new HttpProxy(config.getProxyHost(), config.getProxyPort())));
         }
-        httpClientCustomizers.add(hc -> hc.setMaxConnectionsPerDestination(Math.max(64, config.getHttpClientDefaultMaxPerRoute())));
+        final int maxPerDestination = Math.max(64, config.getHttpClientDefaultMaxPerRoute());
+        httpClientCustomizers.add(hc -> hc.setMaxConnectionsPerDestination(maxPerDestination));
+
+        if (config.isTuneConnectionPool()) {
+            httpClientCustomizers.add(hc -> hc.getTransport().setConnectionPoolFactory(httpDestination -> {
+                RoundRobinConnectionPool c =  new RoundRobinConnectionPool(httpDestination, maxPerDestination, httpDestination);
+                c.setMaxUsageCount(config.getMexUsages());
+                return c;
+            }));
+        }
         return httpClientCustomizers;
     }
 

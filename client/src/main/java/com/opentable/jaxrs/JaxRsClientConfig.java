@@ -50,6 +50,11 @@ public interface JaxRsClientConfig
         return Duration.ofSeconds(5);
     }
 
+
+    @Value.Default
+    default boolean isTuneConnectionPool() { return true; }
+    @Value.Default
+    default int getMexUsages() { return 5; }
     /**
      * Monitor connection pool for failure to acquire leases.
      *
