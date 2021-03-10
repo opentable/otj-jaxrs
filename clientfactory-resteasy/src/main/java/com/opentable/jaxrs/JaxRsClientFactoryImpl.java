@@ -78,7 +78,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 // Deviation 1: JAXRS uses this formula. Might as well keep it
                 .maxConnectionsPerHost(Math.max(64, config.getHttpClientDefaultMaxPerRoute()))
                 .followRedirect(false)
-                .isDisableCompression(false)
+                .isDisableCompression(config.getDisableCompression())
                 .isDisableTLS13(config.isDisableTLS13())
                 .isLimitConnectionPool(config.isTuneConnectionPool())
                 .maxUsages(config.getMexUsages())

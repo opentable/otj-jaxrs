@@ -80,6 +80,17 @@ public interface JaxRsClientConfig
         return 40;
     }
 
+
+    /**
+     * Disable Jetty HttpClient gzip compression and decompression.
+     * Content decoding confuses clients so we default to true.
+     * ot.webclient.(name).disableCompression
+     * @return boolean
+     */
+    default boolean getDisableCompression() {
+        return false;
+    }
+
     /**
      * Maximum number of simultaneous asynchronous requests
      * in-flight awaiting resource (e.g. connection) availability
