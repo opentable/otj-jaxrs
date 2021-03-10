@@ -89,7 +89,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 .threadsPerPool(config.getExecutorThreads())
                 .executor(configureThreadPool(clientName, config))
                 .build();
-        // What to do about threads per pool
+
 
 
         final List<Consumer<SslContextFactory>> sslFactoryContextCustomizers = getSSlFactoryContextCustomizers(config, featureGroups);
@@ -112,12 +112,6 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
 
     private List<Consumer<SslContextFactory>> getSSlFactoryContextCustomizers(final JaxRsClientConfig config, final Collection<JaxRsFeatureGroup> featureGroups) {
         final List<Consumer<SslContextFactory>> factoryCustomizers = new ArrayList<>();
-        if (config.isDisableTLS13()) {
-            factoryCustomizers.add(sslContextFactory ->  {
-                LOG.info("Disabling TLS 1.3");
-                sslContextFactory.setExcludeProtocols("TLSv1.3");
-            });
-        }
         final TlsProvider tlsProvider = featureGroups.contains(StandardFeatureGroup.PLATFORM_INTERNAL) ? provider.get() : null;
         if (tlsProvider != null) {
             addProviderCustomizer(tlsProvider, factoryCustomizers);
@@ -131,7 +125,8 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     }
 
     private ExecutorService configureThreadPool(String clientName, JaxRsClientConfig config) {
-        final int threads = new com.opentable.http.common.CalculateThreads().calculateThreads(config.getExecutorThreads(), clientName);
+        final int threads = new com.opentable.http.common.
+                CalculateThreads().calculateThreads(config.getExecutorThreads(), clientName);
         // We used a fixed thread pool here instead of a QueuedThreadPool (which would lead to lower memory)
         // Primarily because resteasy wants an ExecutorService not an Executor
         // Reexamine in future
