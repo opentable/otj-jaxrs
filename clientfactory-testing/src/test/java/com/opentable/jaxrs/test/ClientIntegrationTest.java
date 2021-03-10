@@ -73,7 +73,7 @@ public class ClientIntegrationTest {
         httpServer.stop(0);
     }
 
-    @Test
+    @Test(timeout = 30000)
     public void closedConnectionPoolNotExhaused() throws InterruptedException {
         final Client client = factory.newClient("test", StandardFeatureGroup.PUBLIC);
 
@@ -87,7 +87,7 @@ public class ClientIntegrationTest {
         }
     }
 
-    @Test
+    @Test(timeout = 30000)
     public void entityReadClosesToo() throws InterruptedException {
         final Client client = factory.newClient("test", StandardFeatureGroup.PUBLIC);
 
