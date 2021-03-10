@@ -90,6 +90,7 @@ public class JettyResteasyClientBuilder extends ClientBuilder {
 
     private HttpClient createHttpClient(HttpClientCommonConfiguration httpClientCommonConfiguration, List<Consumer<SslContextFactory>> sslContextFactoryCustomizers) {
         final HttpClient hc = httpClientBuilder.build(httpClientCommonConfiguration, httpClientCommonConfiguration.getThreadPoolName());
+        // These may be dynamically reconfigured in RestEasyBuilder, so we must always reapply.
         createSslFactory(hc.getSslContextFactory(), sslContextFactoryCustomizers);
         hc.setExecutor(asyncExecutor);
         hc.setConnectTimeout(connectTimeout.toMillis());

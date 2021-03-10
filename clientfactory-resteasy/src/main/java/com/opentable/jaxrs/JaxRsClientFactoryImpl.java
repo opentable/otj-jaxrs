@@ -16,6 +16,7 @@ package com.opentable.jaxrs;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -30,10 +31,6 @@ import javax.ws.rs.client.WebTarget;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.client.HttpProxy;
-import org.eclipse.jetty.util.HttpCookieStore;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
 import org.slf4j.Logger;
@@ -78,16 +75,21 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 .idleTimeout(config.getIdleTimeout())
                 .isRemoveUserAgent(config.isRemoveUserAgent())
                 .userAgent(config.getUserAgent())
+                // Deviation 1: JAXRS uses this formula. Might as well keep it
                 .maxConnectionsPerHost(Math.max(64, config.getHttpClientDefaultMaxPerRoute()))
                 .followRedirect(false)
-                .httpClientCustomizers(getHttpClientCustomizers(config))
                 .isDisableCompression(false)
                 .isDisableTLS13(config.isDisableTLS13())
                 .isLimitConnectionPool(config.isTuneConnectionPool())
                 .maxUsages(config.getMexUsages())
                 .threadPoolName(clientName)
                 .threadsPerPool(config.getExecutorThreads())
+                 // Deviation 2: For complicated reasons (RestEasy api) we can't use the default QTP.
                 .executor(configureThreadPool(clientName, config))
+                 // none of the others wire this up
+                .proxyHost(Optional.ofNullable(config.getProxyHost()))
+                .proxyPort(config.getProxyPort())
+                .isCookieHandlingEnabled(config.isCookieHandlingEnabled())
                 .build();
 
 
@@ -98,18 +100,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 .executorService((ExecutorService) httpClientCommonConfiguration.getExecutor().get());
     }
 
-    private List<Consumer<HttpClient>> getHttpClientCustomizers(final JaxRsClientConfig config) {
-        final List<Consumer<HttpClient>> httpClientCustomizers = new ArrayList<>();
-
-        if (config.isCookieHandlingEnabled()) {
-            httpClientCustomizers.add(hc -> hc.setCookieStore(new HttpCookieStore()));
-        }
-        if(StringUtils.isNotBlank(config.getProxyHost()) && config.getProxyPort() != 0) {
-            httpClientCustomizers.add(hc -> hc.getProxyConfiguration().getProxies().add(new HttpProxy(config.getProxyHost(), config.getProxyPort())));
-        }
-        return httpClientCustomizers;
-    }
-
+    // Note: Most of this is probably obsolete and related to Steven setting up rotating SSL certs.
     private List<Consumer<SslContextFactory>> getSSlFactoryContextCustomizers(final JaxRsClientConfig config, final Collection<JaxRsFeatureGroup> featureGroups) {
         final List<Consumer<SslContextFactory>> factoryCustomizers = new ArrayList<>();
         final TlsProvider tlsProvider = featureGroups.contains(StandardFeatureGroup.PLATFORM_INTERNAL) ? provider.get() : null;
