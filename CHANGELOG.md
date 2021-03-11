@@ -1,9 +1,17 @@
 otj-jaxrs changelog
 ===================
 
+5.2.1
+-----
+* Use common `otj-http-common` library, thus sharing 90% of the
+  HttpClient building code with other clients.
+* add connection pool tweak, active at all times, primarily for PL3.
+To disable adjust `isTuneConnectionPool()`
+* deprecated all of otj-jaxrs-exceptions
+
 5.2.0
 -----
-* Spring 5.2 recompile\
+* Spring 5.2 recompile
 
 3.0.2
 -----

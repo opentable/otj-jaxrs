@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
  * Rudely consumes the http response body and never lets the actual response handler do anything.
  */
 @Provider
+@Deprecated
 class ExceptionClientResponseFilter implements ClientResponseFilter
 {
     private static final Logger LOG = LoggerFactory.getLogger(ExceptionClientResponseFilter.class);

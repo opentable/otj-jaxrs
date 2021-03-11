@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
+@Deprecated
 class ExceptionClientResponseFeature implements Feature
 {
     private final ExceptionClientResponseFilter filter;

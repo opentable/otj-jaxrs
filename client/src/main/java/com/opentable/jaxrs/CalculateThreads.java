@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
  * as cores grow.
  * https://docs.google.com/spreadsheets/d/179upsXNJv_xMWYHZLY2e0456bxoBYbOHW7ORV3m-CxE/edit#gid=288475975
  */
+// Use otj-http-common instead. This is maintained only for the mostly dead jersey and apache versions
+@Deprecated
 public final class CalculateThreads {
     private static final Logger LOG = LoggerFactory.getLogger(CalculateThreads.class);
     private static final int BASE_OPTIMAL_THREADS = 10;
@@ -26,6 +28,7 @@ public final class CalculateThreads {
      * @param name client pool name. Used for logging.
      * @return int actual threads to use
      */
+    @Deprecated
     public static int calculateThreads(final int executorThreads, final String name) {
         // For current standard 8 core machines this is 10 regardless.
         // On Java 10, you might get less than 8 core reported, but it will still size as if it's 8

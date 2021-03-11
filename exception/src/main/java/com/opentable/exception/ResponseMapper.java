@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 
 @Provider
 @Singleton
+@Deprecated
 class ResponseMapper implements ExceptionMapper<OTApiException>
 {
     @Override

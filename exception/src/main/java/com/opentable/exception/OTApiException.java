@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableMap;
  * API exception base class which has automatic transparency through
  * Jersey and HttpClient.  Attempts to remain mostly human-consumable.
  */
+@Deprecated
 public abstract class OTApiException extends ResponseProcessingException
 {
     private static final long serialVersionUID = 1L;
