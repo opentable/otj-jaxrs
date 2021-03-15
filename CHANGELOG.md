@@ -6,7 +6,7 @@ otj-jaxrs changelog
 * Use common `otj-http-common` library, thus sharing 90% of the
   HttpClient building code with other clients.
 * add connection pool tweak, active at all times, primarily for PL3.
-To disable adjust `isTuneConnectionPool()`
+To disable adjust `isLimitConnectionPool()`
 * deprecated all of otj-jaxrs-exceptions
 
 5.2.0

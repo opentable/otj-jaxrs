@@ -80,7 +80,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 .followRedirect(false)
                 .isDisableCompression(config.getDisableCompression())
                 .isDisableTLS13(config.isDisableTLS13())
-                .isLimitConnectionPool(config.isTuneConnectionPool())
+                .isLimitConnectionPool(config.isLimitConnectionPool())
                 .maxUsages(config.getMexUsages())
                 .threadPoolName(clientName)
                 .threadsPerPool(config.getExecutorThreads())

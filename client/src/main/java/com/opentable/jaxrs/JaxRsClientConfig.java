@@ -52,7 +52,7 @@ public interface JaxRsClientConfig
 
 
     @Value.Default
-    default boolean isTuneConnectionPool() { return true; }
+    default boolean isLimitConnectionPool() { return true; }
     @Value.Default
     default int getMexUsages() { return 5; }
     /**
