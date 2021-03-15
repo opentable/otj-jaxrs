@@ -54,7 +54,7 @@ public interface JaxRsClientConfig
     @Value.Default
     default boolean isLimitConnectionPool() { return true; }
     @Value.Default
-    default int getMexUsages() { return 5; }
+    default int getMaxUsages() { return 5; }
     /**
      * Monitor connection pool for failure to acquire leases.
      *
