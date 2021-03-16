@@ -74,6 +74,7 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 .connectTimeout(config.getConnectTimeout())
                 .idleTimeout(config.getIdleTimeout())
                 .isRemoveUserAgent(config.isRemoveUserAgent())
+                .isReplaceUserAgent(config.isReplaceUserAgent())
                 .userAgent(config.getUserAgent())
                 // Deviation 1: JAXRS uses this formula. Might as well keep it
                 .maxConnectionsPerHost(Math.max(64, config.getHttpClientDefaultMaxPerRoute()))
@@ -81,12 +82,12 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
                 .isDisableCompression(config.getDisableCompression())
                 .isDisableTLS13(config.isDisableTLS13())
                 .isLimitConnectionPool(config.isLimitConnectionPool())
-                .maxUsages(config.getMexUsages())
+                .maxUsages(config.getMaxUsages())
                 .threadPoolName(clientName)
                 .threadsPerPool(config.getExecutorThreads())
                  // Deviation 2: For complicated reasons (RestEasy api) we can't use the default QTP.
                 .executor(configureThreadPool(clientName, config))
-                 // none of the others wire this up
+                 // none of the others wire these up...
                 .proxyHost(Optional.ofNullable(config.getProxyHost()))
                 .proxyPort(config.getProxyPort())
                 .isCookieHandlingEnabled(config.isCookieHandlingEnabled())

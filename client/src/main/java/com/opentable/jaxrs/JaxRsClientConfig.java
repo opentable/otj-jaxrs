@@ -221,13 +221,27 @@ public interface JaxRsClientConfig
     }
 
     /**
+     * May replace the user agent with value of getUserAgent
+     * depending on setting of isRemoveUserAgent.
+     *      isReplaceUserAgent      isRemoveUserAgent Outcome
+     *      true or false           true              User Agent is cleared
+     *      true                    false             User Agent is set to value of getUserAgent
+     *      false                   false             User Agent is set to Jetty's default user agent.
+     */
+    @Value.Default
+    default boolean isReplaceUserAgent() {
+        return true;
+    }
+
+    /**
      * Clear the User Agent. In these cases, the user agent specified above is ignored, and NO user agent is set.
      * The motivation for this is to avoid double User-Agent headers which can occur if your own code must programmatically
      * set the User-Agent field. (Jetty unfortunately fails to respect this)
-     * @return if the user agent is supposed to be cleared.
-     * Supported: resteasy
-     * Unsupported: resteasy-apache, jersey
-     */
+     *      isReplaceUserAgent      isRemoveUserAgent Outcome
+     *      true or false           true              User Agent is cleared
+     *      true                    false             User Agent is set to value of getUserAgent
+     *      false                   false             User Agent is set to Jetty's default user agent.
+     * @return if the user agent is supposed to be cleared.*/
     @Value.Default
     default boolean isRemoveUserAgent() {
         return false;
