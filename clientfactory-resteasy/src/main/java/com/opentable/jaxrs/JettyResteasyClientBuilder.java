@@ -61,7 +61,7 @@ public class JettyResteasyClientBuilder extends ClientBuilder {
         this.httpClientCommonConfiguration = httpClientCommonConfiguration;
         this.sslContextFactoryCustomizers = sslContextFactoryCustomizers;
         this.cleanupExecutor = cleanupExecutor;
-        this.httpClientBuilder = new HttpClientBuilder();
+        this.httpClientBuilder = HttpClientBuilder.getInstance();
     }
 
     @Override
