@@ -7,7 +7,10 @@ otj-jaxrs changelog
   HttpClient building code with other clients.
 * add connection pool tweak, active at all times, primarily for PL3.
 To disable adjust `isLimitConnectionPool()`
-* deprecated all of otj-jaxrs-exceptions
+* deprecated all of `otj-jaxrs-exception` library. All of JAXRS is going
+away but this library in particular has serious design flaws. Fortunately,
+all remaining services using this are being retired.  
+  
 
 5.2.0
 -----
