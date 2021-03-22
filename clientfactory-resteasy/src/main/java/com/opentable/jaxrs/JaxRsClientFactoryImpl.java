@@ -16,6 +16,7 @@ package com.opentable.jaxrs;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -30,18 +31,15 @@ import javax.ws.rs.client.WebTarget;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.client.HttpProxy;
-import org.eclipse.jetty.http.HttpField;
-import org.eclipse.jetty.http.HttpHeader;
-import org.eclipse.jetty.util.HttpCookieStore;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.client.jaxrs.ProxyBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
+
+import com.opentable.http.common.HttpClientCommonConfiguration;
+import com.opentable.http.common.ImmutableHttpClientCommonConfiguration;
 
 /**
  * The RESTEasy implementation of ClientFactory. Hides RESTEasy specific stuff
@@ -71,49 +69,41 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
 
     @Override
     public ClientBuilder newBuilder(String clientName, JaxRsClientConfig config, Collection<JaxRsFeatureGroup> featureGroups) {
+        HttpClientCommonConfiguration httpClientCommonConfiguration =
+                ImmutableHttpClientCommonConfiguration.builder()
+                .connectTimeout(config.getConnectTimeout())
+                .idleTimeout(config.getIdleTimeout())
+                .isRemoveUserAgent(config.isRemoveUserAgent())
+                .isReplaceUserAgent(config.isReplaceUserAgent())
+                .userAgent(config.getUserAgent())
+                // Deviation 1: JAXRS uses this formula. Might as well keep it
+                .maxConnectionsPerHost(Math.max(64, config.getHttpClientDefaultMaxPerRoute()))
+                .followRedirect(false)
+                .isDisableCompression(config.getDisableCompression())
+                .isDisableTLS13(config.isDisableTLS13())
+                .isLimitConnectionPool(config.isLimitConnectionPool())
+                .maxUsages(config.getMaxUsages())
+                .threadPoolName(clientName)
+                .threadsPerPool(config.getExecutorThreads())
+                 // Deviation 2: For complicated reasons (RestEasy api) we can't use the default QTP.
+                .executor(configureThreadPool(clientName, config))
+                 // none of the others wire these up...
+                .proxyHost(Optional.ofNullable(config.getProxyHost()))
+                .proxyPort(config.getProxyPort())
+                .isCookieHandlingEnabled(config.isCookieHandlingEnabled())
+                .build();
+
+
+
         final List<Consumer<SslContextFactory>> sslFactoryContextCustomizers = getSSlFactoryContextCustomizers(config, featureGroups);
-        final List<Consumer<HttpClient>> httpClientCustomizers = getHttpClientCustomizers(clientName, config);
-        return new JettyResteasyClientBuilder(true, httpClientCustomizers, sslFactoryContextCustomizers)
+        return new JettyResteasyClientBuilder(true, httpClientCommonConfiguration, sslFactoryContextCustomizers)
                 .connectTimeout(config.getConnectTimeout().toMillis(), TimeUnit.MILLISECONDS)
-                .executorService(configureThreadPool(clientName, config));
+                .executorService((ExecutorService) httpClientCommonConfiguration.getExecutor().get());
     }
 
-    private List<Consumer<HttpClient>> getHttpClientCustomizers(final String clientName, final JaxRsClientConfig config) {
-        final List<Consumer<HttpClient>> httpClientCustomizers = new ArrayList<>();
-        if (config.getIdleTimeout() != null) {
-            httpClientCustomizers.add(hc -> hc.setIdleTimeout(config.getIdleTimeout().toMillis()));
-        }
-        httpClientCustomizers.add(hc -> hc.setRemoveIdleDestinations(true));
-        if (config.getUserAgent() != null) {
-            final HttpField userAgentFieldValue = config.isRemoveUserAgent()
-                    ? null :
-                    new HttpField(HttpHeader.USER_AGENT, config.getUserAgent());
-            final String userAgentChangedMessage = config.isRemoveUserAgent()
-                    ? "Removing User-Agent"
-                    : String.format("Setting User-Agent for the HTTP client %s to %s", clientName, config.getUserAgent());
-            httpClientCustomizers.add(hc -> {
-                LOG.info(userAgentChangedMessage);
-                hc.setUserAgentField(userAgentFieldValue);
-            });
-        }
-        if (config.isCookieHandlingEnabled()) {
-            httpClientCustomizers.add(hc -> hc.setCookieStore(new HttpCookieStore()));
-        }
-        if(StringUtils.isNotBlank(config.getProxyHost()) && config.getProxyPort() != 0) {
-            httpClientCustomizers.add(hc -> hc.getProxyConfiguration().getProxies().add(new HttpProxy(config.getProxyHost(), config.getProxyPort())));
-        }
-        httpClientCustomizers.add(hc -> hc.setMaxConnectionsPerDestination(Math.max(64, config.getHttpClientDefaultMaxPerRoute())));
-        return httpClientCustomizers;
-    }
-
+    // Note: Most of this is probably obsolete and related to Steven setting up rotating SSL certs.
     private List<Consumer<SslContextFactory>> getSSlFactoryContextCustomizers(final JaxRsClientConfig config, final Collection<JaxRsFeatureGroup> featureGroups) {
         final List<Consumer<SslContextFactory>> factoryCustomizers = new ArrayList<>();
-        if (config.isDisableTLS13()) {
-            factoryCustomizers.add(sslContextFactory ->  {
-                LOG.info("Disabling TLS 1.3");
-                sslContextFactory.setExcludeProtocols("TLSv1.3");
-            });
-        }
         final TlsProvider tlsProvider = featureGroups.contains(StandardFeatureGroup.PLATFORM_INTERNAL) ? provider.get() : null;
         if (tlsProvider != null) {
             addProviderCustomizer(tlsProvider, factoryCustomizers);
@@ -127,7 +117,8 @@ public class JaxRsClientFactoryImpl implements InternalClientFactory
     }
 
     private ExecutorService configureThreadPool(String clientName, JaxRsClientConfig config) {
-        final int threads = CalculateThreads.calculateThreads(config.getExecutorThreads(), clientName);
+        final int threads = new com.opentable.http.common.
+                CalculateThreads().calculateThreads(config.getExecutorThreads(), clientName);
         // We used a fixed thread pool here instead of a QueuedThreadPool (which would lead to lower memory)
         // Primarily because resteasy wants an ExecutorService not an Executor
         // Reexamine in future

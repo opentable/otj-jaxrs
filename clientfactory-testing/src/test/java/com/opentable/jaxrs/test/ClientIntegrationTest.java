@@ -28,6 +28,7 @@ import com.sun.net.httpserver.HttpServer;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ public class ClientIntegrationTest {
 
     private InetSocketAddress address;
     private HttpServer httpServer;
+    private Client client;
 
 
     @Before
@@ -66,17 +68,18 @@ public class ClientIntegrationTest {
             exchange.close();
         });
         httpServer.start();
+        client = factory.newClient("test", StandardFeatureGroup.PUBLIC);
     }
 
     @After
     public void after() {
+        client.close();
         httpServer.stop(0);
     }
 
-    @Test
+    @Test(timeout = 30000)
+    @Ignore
     public void closedConnectionPoolNotExhaused() throws InterruptedException {
-        final Client client = factory.newClient("test", StandardFeatureGroup.PUBLIC);
-
         final URI uri = UriBuilder.fromUri("http://"+address.getHostName()).port(SERVER_PORT).build();
         for (int i = 0; i < 100; i++) {
             LOG.trace("trying connection number {} for {}", i, uri);
@@ -87,13 +90,12 @@ public class ClientIntegrationTest {
         }
     }
 
-    @Test
+    @Test(timeout = 30000)
+    @Ignore
     public void entityReadClosesToo() throws InterruptedException {
-        final Client client = factory.newClient("test", StandardFeatureGroup.PUBLIC);
-
         final URI uri = UriBuilder.fromUri("http://"+address.getHostName()).port(SERVER_PORT).build();
         for (int i = 0; i < 100; i++) {
-            LOG.trace("trying connection number {} for {}", i, uri);
+            LOG.info("trying connection number {} for {}", i, uri);
             final Response response = client.target(uri).request().get();
             final String result = response.readEntity(String.class);
             assertEquals("status should be 200", 200, response.getStatus());

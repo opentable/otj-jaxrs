@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * We found a NessApiException, but there was no registered Reviver for it.
  */
+@Deprecated
 final class UnknownOTApiException extends OTApiException
 {
     protected UnknownOTApiException(Map<String, Object> fields)

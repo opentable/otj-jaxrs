@@ -1,9 +1,20 @@
 otj-jaxrs changelog
 ===================
 
+5.2.1
+-----
+* Use common `otj-http-common` library, thus sharing 90% of the
+  HttpClient building code with other clients.
+* add connection pool tweak, active at all times, primarily for PL3.
+To disable adjust `isLimitConnectionPool()`
+* deprecated all of `otj-jaxrs-exception` library. All of JAXRS is going
+away but this library in particular has serious design flaws. Fortunately,
+all remaining services using this are being retired.  
+  
+
 5.2.0
 -----
-* Spring 5.2 recompile\
+* Spring 5.2 recompile
 
 3.0.2
 -----

@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Take a http response and attempt to turn it back into a NessApiException subclass.
  */
+@Deprecated
 class ExceptionReviver implements Function<Map<String, Object>, OTApiException>
 {
     private final String type;

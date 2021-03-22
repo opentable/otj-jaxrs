@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response.StatusType;
 
 import com.google.common.collect.ImmutableList;
 
+@Deprecated
 class OTApiExceptionEntity
 {
     private final int statusCode;

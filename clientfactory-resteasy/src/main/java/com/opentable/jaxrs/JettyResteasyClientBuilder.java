@@ -11,6 +11,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import com.opentable.http.common.HttpClientBuilder;
+import com.opentable.http.common.HttpClientCommonConfiguration;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.client.Client;
@@ -51,19 +53,21 @@ public class JettyResteasyClientBuilder extends ClientBuilder {
 
     // extra customization beyond base ClientBuilder interface
     private final List<Consumer<SslContextFactory>> sslContextFactoryCustomizers;
-    private final List<Consumer<HttpClient>> httpClientCustomizers;
     private final  boolean cleanupExecutor;
+    private final HttpClientCommonConfiguration httpClientCommonConfiguration;
+    private final HttpClientBuilder httpClientBuilder;
 
-    public JettyResteasyClientBuilder(boolean cleanupExecutor, List<Consumer<HttpClient>> httpClientCustomizers, List<Consumer<SslContextFactory>> sslContextFactoryCustomizers) {
-        this.httpClientCustomizers = httpClientCustomizers;
+    public JettyResteasyClientBuilder(boolean cleanupExecutor, HttpClientCommonConfiguration httpClientCommonConfiguration, List<Consumer<SslContextFactory>> sslContextFactoryCustomizers) {
+        this.httpClientCommonConfiguration = httpClientCommonConfiguration;
         this.sslContextFactoryCustomizers = sslContextFactoryCustomizers;
         this.cleanupExecutor = cleanupExecutor;
+        this.httpClientBuilder = HttpClientBuilder.getInstance();
     }
 
     @Override
     public Client build() {
         final HttpClient client = createHttpClient(
-                httpClientCustomizers == null ? new ArrayList<>() : httpClientCustomizers,
+                httpClientCommonConfiguration,
                 sslContextFactoryCustomizers == null ? new ArrayList<>() : sslContextFactoryCustomizers
         );
         final ClientConfiguration cc = new ClientConfiguration(getProviderFactory());
@@ -71,8 +75,7 @@ public class JettyResteasyClientBuilder extends ClientBuilder {
         return new JettyRestEasyClient(clientHttpEngine, asyncExecutor, cleanupExecutor, scheduledExecutorService, cc);
     }
 
-    private SslContextFactory createSslFactory(List<Consumer<SslContextFactory>> factoryCustomizers) {
-        final SslContextFactory factory = new SslContextFactory.Client();
+    private SslContextFactory createSslFactory(SslContextFactory factory, List<Consumer<SslContextFactory>> factoryCustomizers) {
         factory.setHostnameVerifier(hostnameVerifier);
         Optional.ofNullable(clientKeyStore).ifPresent(ks-> {
             factory.setKeyStore(ks);
@@ -85,12 +88,13 @@ public class JettyResteasyClientBuilder extends ClientBuilder {
         return factory;
     }
 
-    private HttpClient createHttpClient(List<Consumer<HttpClient>> httpClientCustomizers, List<Consumer<SslContextFactory>> sslContextFactoryCustomizers) {
-        final HttpClient hc = new HttpClient(createSslFactory(sslContextFactoryCustomizers));
+    private HttpClient createHttpClient(HttpClientCommonConfiguration httpClientCommonConfiguration, List<Consumer<SslContextFactory>> sslContextFactoryCustomizers) {
+        final HttpClient hc = httpClientBuilder.build(httpClientCommonConfiguration, httpClientCommonConfiguration.getThreadPoolName());
+        // These may be dynamically reconfigured in RestEasyBuilder, so we must always reapply.
+        createSslFactory(hc.getSslContextFactory(), sslContextFactoryCustomizers);
         hc.setExecutor(asyncExecutor);
         hc.setConnectTimeout(connectTimeout.toMillis());
         hc.setAddressResolutionTimeout(connectTimeout.toMillis());
-        httpClientCustomizers.forEach(c -> c.accept(hc));
         return hc;
     }
 

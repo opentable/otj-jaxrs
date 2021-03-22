@@ -115,7 +115,7 @@ public class StreamedJsonResponseConverter
                 throw new IOException("Callback failure", e);
             }
         }
-        if (jp.nextValue() != JsonToken.VALUE_TRUE || !jp.getCurrentName().equals("success")) {
+        if (jp.nextValue() != JsonToken.VALUE_TRUE || !"success".equals(jp.getCurrentName())) {
             throw new IOException("Streamed receive did not terminate normally; inspect server logs for cause.");
         }
     }
